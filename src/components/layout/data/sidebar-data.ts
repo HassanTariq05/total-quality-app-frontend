@@ -21,6 +21,8 @@ import {
   AudioWaveform,
   Command,
   GalleryVerticalEnd,
+  Award,
+  BadgePlus,
 } from 'lucide-react'
 import { ClerkLogo } from '@/assets/clerk-logo'
 import { type SidebarData } from '../types'
@@ -77,6 +79,30 @@ export const sidebarData: SidebarData = {
           title: 'Users',
           url: '/users',
           icon: Users,
+        },
+
+        {
+          title: 'Accreditations',
+          icon: Award,
+          items: [
+            {
+              title: 'Accredidation 1',
+              url: '/accreditaion-1',
+            },
+            {
+              title: 'Accredidation 2',
+              url: '',
+            },
+            {
+              title: 'Accredidation 3',
+              url: '',
+            },
+            {
+              title: 'Add Accreditation',
+              url: '/accreditation/create',
+              icon: BadgePlus,
+            },
+          ],
         },
         {
           title: 'Secured by Clerk',

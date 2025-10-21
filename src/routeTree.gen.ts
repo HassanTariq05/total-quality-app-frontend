@@ -39,6 +39,8 @@ import { Route as AuthenticatedSettingsDisplayRouteImport } from './routes/_auth
 import { Route as AuthenticatedSettingsAppearanceRouteImport } from './routes/_authenticated/settings/appearance'
 import { Route as AuthenticatedSettingsAccountRouteImport } from './routes/_authenticated/settings/account'
 import { Route as AuthenticatedErrorsErrorRouteImport } from './routes/_authenticated/errors/$error'
+import { Route as AuthenticatedAccreditationAccreditationIdRouteImport } from './routes/_authenticated/accreditation/$accreditationId'
+import { Route as AuthenticatedAccreditationCreateRouteRouteImport } from './routes/_authenticated/accreditation/create/route'
 
 const ClerkRouteRoute = ClerkRouteRouteImport.update({
   id: '/clerk',
@@ -196,11 +198,22 @@ const AuthenticatedErrorsErrorRoute =
     path: '/errors/$error',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAccreditationAccreditationIdRoute =
+  AuthenticatedAccreditationAccreditationIdRouteImport.update({
+    id: '/accreditation/$accreditationId',
+    path: '/accreditation/$accreditationId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAccreditationCreateRouteRoute =
+  AuthenticatedAccreditationCreateRouteRouteImport.update({
+    id: '/accreditation/create',
+    path: '/accreditation/create',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/clerk': typeof ClerkAuthenticatedRouteRouteWithChildren
   '/settings': typeof AuthenticatedSettingsRouteRouteWithChildren
-  '/clerk/': typeof ClerkauthRouteRouteWithChildren
   '/forgot-password': typeof authForgotPasswordRoute
   '/otp': typeof authOtpRoute
   '/sign-in': typeof authSignInRoute
@@ -212,6 +225,8 @@ export interface FileRoutesByFullPath {
   '/500': typeof errors500Route
   '/503': typeof errors503Route
   '/': typeof AuthenticatedIndexRoute
+  '/accreditation/create': typeof AuthenticatedAccreditationCreateRouteRoute
+  '/accreditation/$accreditationId': typeof AuthenticatedAccreditationAccreditationIdRoute
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/settings/account': typeof AuthenticatedSettingsAccountRoute
   '/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
@@ -240,6 +255,8 @@ export interface FileRoutesByTo {
   '/500': typeof errors500Route
   '/503': typeof errors503Route
   '/': typeof AuthenticatedIndexRoute
+  '/accreditation/create': typeof AuthenticatedAccreditationCreateRouteRoute
+  '/accreditation/$accreditationId': typeof AuthenticatedAccreditationAccreditationIdRoute
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/settings/account': typeof AuthenticatedSettingsAccountRoute
   '/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
@@ -273,6 +290,8 @@ export interface FileRoutesById {
   '/(errors)/500': typeof errors500Route
   '/(errors)/503': typeof errors503Route
   '/_authenticated/': typeof AuthenticatedIndexRoute
+  '/_authenticated/accreditation/create': typeof AuthenticatedAccreditationCreateRouteRoute
+  '/_authenticated/accreditation/$accreditationId': typeof AuthenticatedAccreditationAccreditationIdRoute
   '/_authenticated/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/_authenticated/settings/account': typeof AuthenticatedSettingsAccountRoute
   '/_authenticated/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
@@ -293,7 +312,6 @@ export interface FileRouteTypes {
   fullPaths:
     | '/clerk'
     | '/settings'
-    | '/clerk/'
     | '/forgot-password'
     | '/otp'
     | '/sign-in'
@@ -305,6 +323,8 @@ export interface FileRouteTypes {
     | '/500'
     | '/503'
     | '/'
+    | '/accreditation/create'
+    | '/accreditation/$accreditationId'
     | '/errors/$error'
     | '/settings/account'
     | '/settings/appearance'
@@ -333,6 +353,8 @@ export interface FileRouteTypes {
     | '/500'
     | '/503'
     | '/'
+    | '/accreditation/create'
+    | '/accreditation/$accreditationId'
     | '/errors/$error'
     | '/settings/account'
     | '/settings/appearance'
@@ -365,6 +387,8 @@ export interface FileRouteTypes {
     | '/(errors)/500'
     | '/(errors)/503'
     | '/_authenticated/'
+    | '/_authenticated/accreditation/create'
+    | '/_authenticated/accreditation/$accreditationId'
     | '/_authenticated/errors/$error'
     | '/_authenticated/settings/account'
     | '/_authenticated/settings/appearance'
@@ -498,8 +522,8 @@ declare module '@tanstack/react-router' {
     }
     '/clerk/(auth)': {
       id: '/clerk/(auth)'
-      path: '/'
-      fullPath: '/clerk/'
+      path: ''
+      fullPath: '/clerk'
       preLoaderRoute: typeof ClerkauthRouteRouteImport
       parentRoute: typeof ClerkRouteRoute
     }
@@ -608,6 +632,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedErrorsErrorRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/accreditation/$accreditationId': {
+      id: '/_authenticated/accreditation/$accreditationId'
+      path: '/accreditation/$accreditationId'
+      fullPath: '/accreditation/$accreditationId'
+      preLoaderRoute: typeof AuthenticatedAccreditationAccreditationIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/accreditation/create': {
+      id: '/_authenticated/accreditation/create'
+      path: '/accreditation/create'
+      fullPath: '/accreditation/create'
+      preLoaderRoute: typeof AuthenticatedAccreditationCreateRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
@@ -637,6 +675,8 @@ const AuthenticatedSettingsRouteRouteWithChildren =
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedSettingsRouteRoute: typeof AuthenticatedSettingsRouteRouteWithChildren
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+  AuthenticatedAccreditationCreateRouteRoute: typeof AuthenticatedAccreditationCreateRouteRoute
+  AuthenticatedAccreditationAccreditationIdRoute: typeof AuthenticatedAccreditationAccreditationIdRoute
   AuthenticatedErrorsErrorRoute: typeof AuthenticatedErrorsErrorRoute
   AuthenticatedAppsIndexRoute: typeof AuthenticatedAppsIndexRoute
   AuthenticatedChatsIndexRoute: typeof AuthenticatedChatsIndexRoute
@@ -648,6 +688,10 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSettingsRouteRoute: AuthenticatedSettingsRouteRouteWithChildren,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
+  AuthenticatedAccreditationCreateRouteRoute:
+    AuthenticatedAccreditationCreateRouteRoute,
+  AuthenticatedAccreditationAccreditationIdRoute:
+    AuthenticatedAccreditationAccreditationIdRoute,
   AuthenticatedErrorsErrorRoute: AuthenticatedErrorsErrorRoute,
   AuthenticatedAppsIndexRoute: AuthenticatedAppsIndexRoute,
   AuthenticatedChatsIndexRoute: AuthenticatedChatsIndexRoute,

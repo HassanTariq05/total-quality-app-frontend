@@ -30,17 +30,17 @@ import {
   type NavCollapsible,
   type NavItem,
   type NavLink,
-  type NavGroup as NavGroupProps,
+  type NavGroup,
 } from './types'
 
-export function NavGroup({ title, items }: NavGroupProps) {
+export function NavGroup({ title, items }: any) {
   const { state, isMobile } = useSidebar()
   const href = useLocation({ select: (location) => location.href })
   return (
     <SidebarGroup>
       <SidebarGroupLabel>{title}</SidebarGroupLabel>
       <SidebarMenu>
-        {items.map((item) => {
+        {items.map((item: any) => {
           const key = `${item.title}-${item.url}`
 
           if (!item.items)

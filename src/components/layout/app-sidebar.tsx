@@ -1,4 +1,6 @@
+import { BadgePlus, LucideIcon } from 'lucide-react'
 import { useLayout } from '@/context/layout-provider'
+import { useAccreditations } from '@/hooks/use-accreditations'
 import {
   Sidebar,
   SidebarContent,
@@ -14,22 +16,54 @@ import { TeamSwitcher } from './team-switcher'
 
 export function AppSidebar() {
   const { collapsible, variant } = useLayout()
+  const { data: accreditations } = useAccreditations()
+
+  const accreditationItems: {
+    title: string
+    url: string
+    icon?: LucideIcon
+  }[] =
+    accreditations?.map((acc) => ({
+      title: acc.name,
+      url: `/accreditation/${acc.id}`,
+    })) || []
+
+  accreditationItems.push({
+    title: 'Add Accreditation',
+    url: '/accreditation/create',
+    icon: BadgePlus,
+  })
+
+  const dynamicSidebarData = {
+    ...sidebarData,
+    navGroups: sidebarData.navGroups.map((group) => {
+      if (group.title === 'General') {
+        return {
+          ...group,
+          items: group.items.map((item) => {
+            if (item.title === 'Accreditations') {
+              return { ...item, items: accreditationItems }
+            }
+            return item
+          }),
+        }
+      }
+      return group
+    }),
+  }
+
   return (
     <Sidebar collapsible={collapsible} variant={variant}>
       <SidebarHeader>
-        <TeamSwitcher teams={sidebarData.teams} />
-
-        {/* Replace <TeamSwitch /> with the following <AppTitle />
-         /* if you want to use the normal app title instead of TeamSwitch dropdown */}
-        {/* <AppTitle /> */}
+        <TeamSwitcher teams={dynamicSidebarData.teams} />
       </SidebarHeader>
       <SidebarContent>
-        {sidebarData.navGroups.map((props) => (
+        {dynamicSidebarData.navGroups.map((props) => (
           <NavGroup key={props.title} {...props} />
         ))}
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={sidebarData.user} />
+        <NavUser user={dynamicSidebarData.user} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

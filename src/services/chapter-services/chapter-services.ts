@@ -2,17 +2,24 @@ import apiClient from '@/lib/axios'
 
 export interface Chapter {
   id: string
-  name: string
+  title: string
   description?: string
-  status: 'Active' | 'Inactive' | 'Pending'
+  status: 'Active' | 'Inactive'
+  accreditationId: string
+  accreditation: {
+    id: string
+    name: string
+  }
 }
 
-export type CreateChapterPayload = Omit<Chapter, 'id'>
+export type CreateChapterPayload = Omit<Chapter, 'id' | 'accreditation'>
 export type UpdateChapterPayload = Partial<CreateChapterPayload>
 
 export const ChapterService = {
-  getAll: async (): Promise<Chapter[]> => {
-    const { data } = await apiClient.get('/chapters')
+  getAll: async (id: string): Promise<Chapter[]> => {
+    const { data } = await apiClient.get(
+      `/chapters/getAllByAccreditationId/${id}`
+    )
     return data
   },
 

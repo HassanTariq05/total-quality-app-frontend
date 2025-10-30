@@ -47,7 +47,7 @@ export function TasksPrimaryButtons() {
 
       {/* Create Button */}
       <Button className='space-x-1' onClick={() => setOpen('create')}>
-        <span>Create Department</span> <Plus size={18} />
+        <span>Create Chapter</span> <Plus size={18} />
       </Button>
     </div>
   )

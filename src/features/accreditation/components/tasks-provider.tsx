@@ -9,6 +9,7 @@ type TasksDialogType =
   | 'import'
   | 'edit'
   | 'delete'
+  | 'delete-chapter'
 
 type TasksContextType = {
   open: TasksDialogType | null

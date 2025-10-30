@@ -5,7 +5,7 @@ import { type Table } from '@tanstack/react-table'
 import { AlertTriangle } from 'lucide-react'
 import { toast } from 'sonner'
 import { sleep } from '@/lib/utils'
-import { useDeleteChapter } from '@/hooks/use-chapters'
+import { useDeleteForm } from '@/hooks/use-forms'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -19,14 +19,14 @@ type TaskMultiDeleteDialogProps<TData> = {
 
 const CONFIRM_WORD = 'DELETE'
 
-export function TasksMultiDeleteDialog<TData>({
+export function FormsMultiDeleteDialog<TData>({
   open,
   onOpenChange,
   table,
 }: TaskMultiDeleteDialogProps<TData>) {
   const [value, setValue] = useState('')
 
-  const deleteChapter = useDeleteChapter()
+  const deleteChapter = useDeleteForm()
 
   const selectedRows = table.getFilteredSelectedRowModel().rows
 

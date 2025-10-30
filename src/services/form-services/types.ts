@@ -1,7 +1,7 @@
-export interface Chapter {
+export interface Form {
   id: string
   number?: number
-  title: string
+  name: string
   status: 'Active' | 'Inactive'
   description?: string
 }

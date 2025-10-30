@@ -39,8 +39,10 @@ import { Route as AuthenticatedSettingsDisplayRouteImport } from './routes/_auth
 import { Route as AuthenticatedSettingsAppearanceRouteImport } from './routes/_authenticated/settings/appearance'
 import { Route as AuthenticatedSettingsAccountRouteImport } from './routes/_authenticated/settings/account'
 import { Route as AuthenticatedErrorsErrorRouteImport } from './routes/_authenticated/errors/$error'
-import { Route as AuthenticatedAccreditationAccreditationIdRouteImport } from './routes/_authenticated/accreditation/$accreditationId'
+import { Route as AuthenticatedFormFormIdRouteRouteImport } from './routes/_authenticated/form/$formId/route'
+import { Route as AuthenticatedChapterChapterIdRouteRouteImport } from './routes/_authenticated/chapter/$chapterId/route'
 import { Route as AuthenticatedAccreditationCreateRouteRouteImport } from './routes/_authenticated/accreditation/create/route'
+import { Route as AuthenticatedAccreditationAccreditationIdRouteRouteImport } from './routes/_authenticated/accreditation/$accreditationId/route'
 
 const ClerkRouteRoute = ClerkRouteRouteImport.update({
   id: '/clerk',
@@ -198,16 +200,28 @@ const AuthenticatedErrorsErrorRoute =
     path: '/errors/$error',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedAccreditationAccreditationIdRoute =
-  AuthenticatedAccreditationAccreditationIdRouteImport.update({
-    id: '/accreditation/$accreditationId',
-    path: '/accreditation/$accreditationId',
+const AuthenticatedFormFormIdRouteRoute =
+  AuthenticatedFormFormIdRouteRouteImport.update({
+    id: '/form/$formId',
+    path: '/form/$formId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedChapterChapterIdRouteRoute =
+  AuthenticatedChapterChapterIdRouteRouteImport.update({
+    id: '/chapter/$chapterId',
+    path: '/chapter/$chapterId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedAccreditationCreateRouteRoute =
   AuthenticatedAccreditationCreateRouteRouteImport.update({
     id: '/accreditation/create',
     path: '/accreditation/create',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAccreditationAccreditationIdRouteRoute =
+  AuthenticatedAccreditationAccreditationIdRouteRouteImport.update({
+    id: '/accreditation/$accreditationId',
+    path: '/accreditation/$accreditationId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 
@@ -225,8 +239,10 @@ export interface FileRoutesByFullPath {
   '/500': typeof errors500Route
   '/503': typeof errors503Route
   '/': typeof AuthenticatedIndexRoute
+  '/accreditation/$accreditationId': typeof AuthenticatedAccreditationAccreditationIdRouteRoute
   '/accreditation/create': typeof AuthenticatedAccreditationCreateRouteRoute
-  '/accreditation/$accreditationId': typeof AuthenticatedAccreditationAccreditationIdRoute
+  '/chapter/$chapterId': typeof AuthenticatedChapterChapterIdRouteRoute
+  '/form/$formId': typeof AuthenticatedFormFormIdRouteRoute
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/settings/account': typeof AuthenticatedSettingsAccountRoute
   '/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
@@ -255,8 +271,10 @@ export interface FileRoutesByTo {
   '/500': typeof errors500Route
   '/503': typeof errors503Route
   '/': typeof AuthenticatedIndexRoute
+  '/accreditation/$accreditationId': typeof AuthenticatedAccreditationAccreditationIdRouteRoute
   '/accreditation/create': typeof AuthenticatedAccreditationCreateRouteRoute
-  '/accreditation/$accreditationId': typeof AuthenticatedAccreditationAccreditationIdRoute
+  '/chapter/$chapterId': typeof AuthenticatedChapterChapterIdRouteRoute
+  '/form/$formId': typeof AuthenticatedFormFormIdRouteRoute
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/settings/account': typeof AuthenticatedSettingsAccountRoute
   '/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
@@ -290,8 +308,10 @@ export interface FileRoutesById {
   '/(errors)/500': typeof errors500Route
   '/(errors)/503': typeof errors503Route
   '/_authenticated/': typeof AuthenticatedIndexRoute
+  '/_authenticated/accreditation/$accreditationId': typeof AuthenticatedAccreditationAccreditationIdRouteRoute
   '/_authenticated/accreditation/create': typeof AuthenticatedAccreditationCreateRouteRoute
-  '/_authenticated/accreditation/$accreditationId': typeof AuthenticatedAccreditationAccreditationIdRoute
+  '/_authenticated/chapter/$chapterId': typeof AuthenticatedChapterChapterIdRouteRoute
+  '/_authenticated/form/$formId': typeof AuthenticatedFormFormIdRouteRoute
   '/_authenticated/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/_authenticated/settings/account': typeof AuthenticatedSettingsAccountRoute
   '/_authenticated/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
@@ -323,8 +343,10 @@ export interface FileRouteTypes {
     | '/500'
     | '/503'
     | '/'
-    | '/accreditation/create'
     | '/accreditation/$accreditationId'
+    | '/accreditation/create'
+    | '/chapter/$chapterId'
+    | '/form/$formId'
     | '/errors/$error'
     | '/settings/account'
     | '/settings/appearance'
@@ -353,8 +375,10 @@ export interface FileRouteTypes {
     | '/500'
     | '/503'
     | '/'
-    | '/accreditation/create'
     | '/accreditation/$accreditationId'
+    | '/accreditation/create'
+    | '/chapter/$chapterId'
+    | '/form/$formId'
     | '/errors/$error'
     | '/settings/account'
     | '/settings/appearance'
@@ -387,8 +411,10 @@ export interface FileRouteTypes {
     | '/(errors)/500'
     | '/(errors)/503'
     | '/_authenticated/'
-    | '/_authenticated/accreditation/create'
     | '/_authenticated/accreditation/$accreditationId'
+    | '/_authenticated/accreditation/create'
+    | '/_authenticated/chapter/$chapterId'
+    | '/_authenticated/form/$formId'
     | '/_authenticated/errors/$error'
     | '/_authenticated/settings/account'
     | '/_authenticated/settings/appearance'
@@ -632,11 +658,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedErrorsErrorRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/accreditation/$accreditationId': {
-      id: '/_authenticated/accreditation/$accreditationId'
-      path: '/accreditation/$accreditationId'
-      fullPath: '/accreditation/$accreditationId'
-      preLoaderRoute: typeof AuthenticatedAccreditationAccreditationIdRouteImport
+    '/_authenticated/form/$formId': {
+      id: '/_authenticated/form/$formId'
+      path: '/form/$formId'
+      fullPath: '/form/$formId'
+      preLoaderRoute: typeof AuthenticatedFormFormIdRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/chapter/$chapterId': {
+      id: '/_authenticated/chapter/$chapterId'
+      path: '/chapter/$chapterId'
+      fullPath: '/chapter/$chapterId'
+      preLoaderRoute: typeof AuthenticatedChapterChapterIdRouteRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/accreditation/create': {
@@ -644,6 +677,13 @@ declare module '@tanstack/react-router' {
       path: '/accreditation/create'
       fullPath: '/accreditation/create'
       preLoaderRoute: typeof AuthenticatedAccreditationCreateRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/accreditation/$accreditationId': {
+      id: '/_authenticated/accreditation/$accreditationId'
+      path: '/accreditation/$accreditationId'
+      fullPath: '/accreditation/$accreditationId'
+      preLoaderRoute: typeof AuthenticatedAccreditationAccreditationIdRouteRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
   }
@@ -675,8 +715,10 @@ const AuthenticatedSettingsRouteRouteWithChildren =
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedSettingsRouteRoute: typeof AuthenticatedSettingsRouteRouteWithChildren
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+  AuthenticatedAccreditationAccreditationIdRouteRoute: typeof AuthenticatedAccreditationAccreditationIdRouteRoute
   AuthenticatedAccreditationCreateRouteRoute: typeof AuthenticatedAccreditationCreateRouteRoute
-  AuthenticatedAccreditationAccreditationIdRoute: typeof AuthenticatedAccreditationAccreditationIdRoute
+  AuthenticatedChapterChapterIdRouteRoute: typeof AuthenticatedChapterChapterIdRouteRoute
+  AuthenticatedFormFormIdRouteRoute: typeof AuthenticatedFormFormIdRouteRoute
   AuthenticatedErrorsErrorRoute: typeof AuthenticatedErrorsErrorRoute
   AuthenticatedAppsIndexRoute: typeof AuthenticatedAppsIndexRoute
   AuthenticatedChatsIndexRoute: typeof AuthenticatedChatsIndexRoute
@@ -688,10 +730,13 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSettingsRouteRoute: AuthenticatedSettingsRouteRouteWithChildren,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
+  AuthenticatedAccreditationAccreditationIdRouteRoute:
+    AuthenticatedAccreditationAccreditationIdRouteRoute,
   AuthenticatedAccreditationCreateRouteRoute:
     AuthenticatedAccreditationCreateRouteRoute,
-  AuthenticatedAccreditationAccreditationIdRoute:
-    AuthenticatedAccreditationAccreditationIdRoute,
+  AuthenticatedChapterChapterIdRouteRoute:
+    AuthenticatedChapterChapterIdRouteRoute,
+  AuthenticatedFormFormIdRouteRoute: AuthenticatedFormFormIdRouteRoute,
   AuthenticatedErrorsErrorRoute: AuthenticatedErrorsErrorRoute,
   AuthenticatedAppsIndexRoute: AuthenticatedAppsIndexRoute,
   AuthenticatedChatsIndexRoute: AuthenticatedChatsIndexRoute,

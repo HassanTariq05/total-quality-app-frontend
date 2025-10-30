@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { ChapterService } from '@/services/chapter-services/accreditation-services'
+import { ChapterService } from '@/services/chapter-services/chapter-services'
 import { toast } from 'sonner'
 
 export const chapterQueryKeys = {
@@ -7,10 +7,10 @@ export const chapterQueryKeys = {
   byId: (id: string) => ['chapters', id] as const,
 }
 
-export const useChapters = () =>
+export const useChapters = (id: string) =>
   useQuery({
-    queryKey: chapterQueryKeys.all,
-    queryFn: ChapterService.getAll,
+    queryKey: chapterQueryKeys.byId(id),
+    queryFn: () => ChapterService.getAll(id),
   })
 
 export const useChapter = (id: string) =>

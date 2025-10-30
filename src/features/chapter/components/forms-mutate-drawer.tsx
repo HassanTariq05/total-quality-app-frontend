@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useCreateChapter, useUpdateChapter } from '@/hooks/use-chapters'
+import { useCreateForm, useUpdateForm } from '@/hooks/use-forms'
 import { Button } from '@/components/ui/button'
 import {
   Form,
@@ -30,18 +30,18 @@ import {
 import { Textarea } from '@/components/ui/textarea'
 import { type Chapter } from '../data/schema'
 
-type TaskMutateDrawerProps = {
+type FormMutateDrawerProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
   currentRow?: Chapter
-  accreditationId: string | undefined
+  chapterId: string | undefined
 }
 
 const formSchema = z.object({
   title: z
     .string()
     .min(2, 'Chater name must be at least 2 characters.')
-    .max(30, 'Chapter name must not be longer than 30 characters.'),
+    .max(30, 'Form name must not be longer than 30 characters.'),
   status: z
     .enum(['Active', 'Inactive'])
     .refine((val) => !!val, { message: 'Please select a valid status.' }),
@@ -50,17 +50,17 @@ const formSchema = z.object({
     .max(160, 'Description must not exceed 160 characters.')
     .optional(),
 })
-type TaskForm = z.infer<typeof formSchema>
+type FormForm = z.infer<typeof formSchema>
 
-export function TasksMutateDrawer({
+export function FormsMutateDrawer({
   open,
   onOpenChange,
   currentRow,
-  accreditationId,
-}: TaskMutateDrawerProps) {
+  chapterId,
+}: FormMutateDrawerProps) {
   const isUpdate = !!currentRow
 
-  const form = useForm<TaskForm>({
+  const form = useForm<FormForm>({
     resolver: zodResolver(formSchema),
     defaultValues: currentRow ?? {
       title: '',
@@ -69,18 +69,18 @@ export function TasksMutateDrawer({
     },
   })
 
-  const createChapterMutation = useCreateChapter()
-  const updateChapterMutation = useUpdateChapter()
+  const createFormMutation = useCreateForm()
+  const updateFormMutation = useUpdateForm()
 
-  const onSubmit = (data: TaskForm) => {
+  const onSubmit = (data: FormForm) => {
     if (isUpdate) {
-      updateChapterMutation.mutate({ id: currentRow?.id, payload: data })
+      updateFormMutation.mutate({ id: currentRow?.id, payload: data })
     } else {
-      createChapterMutation.mutate({
+      createFormMutation.mutate({
         title: data?.title,
         description: data?.description,
         status: data?.status,
-        accreditationId: accreditationId || '',
+        chapterId: chapterId || '',
       })
     }
 
@@ -98,11 +98,11 @@ export function TasksMutateDrawer({
     >
       <SheetContent className='flex flex-col'>
         <SheetHeader className='text-start'>
-          <SheetTitle>{isUpdate ? 'Update' : 'Create'} Chapter</SheetTitle>
+          <SheetTitle>{isUpdate ? 'Update' : 'Create'} Form</SheetTitle>
         </SheetHeader>
         <Form {...form}>
           <form
-            id='tasks-form'
+            id='forms-form'
             onSubmit={form.handleSubmit(onSubmit)}
             className='flex-1 space-y-6 overflow-y-auto px-4'
           >
@@ -166,7 +166,7 @@ export function TasksMutateDrawer({
           <SheetClose asChild>
             <Button variant='outline'>Close</Button>
           </SheetClose>
-          <Button form='tasks-form' type='submit'>
+          <Button form='forms-form' type='submit'>
             Save changes
           </Button>
         </SheetFooter>

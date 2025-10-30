@@ -1,6 +1,7 @@
 import { useParams } from '@tanstack/react-router'
 import { cn } from '@/lib/utils'
 import { useAccreditation } from '@/hooks/use-accreditations'
+import { useChapters } from '@/hooks/use-chapters'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import { ConfigDrawer } from '@/components/config-drawer'
@@ -10,11 +11,11 @@ import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { badgeTypes } from '../users/data/data'
+import { AccreditaionBreadcrumb } from './components/breadcrumb'
 import { Chapters } from './components/chapters'
 import { TasksDialogs } from './components/tasks-dialogs'
 import { TasksPrimaryButtons } from './components/tasks-primary-buttons'
 import { TasksProvider } from './components/tasks-provider'
-import { tasks } from './data/tasks'
 
 export function AccreditationView() {
   const params = useParams({
@@ -24,6 +25,9 @@ export function AccreditationView() {
   const { accreditationId } = params
 
   const { data: accreditation } = useAccreditation(accreditationId)
+
+  const { data: chaptersData = [] } = useChapters(accreditationId)
+
   const badgeColor = badgeTypes.get(accreditation?.status?.toLowerCase())
   return (
     <TasksProvider>
@@ -37,6 +41,10 @@ export function AccreditationView() {
       </Header>
 
       <Main className='flex flex-1 flex-col gap-4 sm:gap-6'>
+        <AccreditaionBreadcrumb
+          accreditationId={accreditationId}
+          accreditationName={accreditation?.name || ''}
+        />
         <div className='flex flex-wrap items-end justify-between gap-2'>
           <div>
             <div className='flex items-center gap-2'>
@@ -61,8 +69,7 @@ export function AccreditationView() {
           <TasksPrimaryButtons />
         </div>
         <Separator />
-        {/* <TasksTable data={tasks} /> */}
-        <Chapters data={tasks} />
+        <Chapters data={chaptersData} />
       </Main>
 
       <TasksDialogs accreditation={accreditation} />

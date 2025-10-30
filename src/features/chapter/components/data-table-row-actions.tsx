@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { chapterSchema } from '../data/schema'
-import { useTasks } from './tasks-provider'
+import { useChapters } from './chapters-provider'
 
 type DataTableRowActionsProps<TData> = {
   row: Row<TData>
@@ -21,13 +21,14 @@ type DataTableRowActionsProps<TData> = {
 export function DataTableRowActions<TData>({
   row,
 }: DataTableRowActionsProps<TData>) {
-  const task = chapterSchema.parse(row.original)
-  const { setOpen, setCurrentRow } = useTasks()
+  const form = chapterSchema.parse(row.original)
+
+  const { setOpen, setCurrentRow } = useChapters()
 
   const navigate = useNavigate()
 
-  const handleViewChapter = (id: string) => {
-    navigate({ to: `/chapter/${id}` })
+  const handleViewForm = (id: string) => {
+    navigate({ to: `/form/${id}` })
   }
 
   return (
@@ -44,7 +45,7 @@ export function DataTableRowActions<TData>({
       <DropdownMenuContent align='end' className='w-[160px]'>
         <DropdownMenuItem
           onClick={() => {
-            handleViewChapter(task?.id)
+            handleViewForm(form?.id)
           }}
         >
           View
@@ -54,7 +55,7 @@ export function DataTableRowActions<TData>({
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => {
-            setCurrentRow(task)
+            setCurrentRow(form)
             setOpen('update')
           }}
         >
@@ -66,8 +67,8 @@ export function DataTableRowActions<TData>({
         <DropdownMenuSeparator />
         <DropdownMenuItem
           onClick={() => {
-            setCurrentRow(task)
-            setOpen('delete-chapter')
+            setCurrentRow(form)
+            setOpen('delete-form')
           }}
         >
           Delete

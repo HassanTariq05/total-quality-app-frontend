@@ -1,8 +1,18 @@
+import { useEffect } from 'react'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useCreateChapter, useUpdateChapter } from '@/hooks/use-chapters'
+import { Accreditation } from '@/services/accreditation-services/types'
+import { useUpdateAccreditation } from '@/hooks/use-accreditations'
 import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import {
   Form,
   FormControl,
@@ -19,29 +29,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import {
-  Sheet,
-  SheetClose,
-  SheetContent,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-} from '@/components/ui/sheet'
 import { Textarea } from '@/components/ui/textarea'
-import { type Chapter } from '../data/schema'
-
-type TaskMutateDrawerProps = {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  currentRow?: Chapter
-  accreditationId: string | undefined
-}
 
 const formSchema = z.object({
-  title: z
+  name: z
     .string()
-    .min(2, 'Chater name must be at least 2 characters.')
-    .max(30, 'Chapter name must not be longer than 30 characters.'),
+    .min(2, 'Accreditation name must be at least 2 characters.')
+    .max(30, 'Accreditation name must not be longer than 30 characters.'),
   status: z
     .enum(['Active', 'Inactive'])
     .refine((val) => !!val, { message: 'Please select a valid status.' }),
@@ -50,70 +44,77 @@ const formSchema = z.object({
     .max(160, 'Description must not exceed 160 characters.')
     .optional(),
 })
-type TaskForm = z.infer<typeof formSchema>
 
-export function TasksMutateDrawer({
+type TaskImportDialogProps = {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  accreditation?: Accreditation
+}
+
+type FormValues = z.infer<typeof formSchema>
+
+const defaultValues: Partial<FormValues> = {
+  name: '',
+  status: 'Active',
+  description: '',
+}
+
+export function EditAccreditationDialog({
   open,
   onOpenChange,
-  currentRow,
-  accreditationId,
-}: TaskMutateDrawerProps) {
-  const isUpdate = !!currentRow
-
-  const form = useForm<TaskForm>({
+  accreditation,
+}: TaskImportDialogProps) {
+  const form = useForm<any>({
     resolver: zodResolver(formSchema),
-    defaultValues: currentRow ?? {
-      title: '',
-      description: '',
-      status: 'Active',
-    },
+    defaultValues,
+    mode: 'onChange',
   })
 
-  const createChapterMutation = useCreateChapter()
-  const updateChapterMutation = useUpdateChapter()
-
-  const onSubmit = (data: TaskForm) => {
-    if (isUpdate) {
-      updateChapterMutation.mutate({ id: currentRow?.id, payload: data })
-    } else {
-      createChapterMutation.mutate({
-        title: data?.title,
-        description: data?.description,
-        status: data?.status,
-        accreditationId: accreditationId || '',
+  useEffect(() => {
+    if (open && accreditation) {
+      form.reset({
+        name: accreditation.name || '',
+        status: accreditation.status || 'Active',
+        description: accreditation.description || '',
       })
     }
+  }, [open, accreditation])
 
+  const updateAccreditation = useUpdateAccreditation()
+
+  const onSubmit = (data: FormValues) => {
+    if (!accreditation?.id) return
+
+    updateAccreditation.mutate({ id: accreditation.id, payload: data })
     onOpenChange(false)
-    form.reset()
   }
 
   return (
-    <Sheet
+    <Dialog
       open={open}
-      onOpenChange={(v) => {
-        onOpenChange(v)
+      onOpenChange={(val) => {
+        onOpenChange(val)
         form.reset()
       }}
     >
-      <SheetContent className='flex flex-col'>
-        <SheetHeader className='text-start'>
-          <SheetTitle>{isUpdate ? 'Update' : 'Create'} Chapter</SheetTitle>
-        </SheetHeader>
+      <DialogContent className='gap-2 sm:max-w-sm'>
+        <DialogHeader className='mb-4 text-start'>
+          <DialogTitle>Edit Accreditation</DialogTitle>
+        </DialogHeader>
         <Form {...form}>
           <form
-            id='tasks-form'
+            id='edit-accriditation-form'
             onSubmit={form.handleSubmit(onSubmit)}
-            className='flex-1 space-y-6 overflow-y-auto px-4'
+            className='space-y-4'
           >
             <FormField
               control={form.control}
-              name='title'
+              name='name'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Title</FormLabel>
+                  <FormLabel>Name</FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder='Enter a title' />
+                    <Input {...field} placeholder='Enter a name' />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -162,15 +163,15 @@ export function TasksMutateDrawer({
             />
           </form>
         </Form>
-        <SheetFooter className='gap-2'>
-          <SheetClose asChild>
+        <DialogFooter className='gap-2'>
+          <DialogClose asChild>
             <Button variant='outline'>Close</Button>
-          </SheetClose>
-          <Button form='tasks-form' type='submit'>
-            Save changes
+          </DialogClose>
+          <Button type='submit' form='edit-accriditation-form'>
+            Update
           </Button>
-        </SheetFooter>
-      </SheetContent>
-    </Sheet>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
 }

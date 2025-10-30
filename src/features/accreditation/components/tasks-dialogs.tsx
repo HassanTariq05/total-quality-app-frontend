@@ -1,7 +1,7 @@
 import { useNavigate } from '@tanstack/react-router'
 import { Accreditation } from '@/services/accreditation-services/types'
-import { showSubmittedData } from '@/lib/show-submitted-data'
 import { useDeleteAccreditation } from '@/hooks/use-accreditations'
+import { useDeleteChapter } from '@/hooks/use-chapters'
 import { ConfirmDialog } from '@/components/confirm-dialog'
 import { DeleteDialog } from './delete-dialog'
 import { EditAccreditationDialog } from './edit-accreditation-dialog'
@@ -16,6 +16,7 @@ export function TasksDialogs({ accreditation }: TasksDialogsProps) {
   const { open, setOpen, currentRow, setCurrentRow } = useTasks()
 
   const deleteAccreditation = useDeleteAccreditation()
+  const deleteChapter = useDeleteChapter()
 
   const navigate = useNavigate()
 
@@ -25,12 +26,17 @@ export function TasksDialogs({ accreditation }: TasksDialogsProps) {
     navigate({ to: '/' })
   }
 
+  const handleDeleteChapter = (id: string) => {
+    deleteChapter.mutate(id)
+  }
+
   return (
     <>
       <TasksMutateDrawer
         key='task-create'
         open={open === 'create'}
         onOpenChange={() => setOpen('create')}
+        accreditationId={accreditation?.id}
       />
 
       <EditAccreditationDialog
@@ -61,14 +67,15 @@ export function TasksDialogs({ accreditation }: TasksDialogsProps) {
               }, 500)
             }}
             currentRow={currentRow}
+            accreditationId={accreditation?.id}
           />
 
           <ConfirmDialog
-            key='task-delete'
+            key='chapter-delete'
             destructive
-            open={open === 'delete'}
+            open={open === 'delete-chapter'}
             onOpenChange={() => {
-              setOpen('delete')
+              setOpen('delete-chapter')
               setTimeout(() => {
                 setCurrentRow(null)
               }, 500)
@@ -78,17 +85,14 @@ export function TasksDialogs({ accreditation }: TasksDialogsProps) {
               setTimeout(() => {
                 setCurrentRow(null)
               }, 500)
-              showSubmittedData(
-                currentRow,
-                'The following task has been deleted:'
-              )
+              handleDeleteChapter(currentRow?.id)
             }}
             className='max-w-md'
-            title={`Delete this task: ${currentRow.id} ?`}
+            title={`Delete this Chapter: ${currentRow.title} ?`}
             desc={
               <>
-                You are about to delete a task with the ID{' '}
-                <strong>{currentRow.id}</strong>. <br />
+                You are about to delete a chapter{' '}
+                <strong>{currentRow.title}</strong>. <br />
                 This action cannot be undone.
               </>
             }

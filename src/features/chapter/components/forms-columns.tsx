@@ -4,7 +4,7 @@ import { DataTableColumnHeader } from '@/components/data-table'
 import { type Chapter } from '../data/schema'
 import { DataTableRowActions } from './data-table-row-actions'
 
-export const tasksColumns: ColumnDef<Chapter>[] = [
+export const formColumns: ColumnDef<Chapter>[] = [
   {
     id: 'select',
     header: ({ table }) => (

@@ -24,15 +24,15 @@ import {
 } from '@/components/ui/table'
 import { DataTablePagination, DataTableToolbar } from '@/components/data-table'
 import { DataTableBulkActions } from './data-table-bulk-actions'
-import { tasksColumns as columns } from './tasks-columns'
+import { formColumns as columns } from './forms-columns'
 
-const route = getRouteApi('/_authenticated/accreditation/$accreditationId')
+const route = getRouteApi('/_authenticated/chapter/$chapterId')
 
 type DataTableProps = {
   data: any
 }
 
-export function Chapters({ data }: DataTableProps) {
+export function Forms({ data }: DataTableProps) {
   // Local UI-only states
   const [rowSelection, setRowSelection] = useState({})
   const [sorting, setSorting] = useState<SortingState>([])
@@ -102,11 +102,11 @@ export function Chapters({ data }: DataTableProps) {
   return (
     <div
       className={cn(
-        'max-sm:has-[div[role="toolbar"]]:mb-16', // Add margin bottom to the table on mobile when the toolbar is visible
+        'max-sm:has-[div[role="toolbar"]]:mb-16',
         'flex flex-1 flex-col gap-4'
       )}
     >
-      <h4 className='text-2xl font-bold tracking-tight'>Chapters</h4>
+      <h4 className='text-2xl font-bold tracking-tight'>Forms</h4>
       <DataTableToolbar
         table={table}
         searchPlaceholder='Filter by title or description...'

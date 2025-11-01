@@ -19,11 +19,16 @@ export interface FormSchema {
   id: string
   title: string
   fields: FormField[]
+  rows: TableCell[][]
 }
 
 export interface TableCell {
-  type: 'label' | 'field' | 'checkbox'
-  value?: string
+  type: 'label' | 'field' | 'checkbox' | 'date'
+  value: string
+  bg?: string
+  placeholder?: string
+  alignment?: string
+  cellFlex?: number
 }
 
 export interface TableElement {

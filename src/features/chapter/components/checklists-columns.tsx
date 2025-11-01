@@ -2,9 +2,9 @@ import { type ColumnDef } from '@tanstack/react-table'
 import { Checkbox } from '@/components/ui/checkbox'
 import { DataTableColumnHeader } from '@/components/data-table'
 import { type Chapter } from '../data/schema'
-import { DataTableRowActions } from './data-table-row-actions-forms'
+import { DataTableRowActions } from './data-table-row-actions-checklists'
 
-export const formColumns: ColumnDef<Chapter>[] = [
+export const checklistColumns: ColumnDef<Chapter>[] = [
   {
     id: 'select',
     header: ({ table }) => (

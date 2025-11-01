@@ -1,19 +1,19 @@
 import React, { useEffect, useState } from 'react'
 import { useFormBuilderStore } from '@/stores/useFormBuilderStore'
-import { useFormFormat } from '@/hooks/use-form-formats'
+import { useChecklistFormat } from '@/hooks/use-checklist-formats'
 import { Button } from '@/components/ui/button'
 import { FieldEditor } from './field-editor'
 
-export const FormBuilder: React.FC<{
+export const ChecklistBuilder: React.FC<{
   mode: any
   setMode: any
-  formId: string
-}> = ({ mode, formId }) => {
+  checklistId: string
+}> = ({ mode, checklistId }) => {
   const { form, addField, setForm } = useFormBuilderStore()
 
   const [formType, setFormType] = useState<'create' | 'update'>('create')
 
-  const { data: formData } = useFormFormat(formId)
+  const { data: formData } = useChecklistFormat(checklistId)
   useEffect(() => {
     if (!formData) return
 
@@ -29,7 +29,7 @@ export const FormBuilder: React.FC<{
         {form.fields.map((f: any) => (
           <FieldEditor
             formType={formType}
-            formId={formId}
+            checklistId={checklistId}
             formFormatId={formData?.id}
             editorMode={mode}
             key={f.id}
@@ -45,17 +45,17 @@ export const FormBuilder: React.FC<{
             className='bg-primary hover:bg-primary/90 text-primary-foreground'
             onClick={() => addField('table')}
           >
-            + Add Form
+            + Add Checklist
           </Button>
         </div>
       )}
 
-      <div className='mt-6'>
+      {/* <div className='mt-6'>
         <h3 className='mb-2 font-medium'>Generated JSON</h3>
         <pre className='text-primary-foreground overflow-auto rounded bg-gray-800 p-3 text-sm'>
           {JSON.stringify(form, null, 2)}
         </pre>
-      </div>
+      </div> */}
     </div>
   )
 }

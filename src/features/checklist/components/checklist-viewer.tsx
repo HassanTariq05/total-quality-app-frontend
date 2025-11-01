@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Table, TableBody, TableRow, TableCell } from '@/components/ui/table'
 import { SignatureField } from './signature-field'
 
-export const FormViewer: React.FC = () => {
+export const ChecklistViewer: React.FC = () => {
   const { form } = useFormBuilderStore()
 
   const [formData, setFormData] = useState<Record<string, any>>({})

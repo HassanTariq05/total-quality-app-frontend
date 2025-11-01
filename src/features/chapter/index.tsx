@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useParams } from '@tanstack/react-router'
 import { cn } from '@/lib/utils'
 import { useChapter } from '@/hooks/use-chapters'
+import { useChecklists } from '@/hooks/use-checklists'
 import { useForms } from '@/hooks/use-forms'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -11,10 +12,11 @@ import { Main } from '@/components/layout/main'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
-import { Analytics } from '../dashboard/components/analytics'
 import { badgeTypes } from '../users/data/data'
 import { ChapterBreadcrumb } from './components/breadcrumb'
 import { ChaptersProvider } from './components/chapters-provider'
+import { Checklists } from './components/checklists'
+import { ChecklistsDialogs } from './components/checklists-dialogs'
 import { Forms } from './components/forms'
 import { FormsDialogs } from './components/forms-dialogs'
 import { FormsPrimaryButtons } from './components/forms-primary-buttons'
@@ -27,7 +29,8 @@ export function ChapterView() {
   const { chapterId } = params
 
   const { data: chapter } = useChapter(chapterId)
-  const { data: chapters = [] } = useForms(chapterId)
+  const { data: forms = [] } = useForms(chapterId)
+  const { data: checklists = [] } = useChecklists(chapterId)
 
   const badgeColor = badgeTypes.get(chapter?.status?.toLowerCase())
 
@@ -87,18 +90,17 @@ export function ChapterView() {
           </div>
 
           <TabsContent value='forms' className='space-y-4'>
-            <Forms data={chapters} />
+            <Forms data={forms} />
           </TabsContent>
 
           <TabsContent value='checklists' className='space-y-4'>
-            <Analytics />
+            <Checklists data={checklists} />
           </TabsContent>
         </Tabs>
-        {/* <TasksTable data={tasks} /> */}
-        {/* <Chapters data={chaptersData} /> */}
       </Main>
 
       <FormsDialogs chapter={chapter} />
+      <ChecklistsDialogs chapter={chapter} />
     </ChaptersProvider>
   )
 }

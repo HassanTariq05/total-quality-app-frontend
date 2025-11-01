@@ -3,7 +3,7 @@ import { v4 as uuid } from 'uuid'
 import { create } from 'zustand'
 
 interface FormBuilderState {
-  form: FormSchema
+  form: any
   addField: (type: FormField['type']) => void
   updateField: (id: string, updates: Partial<FormField>) => void
   removeField: (id: string) => void
@@ -33,7 +33,7 @@ export const useFormBuilderStore = create<FormBuilderState>((set) => ({
     set((s) => ({
       form: {
         ...s.form,
-        fields: s.form.fields.map((f) =>
+        fields: s.form.fields.map((f: any) =>
           f.id === id ? { ...f, ...updates } : f
         ),
       },
@@ -42,7 +42,10 @@ export const useFormBuilderStore = create<FormBuilderState>((set) => ({
 
   removeField(id) {
     set((s) => ({
-      form: { ...s.form, fields: s.form.fields.filter((f) => f.id !== id) },
+      form: {
+        ...s.form,
+        fields: s.form.fields.filter((f: any) => f.id !== id),
+      },
     }))
   },
 

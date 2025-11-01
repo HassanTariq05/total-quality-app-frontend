@@ -11,6 +11,7 @@ type ChaptersDialogType =
   | 'edit'
   | 'delete'
   | 'delete-form'
+  | 'delete-checklist'
 
 type ChaptersContextType = {
   open: ChaptersDialogType | null

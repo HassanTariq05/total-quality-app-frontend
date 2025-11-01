@@ -40,6 +40,7 @@ import { Route as AuthenticatedSettingsAppearanceRouteImport } from './routes/_a
 import { Route as AuthenticatedSettingsAccountRouteImport } from './routes/_authenticated/settings/account'
 import { Route as AuthenticatedErrorsErrorRouteImport } from './routes/_authenticated/errors/$error'
 import { Route as AuthenticatedFormFormIdRouteRouteImport } from './routes/_authenticated/form/$formId/route'
+import { Route as AuthenticatedChecklistChecklistIdRouteRouteImport } from './routes/_authenticated/checklist/$checklistId/route'
 import { Route as AuthenticatedChapterChapterIdRouteRouteImport } from './routes/_authenticated/chapter/$chapterId/route'
 import { Route as AuthenticatedAccreditationCreateRouteRouteImport } from './routes/_authenticated/accreditation/create/route'
 import { Route as AuthenticatedAccreditationAccreditationIdRouteRouteImport } from './routes/_authenticated/accreditation/$accreditationId/route'
@@ -206,6 +207,12 @@ const AuthenticatedFormFormIdRouteRoute =
     path: '/form/$formId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedChecklistChecklistIdRouteRoute =
+  AuthenticatedChecklistChecklistIdRouteRouteImport.update({
+    id: '/checklist/$checklistId',
+    path: '/checklist/$checklistId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedChapterChapterIdRouteRoute =
   AuthenticatedChapterChapterIdRouteRouteImport.update({
     id: '/chapter/$chapterId',
@@ -242,6 +249,7 @@ export interface FileRoutesByFullPath {
   '/accreditation/$accreditationId': typeof AuthenticatedAccreditationAccreditationIdRouteRoute
   '/accreditation/create': typeof AuthenticatedAccreditationCreateRouteRoute
   '/chapter/$chapterId': typeof AuthenticatedChapterChapterIdRouteRoute
+  '/checklist/$checklistId': typeof AuthenticatedChecklistChecklistIdRouteRoute
   '/form/$formId': typeof AuthenticatedFormFormIdRouteRoute
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/settings/account': typeof AuthenticatedSettingsAccountRoute
@@ -274,6 +282,7 @@ export interface FileRoutesByTo {
   '/accreditation/$accreditationId': typeof AuthenticatedAccreditationAccreditationIdRouteRoute
   '/accreditation/create': typeof AuthenticatedAccreditationCreateRouteRoute
   '/chapter/$chapterId': typeof AuthenticatedChapterChapterIdRouteRoute
+  '/checklist/$checklistId': typeof AuthenticatedChecklistChecklistIdRouteRoute
   '/form/$formId': typeof AuthenticatedFormFormIdRouteRoute
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/settings/account': typeof AuthenticatedSettingsAccountRoute
@@ -311,6 +320,7 @@ export interface FileRoutesById {
   '/_authenticated/accreditation/$accreditationId': typeof AuthenticatedAccreditationAccreditationIdRouteRoute
   '/_authenticated/accreditation/create': typeof AuthenticatedAccreditationCreateRouteRoute
   '/_authenticated/chapter/$chapterId': typeof AuthenticatedChapterChapterIdRouteRoute
+  '/_authenticated/checklist/$checklistId': typeof AuthenticatedChecklistChecklistIdRouteRoute
   '/_authenticated/form/$formId': typeof AuthenticatedFormFormIdRouteRoute
   '/_authenticated/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/_authenticated/settings/account': typeof AuthenticatedSettingsAccountRoute
@@ -346,6 +356,7 @@ export interface FileRouteTypes {
     | '/accreditation/$accreditationId'
     | '/accreditation/create'
     | '/chapter/$chapterId'
+    | '/checklist/$checklistId'
     | '/form/$formId'
     | '/errors/$error'
     | '/settings/account'
@@ -378,6 +389,7 @@ export interface FileRouteTypes {
     | '/accreditation/$accreditationId'
     | '/accreditation/create'
     | '/chapter/$chapterId'
+    | '/checklist/$checklistId'
     | '/form/$formId'
     | '/errors/$error'
     | '/settings/account'
@@ -414,6 +426,7 @@ export interface FileRouteTypes {
     | '/_authenticated/accreditation/$accreditationId'
     | '/_authenticated/accreditation/create'
     | '/_authenticated/chapter/$chapterId'
+    | '/_authenticated/checklist/$checklistId'
     | '/_authenticated/form/$formId'
     | '/_authenticated/errors/$error'
     | '/_authenticated/settings/account'
@@ -665,6 +678,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedFormFormIdRouteRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/checklist/$checklistId': {
+      id: '/_authenticated/checklist/$checklistId'
+      path: '/checklist/$checklistId'
+      fullPath: '/checklist/$checklistId'
+      preLoaderRoute: typeof AuthenticatedChecklistChecklistIdRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/chapter/$chapterId': {
       id: '/_authenticated/chapter/$chapterId'
       path: '/chapter/$chapterId'
@@ -718,6 +738,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAccreditationAccreditationIdRouteRoute: typeof AuthenticatedAccreditationAccreditationIdRouteRoute
   AuthenticatedAccreditationCreateRouteRoute: typeof AuthenticatedAccreditationCreateRouteRoute
   AuthenticatedChapterChapterIdRouteRoute: typeof AuthenticatedChapterChapterIdRouteRoute
+  AuthenticatedChecklistChecklistIdRouteRoute: typeof AuthenticatedChecklistChecklistIdRouteRoute
   AuthenticatedFormFormIdRouteRoute: typeof AuthenticatedFormFormIdRouteRoute
   AuthenticatedErrorsErrorRoute: typeof AuthenticatedErrorsErrorRoute
   AuthenticatedAppsIndexRoute: typeof AuthenticatedAppsIndexRoute
@@ -736,6 +757,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedAccreditationCreateRouteRoute,
   AuthenticatedChapterChapterIdRouteRoute:
     AuthenticatedChapterChapterIdRouteRoute,
+  AuthenticatedChecklistChecklistIdRouteRoute:
+    AuthenticatedChecklistChecklistIdRouteRoute,
   AuthenticatedFormFormIdRouteRoute: AuthenticatedFormFormIdRouteRoute,
   AuthenticatedErrorsErrorRoute: AuthenticatedErrorsErrorRoute,
   AuthenticatedAppsIndexRoute: AuthenticatedAppsIndexRoute,

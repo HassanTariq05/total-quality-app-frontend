@@ -1,12 +1,12 @@
 import React, { useState } from 'react'
-import { UpdateFormFormatPayload } from '@/services/form-format-services/form-format-services'
+import { UpdateChecklistFormatPayload } from '@/services/checklist-format-services/checklist-format-services'
 import { X, Plus, Pencil, Trash } from 'lucide-react'
 import { useFormBuilderStore } from '@/stores/useFormBuilderStore'
 import { cn } from '@/lib/utils'
 import {
-  useCreateFormFormat,
-  useUpdateFormFormat,
-} from '@/hooks/use-form-formats'
+  useCreateChecklistFormat,
+  useUpdateChecklistFormat,
+} from '@/hooks/use-checklist-formats'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -16,10 +16,10 @@ import { CellEditorModal } from './table-cell-editor-modal'
 export const FieldEditor: React.FC<{
   field: any
   editorMode: string
-  formId: string
+  checklistId: string
   formType: string
   formFormatId: string | undefined
-}> = ({ field, editorMode, formId, formType, formFormatId }) => {
+}> = ({ field, editorMode, checklistId, formType, formFormatId }) => {
   const { updateField, removeField, form } = useFormBuilderStore()
 
   const [modalOpen, setModalOpen] = useState(false)
@@ -118,8 +118,8 @@ export const FieldEditor: React.FC<{
     updateField(field.id, { rows: newRows })
   }
 
-  const createFormFormatMutation = useCreateFormFormat()
-  const updateFormFormatMutation = useUpdateFormFormat()
+  const createChecklistFormatMutation = useCreateChecklistFormat()
+  const updateChecklistFormatMutation = useUpdateChecklistFormat()
 
   // const handleSubmit = () => {
   //   console.log('Submitted Structure: ', JSON.stringify(form, null, 2))
@@ -127,15 +127,18 @@ export const FieldEditor: React.FC<{
 
   const handleSubmit = () => {
     if (formType === 'update') {
-      const data: UpdateFormFormatPayload = {
+      const data: UpdateChecklistFormatPayload = {
         format: JSON.stringify(form, null, 2),
-        formId: formId,
+        checklistId: checklistId,
       }
-      updateFormFormatMutation.mutate({ id: formFormatId || '', payload: data })
+      updateChecklistFormatMutation.mutate({
+        id: formFormatId || '',
+        payload: data,
+      })
     } else {
-      createFormFormatMutation.mutate({
+      createChecklistFormatMutation.mutate({
         format: JSON.stringify(form, null, 2),
-        formId: formId,
+        checklistId: checklistId,
       })
     }
   }

@@ -1,4 +1,4 @@
-import apiClient from '@/lib/axios'
+import { useApiClient } from '@/lib/axios'
 
 export interface Form {
   id: string
@@ -24,33 +24,44 @@ export interface FormFormat {
 export type CreateFormPayload = Omit<Form, 'id' | 'chapter' | 'accreditation'>
 export type UpdateFormPayload = Partial<CreateFormPayload>
 
-export const FormService = {
-  getAll: async (id: string): Promise<Form[]> => {
-    const { data } = await apiClient.get(`/forms/getAllByChapterId/${id}`)
-    return data
-  },
+export const useFormService = () => {
+  const apiClient = useApiClient()
 
-  getFormFormatByFormId: async (id: string): Promise<FormFormat> => {
-    const { data } = await apiClient.get(`/forms/getFormFormatByFormId/${id}`)
+  const getAll = async (chapterId: string): Promise<Form[]> => {
+    const { data } = await apiClient.get(
+      `/forms/getAllByChapterId/${chapterId}`
+    )
     return data
-  },
+  }
 
-  getById: async (id: string): Promise<Form> => {
+  const getById = async (id: string): Promise<Form> => {
     const { data } = await apiClient.get(`/forms/${id}`)
     return data
-  },
+  }
 
-  create: async (payload: CreateFormPayload): Promise<Form> => {
+  const getFormFormatByFormId = async (formId: string): Promise<FormFormat> => {
+    const { data } = await apiClient.get(
+      `/forms/getFormFormatByFormId/${formId}`
+    )
+    return data
+  }
+
+  const create = async (payload: CreateFormPayload): Promise<Form> => {
     const { data } = await apiClient.post('/forms', payload)
     return data
-  },
+  }
 
-  update: async (id: string, payload: UpdateFormPayload): Promise<Form> => {
+  const update = async (
+    id: string,
+    payload: UpdateFormPayload
+  ): Promise<Form> => {
     const { data } = await apiClient.put(`/forms/${id}`, payload)
     return data
-  },
+  }
 
-  delete: async (id: string): Promise<void> => {
+  const remove = async (id: string): Promise<void> => {
     await apiClient.delete(`/forms/${id}`)
-  },
+  }
+
+  return { getAll, getById, getFormFormatByFormId, create, update, remove }
 }

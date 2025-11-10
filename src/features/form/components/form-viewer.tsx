@@ -1,6 +1,13 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import { UpdateFormSubmissionPayload } from '@/services/form-submission-services/form-submission-service'
+import { useAuthStore } from '@/stores/auth-store'
 import { useFormBuilderStore } from '@/stores/useFormBuilderStore'
 import { cn } from '@/lib/utils'
+import {
+  useCreateFormSubmission,
+  useGetFormSubmissionByOrgIdAndFormId,
+  useUpdateFormSubmission,
+} from '@/hooks/use-form-submissions'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -8,19 +15,51 @@ import { Input } from '@/components/ui/input'
 import { Table, TableBody, TableRow, TableCell } from '@/components/ui/table'
 import { SignatureField } from './signature-field'
 
-export const FormViewer: React.FC = () => {
+type FormViewerProps = {
+  formId: string
+}
+
+export const FormViewer: React.FC<FormViewerProps> = ({ formId }) => {
   const { form } = useFormBuilderStore()
+  const { auth } = useAuthStore()
 
   const [formData, setFormData] = useState<Record<string, any>>({})
 
-  const handleChange = (fieldId: string, value: any) => {
-    setFormData((prev) => ({ ...prev, [fieldId]: value }))
+  const handleChange = (id: string, value: any) => {
+    setFormData((prev) => ({ ...prev, [id]: value }))
   }
+
+  const createFormSubmissionMutation = useCreateFormSubmission()
+  const updateFormSubmissionMutation = useUpdateFormSubmission()
+  const { data: formSubmissionData } = useGetFormSubmissionByOrgIdAndFormId(
+    auth?.user?.organisation?.id || '',
+    formId
+  )
+
+  useEffect(() => {
+    if (formSubmissionData?.data) {
+      setFormData(JSON.parse(formSubmissionData?.data || '{}'))
+    }
+  }, [formSubmissionData])
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    console.log('Submitted Form Data:', formData)
-    alert('Form submitted! Check console for output.')
+
+    if (formSubmissionData?.data) {
+      const data: UpdateFormSubmissionPayload = {
+        data: JSON.stringify(formData),
+      }
+      updateFormSubmissionMutation.mutate({
+        id: formSubmissionData?.id || '',
+        payload: data,
+      })
+    } else {
+      createFormSubmissionMutation.mutate({
+        formId: formId,
+        data: JSON.stringify(formData),
+        organisationId: auth?.user?.organisation?.id || '',
+      })
+    }
   }
 
   return (
@@ -28,13 +67,9 @@ export const FormViewer: React.FC = () => {
       onSubmit={handleSubmit}
       className='bg-background text-foreground space-y-6'
     >
-      {/* Render each field */}
       <div className='space-y-4'>
         {form.fields.map((field: any) => (
-          <Card
-            key={field.id}
-            className='bg-card text-card-foreground border-border shadow-sm'
-          >
+          <Card key={field.id} className='bg-card border-border shadow-sm'>
             <CardHeader>
               <h3 className='text-lg font-semibold'>{field.label}</h3>
             </CardHeader>
@@ -69,23 +104,16 @@ export const FormViewer: React.FC = () => {
                 </div>
               )}
 
-              {/* Table-type fields */}
               {field.type === 'table' && (
                 <div className='overflow-x-auto rounded'>
                   <Table className='w-full table-fixed'>
                     <TableBody>
-                      {field.rows.map((row: any, rIdx: any) => (
-                        <TableRow
-                          key={rIdx}
-                          className='flex w-full items-center'
-                        >
-                          {row.map((cell: any, cIdx: any) => (
+                      {field.rows.map((row: any, rIdx: number) => (
+                        <TableRow key={rIdx} className='flex w-full'>
+                          {row.map((cell: any) => (
                             <TableCell
-                              key={cIdx}
-                              className={cn(
-                                'h-full p-0',
-                                cell.bg || 'bg-muted'
-                              )}
+                              key={cell.id}
+                              className={cn('h-full p-0', cell.bg)}
                               style={{ flex: cell.cellFlex ?? 1 }}
                             >
                               <div
@@ -100,24 +128,16 @@ export const FormViewer: React.FC = () => {
                                 )}
                               >
                                 {cell.type === 'label' && (
-                                  <span className='text-foreground text-sm break-words whitespace-normal'>
-                                    {cell.value}
-                                  </span>
+                                  <span className='text-sm'>{cell.value}</span>
                                 )}
 
                                 {cell.type === 'field' && (
                                   <Input
-                                    className='bg-muted text-foreground w-full text-sm'
-                                    placeholder={cell.placeholder || ''}
-                                    value={
-                                      formData[`${field.id}-${rIdx}-${cIdx}`] ||
-                                      ''
-                                    }
+                                    className='bg-muted text-sm'
+                                    placeholder={cell.placeholder}
+                                    value={formData[cell.id] || ''}
                                     onChange={(e) =>
-                                      handleChange(
-                                        `${field.id}-${rIdx}-${cIdx}`,
-                                        e.target.value
-                                      )
+                                      handleChange(cell.id, e.target.value)
                                     }
                                   />
                                 )}
@@ -125,19 +145,12 @@ export const FormViewer: React.FC = () => {
                                 {cell.type === 'checkbox' && (
                                   <div className='flex items-center gap-2'>
                                     <Checkbox
-                                      checked={
-                                        !!formData[
-                                          `${field.id}-${rIdx}-${cIdx}`
-                                        ]
-                                      }
+                                      checked={!!formData[cell.id]}
                                       onCheckedChange={(checked) =>
-                                        handleChange(
-                                          `${field.id}-${rIdx}-${cIdx}`,
-                                          checked
-                                        )
+                                        handleChange(cell.id, checked)
                                       }
                                     />
-                                    <span className='text-foreground text-sm'>
+                                    <span className='text-sm'>
                                       {cell.value}
                                     </span>
                                   </div>
@@ -146,29 +159,19 @@ export const FormViewer: React.FC = () => {
                                 {cell.type === 'date' && (
                                   <Input
                                     type='date'
-                                    className='bg-muted text-foreground w-full text-sm'
-                                    value={
-                                      formData[`${field.id}-${rIdx}-${cIdx}`] ||
-                                      ''
-                                    }
+                                    className='bg-muted text-sm'
+                                    value={formData[cell.id] || ''}
                                     onChange={(e) =>
-                                      handleChange(
-                                        `${field.id}-${rIdx}-${cIdx}`,
-                                        e.target.value
-                                      )
+                                      handleChange(cell.id, e.target.value)
                                     }
                                   />
                                 )}
+
                                 {cell.type === 'signature' && (
                                   <SignatureField
-                                    value={
-                                      formData[`${field.id}-${rIdx}-${cIdx}`]
-                                    }
+                                    value={formData[cell.id]}
                                     onChange={(val) =>
-                                      handleChange(
-                                        `${field.id}-${rIdx}-${cIdx}`,
-                                        val
-                                      )
+                                      handleChange(cell.id, val)
                                     }
                                   />
                                 )}
@@ -186,17 +189,15 @@ export const FormViewer: React.FC = () => {
         ))}
       </div>
 
-      {/* Submit button */}
-      <div className='flex justify-center pt-4'>
-        <Button type='submit' className='px-6 py-2 text-lg'>
-          Submit Form
+      <div className='flex justify-end pt-4'>
+        <Button type='submit'>
+          {formSubmissionData?.data ? 'Update Form' : 'Submit Form'}
         </Button>
       </div>
 
-      {/* Debug: Show live JSON values */}
       <div className='mt-6'>
         <h3 className='mb-2 font-medium'>Filled Values</h3>
-        <pre className='overflow-auto rounded bg-gray-900 p-3 text-sm text-gray-100'>
+        <pre className='rounded bg-gray-900 p-3 text-sm text-gray-100'>
           {JSON.stringify(formData, null, 2)}
         </pre>
       </div>

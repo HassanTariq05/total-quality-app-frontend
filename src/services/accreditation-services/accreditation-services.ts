@@ -1,4 +1,4 @@
-import apiClient from '@/lib/axios'
+import { useApiClient } from '@/lib/axios'
 
 export interface Accreditation {
   id: string
@@ -10,33 +10,37 @@ export interface Accreditation {
 export type CreateAccreditationPayload = Omit<Accreditation, 'id'>
 export type UpdateAccreditationPayload = Partial<CreateAccreditationPayload>
 
-export const AccreditationService = {
-  getAll: async (): Promise<Accreditation[]> => {
+export const useAccreditationService = () => {
+  const apiClient = useApiClient()
+
+  const getAll = async (): Promise<Accreditation[]> => {
     const { data } = await apiClient.get('/accreditations')
     return data
-  },
+  }
 
-  getById: async (id: string): Promise<Accreditation> => {
+  const getById = async (id: string): Promise<Accreditation> => {
     const { data } = await apiClient.get(`/accreditations/${id}`)
     return data
-  },
+  }
 
-  create: async (
+  const create = async (
     payload: CreateAccreditationPayload
   ): Promise<Accreditation> => {
     const { data } = await apiClient.post('/accreditations', payload)
     return data
-  },
+  }
 
-  update: async (
+  const update = async (
     id: string,
     payload: UpdateAccreditationPayload
   ): Promise<Accreditation> => {
     const { data } = await apiClient.put(`/accreditations/${id}`, payload)
     return data
-  },
+  }
 
-  delete: async (id: string): Promise<void> => {
+  const remove = async (id: string): Promise<void> => {
     await apiClient.delete(`/accreditations/${id}`)
-  },
+  }
+
+  return { getAll, getById, create, update, remove }
 }

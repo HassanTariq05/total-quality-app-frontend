@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { ChecklistService } from '@/services/checklist-services/checklist-services'
+import { useChecklistService } from '@/services/checklist-services/checklist-services'
 import { toast } from 'sonner'
 
 export const checklistQueryKeys = {
@@ -7,23 +7,32 @@ export const checklistQueryKeys = {
   byId: (id: string) => ['checklists', id] as const,
 }
 
-export const useChecklists = (id: string) =>
-  useQuery({
-    queryKey: checklistQueryKeys.byId(id),
-    queryFn: () => ChecklistService.getAll(id),
-  })
+export const useChecklists = (chapterId: string) => {
+  const { getAll } = useChecklistService()
 
-export const useChecklist = (id: string) =>
-  useQuery({
+  return useQuery({
+    queryKey: checklistQueryKeys.byId(chapterId),
+    queryFn: () => getAll(chapterId),
+    enabled: !!chapterId,
+  })
+}
+
+export const useChecklist = (id: string) => {
+  const { getById } = useChecklistService()
+
+  return useQuery({
     queryKey: checklistQueryKeys.byId(id),
-    queryFn: () => ChecklistService.getById(id),
+    queryFn: () => getById(id),
     enabled: !!id,
   })
+}
 
 export const useCreateChecklist = () => {
+  const { create } = useChecklistService()
   const queryClient = useQueryClient()
+
   return useMutation({
-    mutationFn: ChecklistService.create,
+    mutationFn: create,
     onSuccess: () => {
       toast.success('Checklist created successfully!')
       queryClient.invalidateQueries({ queryKey: checklistQueryKeys.all })
@@ -35,10 +44,12 @@ export const useCreateChecklist = () => {
 }
 
 export const useUpdateChecklist = () => {
+  const { update } = useChecklistService()
   const queryClient = useQueryClient()
+
   return useMutation({
     mutationFn: ({ id, payload }: { id: string; payload: any }) =>
-      ChecklistService.update(id, payload),
+      update(id, payload),
     onSuccess: (_, { id }) => {
       toast.success('Checklist updated successfully!')
       queryClient.invalidateQueries({
@@ -53,9 +64,11 @@ export const useUpdateChecklist = () => {
 }
 
 export const useDeleteChecklist = () => {
+  const { remove } = useChecklistService()
   const queryClient = useQueryClient()
+
   return useMutation({
-    mutationFn: ChecklistService.delete,
+    mutationFn: remove,
     onSuccess: () => {
       toast.success('Checklist deleted successfully!')
       queryClient.invalidateQueries({ queryKey: checklistQueryKeys.all })

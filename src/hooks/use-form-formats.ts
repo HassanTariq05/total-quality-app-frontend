@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { FormFormatService } from '@/services/form-format-services/form-format-services'
+import { useFormFormatService } from '@/services/form-format-services/form-format-services'
 import { toast } from 'sonner'
 
 export const formFormatQueryKeys = {
@@ -7,38 +7,49 @@ export const formFormatQueryKeys = {
   byId: (id: string) => ['formFormats', id] as const,
 }
 
-export const useFormFormats = (id: string) =>
-  useQuery({
-    queryKey: formFormatQueryKeys.byId(id),
-    queryFn: () => FormFormatService.getAll(id),
-  })
+export const useFormFormats = (chapterId: string) => {
+  const { getAll } = useFormFormatService()
 
-export const useFormFormat = (id: string) =>
-  useQuery({
+  return useQuery({
+    queryKey: formFormatQueryKeys.byId(chapterId),
+    queryFn: () => getAll(chapterId),
+    enabled: !!chapterId,
+  })
+}
+
+export const useFormFormat = (id: string) => {
+  const { getByFormId } = useFormFormatService()
+
+  return useQuery({
     queryKey: formFormatQueryKeys.byId(id),
-    queryFn: () => FormFormatService.getById(id),
+    queryFn: () => getByFormId(id),
     enabled: !!id,
   })
+}
 
 export const useCreateFormFormat = () => {
+  const { create } = useFormFormatService()
   const queryClient = useQueryClient()
+
   return useMutation({
-    mutationFn: FormFormatService.create,
+    mutationFn: create,
     onSuccess: () => {
       toast.success('Form Format created successfully!')
       queryClient.invalidateQueries({ queryKey: formFormatQueryKeys.all })
     },
     onError: () => {
-      toast.error('Failed to create formFormat.')
+      toast.error('Failed to create form format.')
     },
   })
 }
 
 export const useUpdateFormFormat = () => {
+  const { update } = useFormFormatService()
   const queryClient = useQueryClient()
+
   return useMutation({
     mutationFn: ({ id, payload }: { id: string; payload: any }) =>
-      FormFormatService.update(id, payload),
+      update(id, payload),
     onSuccess: (_, { id }) => {
       toast.success('Form Format updated successfully!')
       queryClient.invalidateQueries({
@@ -47,21 +58,23 @@ export const useUpdateFormFormat = () => {
       queryClient.invalidateQueries({ queryKey: formFormatQueryKeys.all })
     },
     onError: () => {
-      toast.error('Failed to update formFormat.')
+      toast.error('Failed to update form format.')
     },
   })
 }
 
 export const useDeleteFormFormat = () => {
+  const { remove } = useFormFormatService()
   const queryClient = useQueryClient()
+
   return useMutation({
-    mutationFn: FormFormatService.delete,
+    mutationFn: remove,
     onSuccess: () => {
       toast.success('Form Format deleted successfully!')
       queryClient.invalidateQueries({ queryKey: formFormatQueryKeys.all })
     },
     onError: () => {
-      toast.error('Failed to delete formFormat.')
+      toast.error('Failed to delete form format.')
     },
   })
 }

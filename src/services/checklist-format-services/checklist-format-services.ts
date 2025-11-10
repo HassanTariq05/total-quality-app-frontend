@@ -1,4 +1,4 @@
-import apiClient from '@/lib/axios'
+import { useApiClient } from '@/lib/axios'
 
 export interface ChecklistFormat {
   id: string
@@ -9,46 +9,48 @@ export interface ChecklistFormat {
 export type CreateChecklistFormatPayload = Omit<ChecklistFormat, 'id'>
 export type UpdateChecklistFormatPayload = Partial<CreateChecklistFormatPayload>
 
-export const ChecklistFormatService = {
-  getAll: async (id: string): Promise<ChecklistFormat[]> => {
+export const useChecklistFormatService = () => {
+  const apiClient = useApiClient()
+
+  const getAll = async (chapterId: string): Promise<ChecklistFormat[]> => {
     const { data } = await apiClient.get(
-      `/checklistFormats/getAllByChapterId/${id}`
+      `/checklistFormats/getAllByChapterId/${chapterId}`
     )
     return data
-  },
+  }
 
-  getChecklistFormatChecklistId: async (
-    id: string
+  const getByChecklistId = async (
+    checklistId: string
   ): Promise<ChecklistFormat> => {
     const { data } = await apiClient.get(
-      `/checklistFormats/getChecklistFormatByChecklistId/${id}`
+      `/checklistFormats/getChecklistFormatByChecklistId/${checklistId}`
     )
     return data
-  },
+  }
 
-  getById: async (id: string): Promise<ChecklistFormat> => {
-    const { data } = await apiClient.get(
-      `/checklistFormats/getChecklistFormatByChecklistId/${id}`
-    )
+  const getById = async (id: string): Promise<ChecklistFormat> => {
+    const { data } = await apiClient.get(`/checklistFormats/${id}`)
     return data
-  },
+  }
 
-  create: async (
+  const create = async (
     payload: CreateChecklistFormatPayload
   ): Promise<ChecklistFormat> => {
     const { data } = await apiClient.post('/checklistFormats', payload)
     return data
-  },
+  }
 
-  update: async (
+  const update = async (
     id: string,
     payload: UpdateChecklistFormatPayload
   ): Promise<ChecklistFormat> => {
     const { data } = await apiClient.put(`/checklistFormats/${id}`, payload)
     return data
-  },
+  }
 
-  delete: async (id: string): Promise<void> => {
+  const remove = async (id: string): Promise<void> => {
     await apiClient.delete(`/checklistFormats/${id}`)
-  },
+  }
+
+  return { getAll, getByChecklistId, getById, create, update, remove }
 }

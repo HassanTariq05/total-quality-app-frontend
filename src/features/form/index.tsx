@@ -98,7 +98,7 @@ export function FormView() {
             <FormBuilder formId={formId} mode={mode} setMode={setMode} />
           </div>
           <div className={mode === 'viewer' ? 'block' : 'hidden'}>
-            <FormViewer />
+            <FormViewer formId={formId} />
           </div>
         </div>
       </Main>

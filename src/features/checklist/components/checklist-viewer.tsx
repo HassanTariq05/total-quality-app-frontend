@@ -189,17 +189,17 @@ export const ChecklistViewer: React.FC = () => {
       {/* Submit button */}
       <div className='flex justify-center pt-4'>
         <Button type='submit' className='px-6 py-2 text-lg'>
-          Submit Form
+          Submit Checklist
         </Button>
       </div>
 
       {/* Debug: Show live JSON values */}
-      <div className='mt-6'>
+      {/* <div className='mt-6'>
         <h3 className='mb-2 font-medium'>Filled Values</h3>
         <pre className='overflow-auto rounded bg-gray-900 p-3 text-sm text-gray-100'>
           {JSON.stringify(formData, null, 2)}
         </pre>
-      </div>
+      </div> */}
     </form>
   )
 }

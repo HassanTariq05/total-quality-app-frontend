@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { FormService } from '@/services/form-services/form-services'
+import { useFormService } from '@/services/form-services/form-services'
 import { toast } from 'sonner'
 
 export const formQueryKeys = {
@@ -7,23 +7,32 @@ export const formQueryKeys = {
   byId: (id: string) => ['forms', id] as const,
 }
 
-export const useForms = (id: string) =>
-  useQuery({
-    queryKey: formQueryKeys.byId(id),
-    queryFn: () => FormService.getAll(id),
-  })
+export const useForms = (chapterId: string) => {
+  const { getAll } = useFormService()
 
-export const useForm = (id: string) =>
-  useQuery({
+  return useQuery({
+    queryKey: formQueryKeys.byId(chapterId),
+    queryFn: () => getAll(chapterId),
+    enabled: !!chapterId,
+  })
+}
+
+export const useForm = (id: string) => {
+  const { getById } = useFormService()
+
+  return useQuery({
     queryKey: formQueryKeys.byId(id),
-    queryFn: () => FormService.getById(id),
+    queryFn: () => getById(id),
     enabled: !!id,
   })
+}
 
 export const useCreateForm = () => {
+  const { create } = useFormService()
   const queryClient = useQueryClient()
+
   return useMutation({
-    mutationFn: FormService.create,
+    mutationFn: create,
     onSuccess: () => {
       toast.success('Form created successfully!')
       queryClient.invalidateQueries({ queryKey: formQueryKeys.all })
@@ -35,15 +44,15 @@ export const useCreateForm = () => {
 }
 
 export const useUpdateForm = () => {
+  const { update } = useFormService()
   const queryClient = useQueryClient()
+
   return useMutation({
     mutationFn: ({ id, payload }: { id: string; payload: any }) =>
-      FormService.update(id, payload),
+      update(id, payload),
     onSuccess: (_, { id }) => {
       toast.success('Form updated successfully!')
-      queryClient.invalidateQueries({
-        queryKey: formQueryKeys.byId(id),
-      })
+      queryClient.invalidateQueries({ queryKey: formQueryKeys.byId(id) })
       queryClient.invalidateQueries({ queryKey: formQueryKeys.all })
     },
     onError: () => {
@@ -53,9 +62,11 @@ export const useUpdateForm = () => {
 }
 
 export const useDeleteForm = () => {
+  const { remove } = useFormService()
   const queryClient = useQueryClient()
+
   return useMutation({
-    mutationFn: FormService.delete,
+    mutationFn: remove,
     onSuccess: () => {
       toast.success('Form deleted successfully!')
       queryClient.invalidateQueries({ queryKey: formQueryKeys.all })

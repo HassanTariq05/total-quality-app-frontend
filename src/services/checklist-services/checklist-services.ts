@@ -1,4 +1,5 @@
-import apiClient from '@/lib/axios'
+// services/checklist-services/useChecklistService.ts
+import { useApiClient } from '@/lib/axios'
 
 export interface Checklist {
   id: string
@@ -27,38 +28,48 @@ export type CreateChecklistPayload = Omit<
 >
 export type UpdateChecklistPayload = Partial<CreateChecklistPayload>
 
-export const ChecklistService = {
-  getAll: async (id: string): Promise<Checklist[]> => {
-    const { data } = await apiClient.get(`/checklists/getAllByChapterId/${id}`)
-    return data
-  },
+export const useChecklistService = () => {
+  const apiClient = useApiClient()
 
-  getFormFormatByFormId: async (id: string): Promise<ChecklistFormat> => {
+  const getAll = async (chapterId: string): Promise<Checklist[]> => {
     const { data } = await apiClient.get(
-      `/checklists/getChecklistFormatByChecklistId/${id}`
+      `/checklists/getAllByChapterId/${chapterId}`
     )
     return data
-  },
+  }
 
-  getById: async (id: string): Promise<Checklist> => {
+  const getById = async (id: string): Promise<Checklist> => {
     const { data } = await apiClient.get(`/checklists/${id}`)
     return data
-  },
+  }
 
-  create: async (payload: CreateChecklistPayload): Promise<Checklist> => {
+  const getFormFormatByFormId = async (
+    checklistId: string
+  ): Promise<ChecklistFormat> => {
+    const { data } = await apiClient.get(
+      `/checklists/getChecklistFormatByChecklistId/${checklistId}`
+    )
+    return data
+  }
+
+  const create = async (
+    payload: CreateChecklistPayload
+  ): Promise<Checklist> => {
     const { data } = await apiClient.post('/checklists', payload)
     return data
-  },
+  }
 
-  update: async (
+  const update = async (
     id: string,
     payload: UpdateChecklistPayload
   ): Promise<Checklist> => {
     const { data } = await apiClient.put(`/checklists/${id}`, payload)
     return data
-  },
+  }
 
-  delete: async (id: string): Promise<void> => {
+  const remove = async (id: string): Promise<void> => {
     await apiClient.delete(`/checklists/${id}`)
-  },
+  }
+
+  return { getAll, getById, getFormFormatByFormId, create, update, remove }
 }

@@ -1,4 +1,4 @@
-import apiClient from '@/lib/axios'
+import { useApiClient } from '@/lib/axios'
 
 export interface Chapter {
   id: string
@@ -15,33 +15,37 @@ export interface Chapter {
 export type CreateChapterPayload = Omit<Chapter, 'id' | 'accreditation'>
 export type UpdateChapterPayload = Partial<CreateChapterPayload>
 
-export const ChapterService = {
-  getAll: async (id: string): Promise<Chapter[]> => {
+export const useChapterService = () => {
+  const apiClient = useApiClient()
+
+  const getAll = async (id: string): Promise<Chapter[]> => {
     const { data } = await apiClient.get(
       `/chapters/getAllByAccreditationId/${id}`
     )
     return data
-  },
+  }
 
-  getById: async (id: string): Promise<Chapter> => {
+  const getById = async (id: string): Promise<Chapter> => {
     const { data } = await apiClient.get(`/chapters/${id}`)
     return data
-  },
+  }
 
-  create: async (payload: CreateChapterPayload): Promise<Chapter> => {
+  const create = async (payload: CreateChapterPayload): Promise<Chapter> => {
     const { data } = await apiClient.post('/chapters', payload)
     return data
-  },
+  }
 
-  update: async (
+  const update = async (
     id: string,
     payload: UpdateChapterPayload
   ): Promise<Chapter> => {
     const { data } = await apiClient.put(`/chapters/${id}`, payload)
     return data
-  },
+  }
 
-  delete: async (id: string): Promise<void> => {
+  const remove = async (id: string): Promise<void> => {
     await apiClient.delete(`/chapters/${id}`)
-  },
+  }
+
+  return { getAll, getById, create, update, remove }
 }

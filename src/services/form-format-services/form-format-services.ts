@@ -1,4 +1,4 @@
-import apiClient from '@/lib/axios'
+import { useApiClient } from '@/lib/axios'
 
 export interface FormFormat {
   id: string
@@ -9,40 +9,46 @@ export interface FormFormat {
 export type CreateFormFormatPayload = Omit<FormFormat, 'id'>
 export type UpdateFormFormatPayload = Partial<CreateFormFormatPayload>
 
-export const FormFormatService = {
-  getAll: async (id: string): Promise<FormFormat[]> => {
-    const { data } = await apiClient.get(`/formFormats/getAllByChapterId/${id}`)
-    return data
-  },
+export const useFormFormatService = () => {
+  const apiClient = useApiClient()
 
-  getFormFormatFormId: async (id: string): Promise<FormFormat> => {
+  const getAll = async (chapterId: string): Promise<FormFormat[]> => {
     const { data } = await apiClient.get(
-      `/formFormats/getFormFormatByFormId/${id}`
+      `/formFormats/getAllByChapterId/${chapterId}`
     )
     return data
-  },
+  }
 
-  getById: async (id: string): Promise<FormFormat> => {
+  const getByFormId = async (formId: string): Promise<FormFormat> => {
     const { data } = await apiClient.get(
-      `/formFormats/getFormFormatByFormId/${id}`
+      `/formFormats/getFormFormatByFormId/${formId}`
     )
     return data
-  },
+  }
 
-  create: async (payload: CreateFormFormatPayload): Promise<FormFormat> => {
+  const getById = async (id: string): Promise<FormFormat> => {
+    const { data } = await apiClient.get(`/formFormats/${id}`)
+    return data
+  }
+
+  const create = async (
+    payload: CreateFormFormatPayload
+  ): Promise<FormFormat> => {
     const { data } = await apiClient.post('/formFormats', payload)
     return data
-  },
+  }
 
-  update: async (
+  const update = async (
     id: string,
     payload: UpdateFormFormatPayload
   ): Promise<FormFormat> => {
     const { data } = await apiClient.put(`/formFormats/${id}`, payload)
     return data
-  },
+  }
 
-  delete: async (id: string): Promise<void> => {
+  const remove = async (id: string): Promise<void> => {
     await apiClient.delete(`/formFormats/${id}`)
-  },
+  }
+
+  return { getAll, getByFormId, getById, create, update, remove }
 }

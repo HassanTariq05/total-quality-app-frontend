@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { ChecklistFormatService } from '@/services/checklist-format-services/checklist-format-services'
+import { useChecklistFormatService } from '@/services/checklist-format-services/checklist-format-services'
 import { toast } from 'sonner'
 
 export const checklistFormatQueryKeys = {
@@ -7,38 +7,49 @@ export const checklistFormatQueryKeys = {
   byId: (id: string) => ['checklistFormats', id] as const,
 }
 
-export const useChecklistFormats = (id: string) =>
-  useQuery({
-    queryKey: checklistFormatQueryKeys.byId(id),
-    queryFn: () => ChecklistFormatService.getAll(id),
-  })
+export const useChecklistFormats = (chapterId: string) => {
+  const { getAll } = useChecklistFormatService()
 
-export const useChecklistFormat = (id: string) =>
-  useQuery({
+  return useQuery({
+    queryKey: checklistFormatQueryKeys.byId(chapterId),
+    queryFn: () => getAll(chapterId),
+    enabled: !!chapterId,
+  })
+}
+
+export const useChecklistFormat = (id: string) => {
+  const { getById } = useChecklistFormatService()
+
+  return useQuery({
     queryKey: checklistFormatQueryKeys.byId(id),
-    queryFn: () => ChecklistFormatService.getById(id),
+    queryFn: () => getById(id),
     enabled: !!id,
   })
+}
 
 export const useCreateChecklistFormat = () => {
+  const { create } = useChecklistFormatService()
   const queryClient = useQueryClient()
+
   return useMutation({
-    mutationFn: ChecklistFormatService.create,
+    mutationFn: create,
     onSuccess: () => {
       toast.success('Form Format created successfully!')
       queryClient.invalidateQueries({ queryKey: checklistFormatQueryKeys.all })
     },
     onError: () => {
-      toast.error('Failed to create checklistFormat.')
+      toast.error('Failed to create checklist format.')
     },
   })
 }
 
 export const useUpdateChecklistFormat = () => {
+  const { update } = useChecklistFormatService()
   const queryClient = useQueryClient()
+
   return useMutation({
     mutationFn: ({ id, payload }: { id: string; payload: any }) =>
-      ChecklistFormatService.update(id, payload),
+      update(id, payload),
     onSuccess: (_, { id }) => {
       toast.success('Form Format updated successfully!')
       queryClient.invalidateQueries({
@@ -47,21 +58,23 @@ export const useUpdateChecklistFormat = () => {
       queryClient.invalidateQueries({ queryKey: checklistFormatQueryKeys.all })
     },
     onError: () => {
-      toast.error('Failed to update checklistFormat.')
+      toast.error('Failed to update checklist format.')
     },
   })
 }
 
 export const useDeleteChecklistFormat = () => {
+  const { remove } = useChecklistFormatService()
   const queryClient = useQueryClient()
+
   return useMutation({
-    mutationFn: ChecklistFormatService.delete,
+    mutationFn: remove,
     onSuccess: () => {
       toast.success('Form Format deleted successfully!')
       queryClient.invalidateQueries({ queryKey: checklistFormatQueryKeys.all })
     },
     onError: () => {
-      toast.error('Failed to delete checklistFormat.')
+      toast.error('Failed to delete checklist format.')
     },
   })
 }

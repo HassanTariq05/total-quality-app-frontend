@@ -102,7 +102,7 @@ export function ChecklistView() {
             />
           </div>
           <div className={mode === 'viewer' ? 'block' : 'hidden'}>
-            <ChecklistViewer />
+            <ChecklistViewer checklistId={checklistId} />
           </div>
         </div>
       </Main>

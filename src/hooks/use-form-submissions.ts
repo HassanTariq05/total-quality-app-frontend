@@ -55,9 +55,15 @@ export const useCreateFormSubmission = () => {
 
   return useMutation({
     mutationFn: create,
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       toast.success('Form submitted successfully!')
-      queryClient.invalidateQueries({ queryKey: formSubmissionQueryKeys.all })
+
+      queryClient.invalidateQueries({
+        queryKey: formSubmissionQueryKeys.byOrganisationIdAndFormId(
+          variables.organisationId,
+          variables.formId
+        ),
+      })
     },
     onError: () => {
       toast.error('Failed to submit form.')

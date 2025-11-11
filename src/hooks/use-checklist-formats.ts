@@ -27,6 +27,16 @@ export const useChecklistFormat = (id: string) => {
   })
 }
 
+export const useChecklistFormatByChecklistId = (id: string) => {
+  const { getByChecklistId } = useChecklistFormatService()
+
+  return useQuery({
+    queryKey: checklistFormatQueryKeys.byId(id),
+    queryFn: () => getByChecklistId(id),
+    enabled: !!id,
+  })
+}
+
 export const useCreateChecklistFormat = () => {
   const { create } = useChecklistFormatService()
   const queryClient = useQueryClient()

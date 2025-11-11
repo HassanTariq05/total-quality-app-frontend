@@ -1,16 +1,19 @@
 import React, { useState } from 'react'
 import { UpdateChecklistFormatPayload } from '@/services/checklist-format-services/checklist-format-services'
-import { X, Plus, Pencil, Trash } from 'lucide-react'
+import { X, Plus, Pencil, Trash, Copy } from 'lucide-react'
+import { v4 as uuidv4 } from 'uuid'
 import { useFormBuilderStore } from '@/stores/useFormBuilderStore'
 import { cn } from '@/lib/utils'
 import {
   useCreateChecklistFormat,
+  useDeleteChecklistFormat,
   useUpdateChecklistFormat,
 } from '@/hooks/use-checklist-formats'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Table, TableRow, TableCell, TableBody } from '@/components/ui/table'
+import { DeleteDialog } from '@/features/accreditation/components/delete-dialog'
 import { CellEditorModal } from './table-cell-editor-modal'
 
 export const FieldEditor: React.FC<{
@@ -23,6 +26,8 @@ export const FieldEditor: React.FC<{
   const { updateField, removeField, form } = useFormBuilderStore()
 
   const [modalOpen, setModalOpen] = useState(false)
+  const [openDeleteModal, setOpenDeleteModal] = useState(false)
+  const [deleteChecklistId, setDeleteChecklistId] = useState('')
   const [editingCell, setEditingCell] = useState<{
     row: number
     col: number
@@ -64,6 +69,7 @@ export const FieldEditor: React.FC<{
         ? r.map((c: any, cIdx: any) =>
             cIdx === col
               ? {
+                  id: c.id || uuidv4(),
                   type,
                   value: value || (type === 'label' ? 'Label' : ''),
                   bg: bg || c.bg,
@@ -81,7 +87,13 @@ export const FieldEditor: React.FC<{
 
   const handleAddRow = () => {
     const newRow = [
-      { type: 'field', value: '', bg: 'bg-card/40', placeholder: 'Field' },
+      {
+        id: uuidv4(),
+        type: 'field',
+        value: '',
+        bg: 'bg-card/40',
+        placeholder: 'Field',
+      },
     ]
     updateField(field.id, { rows: [...field.rows, newRow] })
   }
@@ -92,6 +104,7 @@ export const FieldEditor: React.FC<{
         ? [
             ...r,
             {
+              id: uuidv4(),
               type: 'field',
               value: '',
               bg: 'bg-card/40',
@@ -102,6 +115,23 @@ export const FieldEditor: React.FC<{
           ]
         : r
     )
+    updateField(field.id, { rows: newRows })
+  }
+
+  const handleCloneRow = (rowIdx: number) => {
+    const rowToClone = field.rows[rowIdx]
+
+    const clonedRow = rowToClone.map((cell: any) => ({
+      ...cell,
+      id: uuidv4(),
+    }))
+
+    const newRows = [
+      ...field.rows.slice(0, rowIdx + 1),
+      clonedRow,
+      ...field.rows.slice(rowIdx + 1),
+    ]
+
     updateField(field.id, { rows: newRows })
   }
 
@@ -120,10 +150,7 @@ export const FieldEditor: React.FC<{
 
   const createChecklistFormatMutation = useCreateChecklistFormat()
   const updateChecklistFormatMutation = useUpdateChecklistFormat()
-
-  // const handleSubmit = () => {
-  //   console.log('Submitted Structure: ', JSON.stringify(form, null, 2))
-  // }
+  const deleteChecklistFormatMutation = useDeleteChecklistFormat()
 
   const handleSubmit = () => {
     if (formType === 'update') {
@@ -143,6 +170,11 @@ export const FieldEditor: React.FC<{
     }
   }
 
+  const handleDeleteChecklist = () => {
+    removeField(deleteChecklistId)
+    deleteChecklistFormatMutation.mutate(formFormatId || '')
+  }
+
   return (
     <Card className='bg-card text-card-foreground border-border shadow-sm'>
       <CardHeader className='flex items-center justify-between'>
@@ -154,7 +186,10 @@ export const FieldEditor: React.FC<{
         <Button
           variant='ghost'
           size='icon'
-          onClick={() => removeField(field.id)}
+          onClick={() => {
+            setOpenDeleteModal(true)
+            setDeleteChecklistId(field.id)
+          }}
           className='text-destructive hover:text-destructive/80'
         >
           <X className='h-4 w-4' />
@@ -270,6 +305,18 @@ export const FieldEditor: React.FC<{
                         </Button>
                       </TableCell>
 
+                      <TableCell className='bg-muted flex w-10 flex-shrink-0 text-center'>
+                        <Button
+                          variant='ghost'
+                          size='icon'
+                          onClick={() => handleCloneRow(rIdx)}
+                          className='text-muted-foreground hover:text-foreground h-6 w-6 self-center rounded-full p-0 hover:bg-transparent'
+                          title='Clone row'
+                        >
+                          <Copy className='h-3 w-3' />
+                        </Button>
+                      </TableCell>
+
                       {/* Delete row button */}
                       <TableCell className='bg-muted flex w-10 flex-shrink-0 text-center'>
                         <Button
@@ -322,6 +369,14 @@ export const FieldEditor: React.FC<{
           onSave={handleSaveCell}
         />
       )}
+
+      <DeleteDialog
+        open={openDeleteModal}
+        title='Confirm'
+        description='Are you sure to delete this checklist format?'
+        onOpenChange={() => setOpenDeleteModal(openDeleteModal)}
+        onConfirm={() => handleDeleteChecklist()}
+      />
     </Card>
   )
 }

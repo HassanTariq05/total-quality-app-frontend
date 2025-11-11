@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { useFormBuilderStore } from '@/stores/useFormBuilderStore'
-import { useChecklistFormat } from '@/hooks/use-checklist-formats'
+import {
+  useChecklistFormat,
+  useChecklistFormatByChecklistId,
+} from '@/hooks/use-checklist-formats'
 import { Button } from '@/components/ui/button'
 import { FieldEditor } from './field-editor'
 
@@ -13,7 +16,7 @@ export const ChecklistBuilder: React.FC<{
 
   const [formType, setFormType] = useState<'create' | 'update'>('create')
 
-  const { data: formData } = useChecklistFormat(checklistId)
+  const { data: formData } = useChecklistFormatByChecklistId(checklistId)
   useEffect(() => {
     if (!formData) return
 

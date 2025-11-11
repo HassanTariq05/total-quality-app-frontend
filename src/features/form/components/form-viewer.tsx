@@ -195,12 +195,12 @@ export const FormViewer: React.FC<FormViewerProps> = ({ formId }) => {
         </Button>
       </div>
 
-      <div className='mt-6'>
+      {/* <div className='mt-6'>
         <h3 className='mb-2 font-medium'>Filled Values</h3>
         <pre className='rounded bg-gray-900 p-3 text-sm text-gray-100'>
           {JSON.stringify(formData, null, 2)}
         </pre>
-      </div>
+      </div> */}
     </form>
   )
 }

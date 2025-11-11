@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useFormBuilderStore } from '@/stores/useFormBuilderStore'
-import {
-  useChecklistFormat,
-  useChecklistFormatByChecklistId,
-} from '@/hooks/use-checklist-formats'
+import { useChecklistFormatByChecklistId } from '@/hooks/use-checklist-formats'
 import { Button } from '@/components/ui/button'
 import { FieldEditor } from './field-editor'
 

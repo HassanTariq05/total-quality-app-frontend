@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
+import { FormFormat } from '@/services/form-format-services/types'
 import { useFormBuilderStore } from '@/stores/useFormBuilderStore'
-import { useFormFormat } from '@/hooks/use-form-formats'
 import { Button } from '@/components/ui/button'
 import { FieldEditor } from './field-editor'
 
@@ -8,20 +8,10 @@ export const FormBuilder: React.FC<{
   mode: any
   setMode: any
   formId: string
-}> = ({ mode, formId }) => {
-  const { form, addField, setForm } = useFormBuilderStore()
-
-  const [formType, setFormType] = useState<'create' | 'update'>('create')
-
-  const { data: formData } = useFormFormat(formId)
-  useEffect(() => {
-    if (!formData) return
-
-    console.log('Form Data:', formData)
-    console.log('form', form)
-    setForm(JSON.parse(formData.format || '{}'))
-    setFormType('update')
-  }, [formData])
+  formData: FormFormat | undefined
+  formType: any
+}> = ({ mode, formId, formData, formType }) => {
+  const { form, addField } = useFormBuilderStore()
 
   return (
     <div className='p-0'>
@@ -39,13 +29,34 @@ export const FormBuilder: React.FC<{
       </div>
 
       {form.fields.length === 0 && (
-        <div className='mt-2 flex gap-2'>
+        <div className='border-muted-foreground/30 bg-muted/30 flex h-[60vh] flex-col items-center justify-center rounded-lg border border-dashed p-10 text-center'>
+          <div className='bg-primary/10 mb-4 rounded-full p-4'>
+            <svg
+              xmlns='http://www.w3.org/2000/svg'
+              className='text-primary h-10 w-10'
+              fill='none'
+              viewBox='0 0 24 24'
+              strokeWidth={1.5}
+              stroke='currentColor'
+            >
+              <path
+                strokeLinecap='round'
+                strokeLinejoin='round'
+                d='M12 4v16m8-8H4'
+              />
+            </svg>
+          </div>
+
+          <h2 className='text-foreground text-xl font-semibold'>Let’s Build</h2>
+          <p className='text-muted-foreground mt-2 max-w-sm text-sm'>
+            Click the button below to start building.
+          </p>
           <Button
             size='sm'
-            className='bg-primary hover:bg-primary/90 text-primary-foreground'
+            className='bg-primary hover:bg-primary/90 text-primary-foreground mt-6 transition-all'
             onClick={() => addField('table')}
           >
-            + Add Form
+            + Create Form Layout
           </Button>
         </div>
       )}

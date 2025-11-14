@@ -38,7 +38,8 @@ export const useChecklistSubmission = (id: string) => {
 
 export const useGetChecklistSubmissionByOrgIdAndChecklistId = (
   organisationId: string,
-  checklistId: string
+  checklistId: string,
+  options?: { enabled?: boolean }
 ) => {
   const { getByOrganisationIdAndChecklistId } = useChecklistSubmissionService()
 
@@ -49,7 +50,7 @@ export const useGetChecklistSubmissionByOrgIdAndChecklistId = (
     ),
     queryFn: () =>
       getByOrganisationIdAndChecklistId(organisationId, checklistId),
-    enabled: !!checklistId || !!organisationId,
+    enabled: !!checklistId && !!organisationId && (options?.enabled ?? true),
   })
 }
 

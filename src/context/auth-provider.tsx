@@ -1,11 +1,10 @@
 import { ReactNode, useEffect, useState } from 'react'
 import axios from 'axios'
-// import { useNavigate } from '@tanstack/react-router'
+import { Loader2 } from 'lucide-react'
 import { useAuthStore } from '@/stores/auth-store'
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const { auth } = useAuthStore()
-  //   const navigate = useNavigate()
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -36,7 +35,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     init()
   }, [])
 
-  if (loading) return <div>Loading...</div>
+  if (loading) {
+    return (
+      <div className='flex h-screen w-full items-center justify-center'>
+        <Loader2 className='text-muted-foreground h-10 w-10 animate-spin' />
+      </div>
+    )
+  }
 
   return <>{children}</>
 }

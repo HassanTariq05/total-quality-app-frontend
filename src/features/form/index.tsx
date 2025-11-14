@@ -1,6 +1,11 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams } from '@tanstack/react-router'
+import { Loader2 } from 'lucide-react'
+import { useAuthStore } from '@/stores/auth-store'
+import { useFormBuilderStore } from '@/stores/useFormBuilderStore'
 import { cn } from '@/lib/utils'
+import { useFormFormat } from '@/hooks/use-form-formats'
+import { useGetFormSubmissionByOrgIdAndFormId } from '@/hooks/use-form-submissions'
 import { useForm } from '@/hooks/use-forms'
 import { Badge } from '@/components/ui/badge'
 import { Label } from '@/components/ui/label'
@@ -22,21 +27,48 @@ export function FormView() {
     from: '/_authenticated/form/$formId',
   })
 
+  const [formType, setFormType] = useState<'create' | 'update'>('create')
+  const { setForm } = useFormBuilderStore()
+  const { auth } = useAuthStore()
+
   const { formId } = params
-
-  const { data: form } = useForm(formId)
-
+  const { data: form, isLoading } = useForm(formId)
   const badgeColor = badgeTypes.get(form?.status?.toLowerCase())
 
-  const [mode, setMode] = useState<'builder' | 'viewer'>('builder')
+  const { data: formData } = useFormFormat(formId)
+
+  useEffect(() => {
+    if (!formData) return
+
+    console.log('Form Data:', formData)
+    console.log('form', form)
+    setForm(JSON.parse(formData.format || '{}'))
+    setFormType('update')
+  }, [formData])
+
+  const { data: formSubmissionData, isLoading: isFetchingFormSubmission } =
+    useGetFormSubmissionByOrgIdAndFormId(
+      auth?.user?.organisation?.id || '',
+      formId,
+      {
+        enabled: !!formData?.format,
+      }
+    )
+
+  const [mode, setMode] = useState<'builder' | 'viewer'>('viewer')
 
   const handleCheckChange = () => {
-    if (mode === 'builder') {
-      setMode('viewer')
-    } else {
-      setMode('builder')
-    }
+    setMode(mode === 'builder' ? 'viewer' : 'builder')
   }
+
+  if (isLoading) {
+    return (
+      <div className='flex h-screen w-full items-center justify-center'>
+        <Loader2 className='text-muted-foreground h-10 w-10 animate-spin' />
+      </div>
+    )
+  }
+
   return (
     <FormsProvider>
       <Header fixed>
@@ -48,7 +80,7 @@ export function FormView() {
         </div>
       </Header>
 
-      <Main className='sm:gap- flex flex-1 flex-col gap-4'>
+      <Main className='flex flex-1 flex-col gap-4'>
         <FormBreadcrumb
           chapterId={form?.chapter?.id || ''}
           chapterName={form?.chapter?.title || ''}
@@ -59,7 +91,7 @@ export function FormView() {
         />
 
         <div className='mb-0 flex items-center justify-between space-y-2'>
-          <div className='m-0'>
+          <div>
             <div className='flex items-center gap-2'>
               <h2 className='text-2xl font-bold tracking-tight'>
                 {form?.title}
@@ -74,12 +106,12 @@ export function FormView() {
                 {form?.status}
               </Badge>
             </div>
-
             <p className='text-muted-foreground'>{form?.description}</p>
           </div>
+
           <div className='flex items-center space-x-2'>
             <Switch
-              checked={mode === 'builder' ? true : false}
+              checked={mode === 'builder'}
               onCheckedChange={handleCheckChange}
               id='mode'
             />
@@ -87,19 +119,22 @@ export function FormView() {
           </div>
         </div>
 
-        {/* {mode === 'builder' ? (
-          <FormBuilder formId={formId} mode={mode} setMode={setMode} />
-        ) : (
-          <FormViewer />
-        )} */}
-
         <div className='relative'>
-          <div className={mode === 'builder' ? 'block' : 'hidden'}>
-            <FormBuilder formId={formId} mode={mode} setMode={setMode} />
-          </div>
-          <div className={mode === 'viewer' ? 'block' : 'hidden'}>
-            <FormViewer formId={formId} />
-          </div>
+          {mode === 'builder' ? (
+            <FormBuilder
+              formData={formData}
+              formType={formType}
+              formId={formId}
+              mode={mode}
+              setMode={setMode}
+            />
+          ) : (
+            <FormViewer
+              formSubmissionData={formSubmissionData}
+              isFetchingSubmissionData={isFetchingFormSubmission}
+              formId={formId}
+            />
+          )}
         </div>
       </Main>
     </FormsProvider>

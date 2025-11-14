@@ -30,9 +30,9 @@ export function FormsDialogs({ chapter }: FormsDialogsProps) {
         <>
           <FormsMutateDrawer
             key={`form-update-${currentRow.id}`}
-            open={open === 'update'}
+            open={open === 'update-form'}
             onOpenChange={() => {
-              setOpen('update')
+              setOpen('update-form')
               setTimeout(() => {
                 setCurrentRow(null)
               }, 500)

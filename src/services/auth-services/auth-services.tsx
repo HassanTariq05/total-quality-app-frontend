@@ -10,6 +10,7 @@ export interface RegisterUserPayload {
   name: string
   email: string
   password: string
+  organisationId: string
 }
 
 export interface AuthUser {

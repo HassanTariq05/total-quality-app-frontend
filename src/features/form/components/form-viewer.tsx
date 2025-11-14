@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from 'react'
-import { UpdateFormSubmissionPayload } from '@/services/form-submission-services/form-submission-service'
+import {
+  FormSubmission,
+  UpdateFormSubmissionPayload,
+} from '@/services/form-submission-services/form-submission-service'
+import { Loader2 } from 'lucide-react'
 import { useAuthStore } from '@/stores/auth-store'
 import { useFormBuilderStore } from '@/stores/useFormBuilderStore'
 import { cn } from '@/lib/utils'
 import {
   useCreateFormSubmission,
-  useGetFormSubmissionByOrgIdAndFormId,
   useUpdateFormSubmission,
 } from '@/hooks/use-form-submissions'
 import { Button } from '@/components/ui/button'
@@ -17,9 +20,15 @@ import { SignatureField } from './signature-field'
 
 type FormViewerProps = {
   formId: string
+  formSubmissionData: FormSubmission | undefined
+  isFetchingSubmissionData: boolean
 }
 
-export const FormViewer: React.FC<FormViewerProps> = ({ formId }) => {
+export const FormViewer: React.FC<FormViewerProps> = ({
+  formId,
+  formSubmissionData,
+  isFetchingSubmissionData,
+}) => {
   const { form } = useFormBuilderStore()
   const { auth } = useAuthStore()
 
@@ -31,10 +40,6 @@ export const FormViewer: React.FC<FormViewerProps> = ({ formId }) => {
 
   const createFormSubmissionMutation = useCreateFormSubmission()
   const updateFormSubmissionMutation = useUpdateFormSubmission()
-  const { data: formSubmissionData } = useGetFormSubmissionByOrgIdAndFormId(
-    auth?.user?.organisation?.id || '',
-    formId
-  )
 
   useEffect(() => {
     if (formSubmissionData?.data) {
@@ -62,11 +67,16 @@ export const FormViewer: React.FC<FormViewerProps> = ({ formId }) => {
     }
   }
 
+  if (isFetchingSubmissionData) {
+    return (
+      <div className='flex h-screen w-full items-center justify-center'>
+        <Loader2 className='text-muted-foreground h-10 w-10 animate-spin' />
+      </div>
+    )
+  }
+
   return (
-    <form
-      onSubmit={handleSubmit}
-      className='bg-background text-foreground space-y-6'
-    >
+    <form onSubmit={handleSubmit} className='bg-background text-foreground'>
       <div className='space-y-4'>
         {form.fields.map((field: any) => (
           <Card key={field.id} className='bg-card border-border shadow-sm'>
@@ -109,7 +119,10 @@ export const FormViewer: React.FC<FormViewerProps> = ({ formId }) => {
                   <Table className='w-full table-fixed'>
                     <TableBody>
                       {field.rows.map((row: any, rIdx: number) => (
-                        <TableRow key={rIdx} className='flex w-full'>
+                        <TableRow
+                          key={rIdx}
+                          className='flex w-full items-center justify-center'
+                        >
                           {row.map((cell: any) => (
                             <TableCell
                               key={cell.id}
@@ -118,63 +131,148 @@ export const FormViewer: React.FC<FormViewerProps> = ({ formId }) => {
                             >
                               <div
                                 className={cn(
-                                  'group flex h-full min-h-[52px] w-full items-center gap-2 p-2',
-                                  {
-                                    'justify-start': cell.alignment === 'left',
-                                    'justify-center':
-                                      cell.alignment === 'center',
-                                    'justify-end': cell.alignment === 'right',
-                                  }
+                                  'flex h-full min-h-[52px] w-full flex-col gap-2 p-2'
                                 )}
                               >
-                                {cell.type === 'label' && (
-                                  <span className='text-sm'>{cell.value}</span>
-                                )}
-
-                                {cell.type === 'field' && (
-                                  <Input
-                                    className='bg-muted text-sm'
-                                    placeholder={cell.placeholder}
-                                    value={formData[cell.id] || ''}
-                                    onChange={(e) =>
-                                      handleChange(cell.id, e.target.value)
-                                    }
-                                  />
-                                )}
-
-                                {cell.type === 'checkbox' && (
-                                  <div className='flex items-center gap-2'>
-                                    <Checkbox
-                                      checked={!!formData[cell.id]}
-                                      onCheckedChange={(checked) =>
-                                        handleChange(cell.id, checked)
-                                      }
-                                    />
-                                    <span className='text-sm'>
+                                <div
+                                  className={cn('flex items-center gap-2', {
+                                    'justify-start text-left':
+                                      cell.alignment === 'left',
+                                    'justify-center text-center':
+                                      cell.alignment === 'center',
+                                    'justify-end text-right':
+                                      cell.alignment === 'right',
+                                  })}
+                                >
+                                  {cell.type === 'label' && (
+                                    <span className='text-sm break-words whitespace-normal'>
                                       {cell.value}
                                     </span>
+                                  )}
+
+                                  {cell.type === 'field' && (
+                                    <Input
+                                      className='bg-muted text-sm'
+                                      placeholder={cell.placeholder}
+                                      value={formData[cell.id] || ''}
+                                      onChange={(e) =>
+                                        handleChange(cell.id, e.target.value)
+                                      }
+                                    />
+                                  )}
+
+                                  {cell.type === 'checkbox' && (
+                                    <div className='flex items-center gap-2'>
+                                      <Checkbox
+                                        checked={!!formData[cell.id]}
+                                        onCheckedChange={(checked) =>
+                                          handleChange(cell.id, checked)
+                                        }
+                                      />
+                                      <span className='text-sm break-words whitespace-normal'>
+                                        {cell.value}
+                                      </span>
+                                    </div>
+                                  )}
+
+                                  {cell.type === 'date' && (
+                                    <Input
+                                      type='date'
+                                      className='bg-muted text-sm'
+                                      value={formData[cell.id] || ''}
+                                      onChange={(e) =>
+                                        handleChange(cell.id, e.target.value)
+                                      }
+                                    />
+                                  )}
+
+                                  {cell.type === 'signature' && (
+                                    <SignatureField
+                                      value={formData[cell.id]}
+                                      onChange={(val) =>
+                                        handleChange(cell.id, val)
+                                      }
+                                    />
+                                  )}
+                                </div>
+
+                                {cell.children?.map((child: any) => (
+                                  <div
+                                    key={child.id}
+                                    className='border-border flex w-full flex-col border-t pt-2'
+                                  >
+                                    <div
+                                      className={cn(
+                                        'flex w-full items-center gap-2',
+                                        {
+                                          'justify-start text-left':
+                                            child.alignment === 'left',
+                                          'justify-center text-center':
+                                            child.alignment === 'center',
+                                          'justify-end text-right':
+                                            child.alignment === 'right',
+                                        }
+                                      )}
+                                    >
+                                      {child.type === 'label' && (
+                                        <span className='text-sm break-words whitespace-normal'>
+                                          {child.value}
+                                        </span>
+                                      )}
+
+                                      {child.type === 'field' && (
+                                        <Input
+                                          className='bg-muted text-sm'
+                                          placeholder={child.placeholder}
+                                          value={formData[child.id] || ''}
+                                          onChange={(e) =>
+                                            handleChange(
+                                              child.id,
+                                              e.target.value
+                                            )
+                                          }
+                                        />
+                                      )}
+
+                                      {child.type === 'checkbox' && (
+                                        <div className='flex items-center gap-2'>
+                                          <Checkbox
+                                            checked={!!formData[child.id]}
+                                            onCheckedChange={(checked) =>
+                                              handleChange(child.id, checked)
+                                            }
+                                          />
+                                          <span className='text-sm'>
+                                            {child.value}
+                                          </span>
+                                        </div>
+                                      )}
+
+                                      {child.type === 'date' && (
+                                        <Input
+                                          type='date'
+                                          className='bg-muted text-sm'
+                                          value={formData[child.id] || ''}
+                                          onChange={(e) =>
+                                            handleChange(
+                                              child.id,
+                                              e.target.value
+                                            )
+                                          }
+                                        />
+                                      )}
+
+                                      {child.type === 'signature' && (
+                                        <SignatureField
+                                          value={formData[child.id]}
+                                          onChange={(val) =>
+                                            handleChange(child.id, val)
+                                          }
+                                        />
+                                      )}
+                                    </div>
                                   </div>
-                                )}
-
-                                {cell.type === 'date' && (
-                                  <Input
-                                    type='date'
-                                    className='bg-muted text-sm'
-                                    value={formData[cell.id] || ''}
-                                    onChange={(e) =>
-                                      handleChange(cell.id, e.target.value)
-                                    }
-                                  />
-                                )}
-
-                                {cell.type === 'signature' && (
-                                  <SignatureField
-                                    value={formData[cell.id]}
-                                    onChange={(val) =>
-                                      handleChange(cell.id, val)
-                                    }
-                                  />
-                                )}
+                                ))}
                               </div>
                             </TableCell>
                           ))}
@@ -189,11 +287,41 @@ export const FormViewer: React.FC<FormViewerProps> = ({ formId }) => {
         ))}
       </div>
 
-      <div className='flex justify-end pt-4'>
-        <Button type='submit'>
-          {formSubmissionData?.data ? 'Update Form' : 'Submit Form'}
-        </Button>
-      </div>
+      {form.fields.length !== 0 && (
+        <div className='flex justify-end pt-4'>
+          <Button type='submit'>
+            {formSubmissionData?.data ? 'Update Form' : 'Submit Form'}
+          </Button>
+        </div>
+      )}
+
+      {form.fields.length === 0 && (
+        <div className='border-muted-foreground/30 bg-muted/30 flex h-[60vh] flex-col items-center justify-center rounded-lg border border-dashed p-10 text-center'>
+          <div className='bg-primary/10 mb-4 rounded-full p-4'>
+            <svg
+              xmlns='http://www.w3.org/2000/svg'
+              className='text-muted-foreground h-10 w-10'
+              fill='none'
+              viewBox='0 0 24 24'
+              stroke='currentColor'
+              strokeWidth={1.5}
+            >
+              <path
+                strokeLinecap='round'
+                strokeLinejoin='round'
+                d='M9 13h6m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h6l6 6v10a2 2 0 01-2 2z'
+              />
+            </svg>
+          </div>
+
+          <h2 className='text-foreground text-xl font-semibold'>
+            No Layout Found
+          </h2>
+          <p className='text-muted-foreground mt-2 max-w-sm text-sm'>
+            It looks like this form hasn’t been created or submitted yet.
+          </p>
+        </div>
+      )}
 
       {/* <div className='mt-6'>
         <h3 className='mb-2 font-medium'>Filled Values</h3>

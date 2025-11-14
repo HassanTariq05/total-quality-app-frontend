@@ -35,7 +35,8 @@ export const useFormSubmission = (id: string) => {
 
 export const useGetFormSubmissionByOrgIdAndFormId = (
   organisationId: string,
-  formId: string
+  formId: string,
+  options?: { enabled?: boolean } // <-- accept options
 ) => {
   const { getByOrganisationIdAndFormId } = useFormSubmissionService()
 
@@ -45,7 +46,7 @@ export const useGetFormSubmissionByOrgIdAndFormId = (
       formId
     ),
     queryFn: () => getByOrganisationIdAndFormId(organisationId, formId),
-    enabled: !!formId || !!organisationId,
+    enabled: !!formId && !!organisationId && (options?.enabled ?? true), // <-- merge with default
   })
 }
 

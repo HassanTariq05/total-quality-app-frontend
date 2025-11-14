@@ -41,8 +41,8 @@ export function UserAuthForm({
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: '',
-      password: '',
+      email: 'hassan.tarique05@gmail.com',
+      password: 'password123',
     },
   })
 
@@ -54,7 +54,7 @@ export function UserAuthForm({
 
         toast.success(`Welcome back, ${res.user.name}!`)
 
-        const target = redirectTo || '/'
+        const target = '/'
         navigate({ to: target, replace: true })
       },
       onError: () => {

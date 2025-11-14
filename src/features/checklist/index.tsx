@@ -1,9 +1,16 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams } from '@tanstack/react-router'
+import { Loader2 } from 'lucide-react'
+import { useAuthStore } from '@/stores/auth-store'
+import { useFormBuilderStore } from '@/stores/useFormBuilderStore'
 import { cn } from '@/lib/utils'
+import { useChecklistFormatByChecklistId } from '@/hooks/use-checklist-formats'
+import { useGetChecklistSubmissionByOrgIdAndChecklistId } from '@/hooks/use-checklist-submissions'
 import { useChecklist } from '@/hooks/use-checklists'
 import { Badge } from '@/components/ui/badge'
+// import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
+// import { Separator } from '@/components/ui/separator'
 import { Switch } from '@/components/ui/switch'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { Header } from '@/components/layout/header'
@@ -22,13 +29,37 @@ export function ChecklistView() {
     from: '/_authenticated/checklist/$checklistId',
   })
 
+  const [checklistType, setChecklistType] = useState<'create' | 'update'>(
+    'create'
+  )
+  const { setForm } = useFormBuilderStore()
+  const { auth } = useAuthStore()
   const { checklistId } = params
 
-  const { data: form } = useChecklist(checklistId)
+  const { data: form, isLoading } = useChecklist(checklistId)
+
+  const { data: formData } = useChecklistFormatByChecklistId(checklistId)
+  useEffect(() => {
+    if (!formData) return
+
+    console.log('Checklist Data:', formData)
+    console.log('form', form)
+    setForm(JSON.parse(formData.format || '{}'))
+    setChecklistType('update')
+  }, [formData])
+
+  const { data: checklistSubmissionData, isLoading: isFetchingSubmissionData } =
+    useGetChecklistSubmissionByOrgIdAndChecklistId(
+      auth?.user?.organisation?.id || '',
+      checklistId,
+      {
+        enabled: !!formData?.format,
+      }
+    )
 
   const badgeColor = badgeTypes.get(form?.status?.toLowerCase())
 
-  const [mode, setMode] = useState<'builder' | 'viewer'>('builder')
+  const [mode, setMode] = useState<'builder' | 'viewer'>('viewer')
 
   const handleCheckChange = () => {
     if (mode === 'builder') {
@@ -37,6 +68,16 @@ export function ChecklistView() {
       setMode('builder')
     }
   }
+
+  if (isLoading) {
+    return (
+      <div className='flex h-screen w-full items-center justify-center'>
+        <Loader2 className='text-muted-foreground h-10 w-10 animate-spin' />
+      </div>
+    )
+  }
+
+  // const handlePrintClick = () => {}
   return (
     <ChecklistsProvider>
       <Header fixed>
@@ -48,7 +89,7 @@ export function ChecklistView() {
         </div>
       </Header>
 
-      <Main className='sm:gap- flex flex-1 flex-col gap-4'>
+      <Main className='flex flex-1 flex-col gap-4'>
         <ChecklistBreadcrumb
           chapterId={form?.chapter?.id || ''}
           chapterName={form?.chapter?.title || ''}
@@ -59,7 +100,7 @@ export function ChecklistView() {
         />
 
         <div className='mb-0 flex items-center justify-between space-y-2'>
-          <div className='m-0'>
+          <div>
             <div className='flex items-center gap-2'>
               <h2 className='text-2xl font-bold tracking-tight'>
                 {form?.title}
@@ -77,9 +118,20 @@ export function ChecklistView() {
 
             <p className='text-muted-foreground'>{form?.description}</p>
           </div>
+
           <div className='flex items-center space-x-2'>
+            {/* <Button
+              variant='ghost'
+              size='icon'
+              onClick={() => handlePrintClick()}
+              className='text-muted-foreground hover:text-foreground h-6 w-6 self-center rounded-full p-0 hover:bg-transparent'
+              title='Print'
+            >
+              <Printer className='h-3 w-3' />
+            </Button>
+            <Separator orientation='vertical' className='h-6' /> */}
             <Switch
-              checked={mode === 'builder' ? true : false}
+              checked={mode === 'builder'}
               onCheckedChange={handleCheckChange}
               id='mode'
             />
@@ -87,23 +139,22 @@ export function ChecklistView() {
           </div>
         </div>
 
-        {/* {mode === 'builder' ? (
-          <FormBuilder formId={formId} mode={mode} setMode={setMode} />
-        ) : (
-          <FormViewer />
-        )} */}
-
         <div className='relative'>
-          <div className={mode === 'builder' ? 'block' : 'hidden'}>
+          {mode === 'builder' ? (
             <ChecklistBuilder
+              formData={formData}
+              checklistType={checklistType}
               checklistId={checklistId}
               mode={mode}
               setMode={setMode}
             />
-          </div>
-          <div className={mode === 'viewer' ? 'block' : 'hidden'}>
-            <ChecklistViewer checklistId={checklistId} />
-          </div>
+          ) : (
+            <ChecklistViewer
+              checklistSubmissionData={checklistSubmissionData}
+              isFetchingSubmissionData={isFetchingSubmissionData}
+              checklistId={checklistId}
+            />
+          )}
         </div>
       </Main>
     </ChecklistsProvider>

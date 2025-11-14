@@ -56,7 +56,7 @@ export function DataTableRowActions<TData>({
         <DropdownMenuItem
           onClick={() => {
             setCurrentRow(form)
-            setOpen('update')
+            setOpen('update-form')
           }}
         >
           Edit

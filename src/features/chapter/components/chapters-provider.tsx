@@ -6,6 +6,7 @@ type ChaptersDialogType =
   | 'create'
   | 'create-checklist'
   | 'update'
+  | 'update-form'
   | 'delete'
   | 'import'
   | 'edit'

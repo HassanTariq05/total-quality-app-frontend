@@ -1,6 +1,14 @@
 import React, { useState } from 'react'
 import { UpdateChecklistFormatPayload } from '@/services/checklist-format-services/checklist-format-services'
-import { X, Plus, Pencil, Trash, Copy } from 'lucide-react'
+import {
+  X,
+  Plus,
+  Pencil,
+  Trash,
+  Copy,
+  ClipboardPaste,
+  PlusSquare,
+} from 'lucide-react'
 import { v4 as uuidv4 } from 'uuid'
 import { useFormBuilderStore } from '@/stores/useFormBuilderStore'
 import { cn } from '@/lib/utils'
@@ -14,6 +22,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Table, TableRow, TableCell, TableBody } from '@/components/ui/table'
 import { DeleteDialog } from '@/features/accreditation/components/delete-dialog'
+import { CellContent } from './cell-content'
 import { CellEditorModal } from './table-cell-editor-modal'
 
 export const FieldEditor: React.FC<{
@@ -26,11 +35,13 @@ export const FieldEditor: React.FC<{
   const { updateField, removeField, form } = useFormBuilderStore()
 
   const [modalOpen, setModalOpen] = useState(false)
+  const [copiedRow, setCopiedRow] = useState<any[] | null>(null)
   const [openDeleteModal, setOpenDeleteModal] = useState(false)
   const [deleteChecklistId, setDeleteChecklistId] = useState('')
   const [editingCell, setEditingCell] = useState<{
     row: number
     col: number
+    childIdx?: string
     type: 'label' | 'field' | 'checkbox'
     value: string
     placeholder: string
@@ -39,10 +50,16 @@ export const FieldEditor: React.FC<{
     cellFlex?: number
   } | null>(null)
 
-  const openModal = (rowIdx: number, colIdx: number, cell: any) => {
+  const openModal = (
+    rowIdx: number,
+    colIdx: number,
+    cell: any,
+    childIdx?: string
+  ) => {
     setEditingCell({
       row: rowIdx,
       col: colIdx,
+      childIdx,
       type: cell.type,
       placeholder: cell.placeholder,
       value: cell.value || (cell.type === 'label' ? 'Label' : ''),
@@ -62,25 +79,63 @@ export const FieldEditor: React.FC<{
     cellFlex?: number
   ) => {
     if (!editingCell) return
-    const { row, col } = editingCell
+    const { row, col, childIdx } = editingCell
 
-    const newRows = field.rows.map((r: any, rIdx: any) =>
-      rIdx === row
-        ? r.map((c: any, cIdx: any) =>
-            cIdx === col
+    const newRows = field.rows.map((r: any, rIdx: any) => {
+      if (rIdx !== row) return r
+      return r.map((c: any, cIdx: any) => {
+        if (cIdx !== col) return c
+
+        if (typeof childIdx === 'number') {
+          const updatedChildren = c.children.map((child: any, i: number) =>
+            i === childIdx
               ? {
-                  id: c.id || uuidv4(),
+                  ...child,
+                  id: child.id || uuidv4(),
                   type,
                   value: value || (type === 'label' ? 'Label' : ''),
-                  bg: bg || c.bg,
-                  placeholder: placeholder ?? c.placeholder,
-                  alignment: alignment ?? c.alignment,
-                  cellFlex: cellFlex ?? c.cellFlex,
+                  bg: bg || child.bg,
+                  placeholder: placeholder ?? child.placeholder,
+                  alignment: alignment ?? child.alignment,
+                  cellFlex: cellFlex ?? child.cellFlex,
                 }
-              : c
+              : child
           )
-        : r
-    )
+          return { ...c, children: updatedChildren }
+        }
+
+        return {
+          ...c,
+          id: c.id || uuidv4(),
+          type,
+          value: value || (type === 'label' ? 'Label' : ''),
+          bg: bg || c.bg,
+          placeholder: placeholder ?? c.placeholder,
+          alignment: alignment ?? c.alignment,
+          cellFlex: cellFlex ?? c.cellFlex,
+        }
+      })
+    })
+
+    updateField(field.id, { rows: newRows })
+  }
+
+  const handleDeleteChildCell = (
+    rowIdx: string,
+    colIdx: string,
+    childIdx: string
+  ) => {
+    const newRows = field.rows.map((r: any, rIdx: string) => {
+      if (rIdx !== rowIdx) return r
+      return r.map((c: any, cIdx: string) => {
+        if (cIdx !== colIdx) return c
+        return {
+          ...c,
+          children:
+            c.children?.filter((_: any, i: string) => i !== childIdx) || [],
+        }
+      })
+    })
 
     updateField(field.id, { rows: newRows })
   }
@@ -118,17 +173,25 @@ export const FieldEditor: React.FC<{
     updateField(field.id, { rows: newRows })
   }
 
-  const handleCloneRow = (rowIdx: number) => {
-    const rowToClone = field.rows[rowIdx]
+  const handleCopyRow = (rowIdx: number) => {
+    const rowToCopy = field.rows[rowIdx]
+    // Store a deep copy to avoid reference mutation
+    const clonedCopy = rowToCopy.map((cell: any) => ({ ...cell }))
+    setCopiedRow(clonedCopy)
+  }
 
-    const clonedRow = rowToClone.map((cell: any) => ({
+  const handlePasteRow = (rowIdx: number) => {
+    if (!copiedRow) return
+
+    // Create a new row with fresh UUIDs
+    const newRow = copiedRow.map((cell: any) => ({
       ...cell,
       id: uuidv4(),
     }))
 
     const newRows = [
       ...field.rows.slice(0, rowIdx + 1),
-      clonedRow,
+      newRow,
       ...field.rows.slice(rowIdx + 1),
     ]
 
@@ -175,6 +238,27 @@ export const FieldEditor: React.FC<{
     deleteChecklistFormatMutation.mutate(formFormatId || '')
   }
 
+  const handleAddVerticalCell = (rowIdx: number, colIdx: number) => {
+    const newRows = field.rows.map((r: any, rIdx: number) => {
+      if (rIdx !== rowIdx) return r
+      return r.map((c: any, cIdx: number) => {
+        if (cIdx !== colIdx) return c
+        const newChild = {
+          id: uuidv4(),
+          type: 'field',
+          value: '',
+          placeholder: 'Field',
+        }
+        return {
+          ...c,
+          children: [...(c.children || []), newChild],
+        }
+      })
+    })
+
+    updateField(field.id, { rows: newRows })
+  }
+
   return (
     <Card className='bg-card text-card-foreground border-border shadow-sm'>
       <CardHeader className='flex items-center justify-between'>
@@ -208,85 +292,120 @@ export const FieldEditor: React.FC<{
                   {row.map((cell: any, cIdx: any) => (
                     <TableCell
                       key={cIdx}
-                      className={cn(
-                        'h-full p-0', // no flex-1 here
-                        cell.bg || 'bg-muted'
-                      )}
+                      className={cn('h-full p-0', cell.bg || 'bg-muted')}
                       style={{ flex: cell.cellFlex ?? 1 }}
                     >
                       <div
                         className={cn(
-                          'group flex h-full min-h-[52px] w-full items-center gap-2 p-2',
+                          'group flex h-full min-h-[52px] w-full flex-col gap-2 p-2', // <-- flex-col here
                           {
-                            'justify-start': cell.alignment === 'left',
-                            'justify-center': cell.alignment === 'center',
-                            'justify-end': cell.alignment === 'right',
+                            'justify-start text-left':
+                              cell.alignment === 'left',
+                            'justify-center text-center':
+                              cell.alignment === 'center',
+                            'justify-end text-right':
+                              cell.alignment === 'right',
                           }
                         )}
                       >
-                        {cell.type === 'label' && (
-                          <span className='text-foreground text-sm break-words whitespace-normal'>
-                            {cell.value}
-                          </span>
-                        )}
+                        {/* Parent cell content */}
+                        <div className='flex w-full items-center justify-between gap-2'>
+                          <CellContent cell={cell} rIdx={rIdx} cIdx={cIdx} />
 
-                        {cell.type === 'field' && (
-                          <Input
-                            disabled
-                            className='bg-muted text-muted-foreground w-full text-sm'
-                            placeholder={cell?.placeholder}
-                          />
-                        )}
+                          {editorMode === 'builder' && (
+                            <div className='hidden items-center gap-1 group-hover:flex'>
+                              <Button
+                                variant='ghost'
+                                size='icon'
+                                onClick={() => openModal(rIdx, cIdx, cell)}
+                                className='text-muted-foreground h-5 w-5 p-0'
+                                title='Edit cell'
+                              >
+                                <Pencil className='h-3 w-3' />
+                              </Button>
+                              <Button
+                                variant='ghost'
+                                size='icon'
+                                onClick={() =>
+                                  handleAddVerticalCell(rIdx, cIdx)
+                                }
+                                className='text-muted-foreground hover:text-foreground h-5 w-5 p-0'
+                                title='Add vertical cell'
+                              >
+                                <PlusSquare className='h-3 w-3' />
+                              </Button>
+                              <Button
+                                variant='ghost'
+                                size='icon'
+                                onClick={() => handleDeleteCell(rIdx, cIdx)}
+                                className='text-muted-foreground h-5 w-5 p-0'
+                                title='Delete cell'
+                              >
+                                <X className='h-3 w-3' />
+                              </Button>
+                            </div>
+                          )}
+                        </div>
 
-                        {cell.type === 'checkbox' && (
-                          <div className='flex items-center gap-1'>
-                            <input type='checkbox' disabled />
-                            <span className='text-foreground text-sm'>
-                              {cell.value}
-                            </span>
+                        {cell.children?.map((child: any, childIdx: string) => (
+                          <div
+                            key={child.id}
+                            className='border-border flex w-full flex-col border-t pt-2'
+                          >
+                            <div className='group flex w-full items-center justify-between'>
+                              <CellContent
+                                cell={child}
+                                rIdx={rIdx}
+                                cIdx={cIdx}
+                                childIdx={childIdx}
+                              />
+
+                              {editorMode === 'builder' && (
+                                <div className='hidden items-center gap-1 group-hover:flex'>
+                                  <Button
+                                    variant='ghost'
+                                    size='icon'
+                                    onClick={() =>
+                                      openModal(rIdx, cIdx, child, childIdx)
+                                    }
+                                    className='text-muted-foreground h-5 w-5 p-0'
+                                    title='Edit child cell'
+                                  >
+                                    <Pencil className='h-3 w-3' />
+                                  </Button>
+
+                                  <Button
+                                    variant='ghost'
+                                    size='icon'
+                                    onClick={() =>
+                                      handleAddVerticalCell(rIdx, cIdx)
+                                    }
+                                    className='text-muted-foreground hover:text-foreground h-5 w-5 p-0'
+                                    title='Add vertical cell'
+                                  >
+                                    <PlusSquare className='h-3 w-3' />
+                                  </Button>
+
+                                  <Button
+                                    variant='ghost'
+                                    size='icon'
+                                    onClick={() =>
+                                      handleDeleteChildCell(
+                                        rIdx,
+                                        cIdx,
+                                        childIdx
+                                      )
+                                    }
+                                    className='text-muted-foreground h-5 w-5 p-0'
+                                    title='Delete child cell'
+                                  >
+                                    <X className='h-3 w-3' />
+                                  </Button>
+                                </div>
+                              )}
+                            </div>
                           </div>
-                        )}
-
-                        {cell.type === 'date' && (
-                          <Input
-                            type='date'
-                            disabled
-                            className='bg-muted text-muted-foreground w-full text-sm'
-                          />
-                        )}
-
-                        {cell.type === 'signature' && (
-                          <div className='border-muted-foreground/50 flex h-[36px] w-full flex-col justify-end border-b border-dashed p-2 text-center'>
-                            <span className='text-muted-foreground text-xs'>
-                              Signature
-                            </span>
-                          </div>
-                        )}
-
-                        {/* Edit/Delete buttons — inline and only visible on hover */}
-                        {editorMode === 'builder' && (
-                          <div className='ml-0 hidden items-center gap-1 transition-all duration-150 group-hover:flex'>
-                            <Button
-                              variant='ghost'
-                              size='icon'
-                              onClick={() => openModal(rIdx, cIdx, cell)}
-                              className='text-muted-foreground h-5 w-5 p-0'
-                              title='Edit cell'
-                            >
-                              <Pencil className='h-3 w-3' />
-                            </Button>
-
-                            <Button
-                              variant='ghost'
-                              size='icon'
-                              onClick={() => handleDeleteCell(rIdx, cIdx)}
-                              className='text-muted-foreground h-5 w-5 p-0'
-                              title='Delete cell'
-                            >
-                              <X className='h-3 w-3' />
-                            </Button>
-                          </div>
-                        )}
+                        ))}
                       </div>
                     </TableCell>
                   ))}
@@ -309,15 +428,28 @@ export const FieldEditor: React.FC<{
                         <Button
                           variant='ghost'
                           size='icon'
-                          onClick={() => handleCloneRow(rIdx)}
+                          onClick={() => handleCopyRow(rIdx)}
                           className='text-muted-foreground hover:text-foreground h-6 w-6 self-center rounded-full p-0 hover:bg-transparent'
-                          title='Clone row'
+                          title='Copy row'
                         >
                           <Copy className='h-3 w-3' />
                         </Button>
                       </TableCell>
 
-                      {/* Delete row button */}
+                      {copiedRow && (
+                        <TableCell className='bg-muted flex w-10 flex-shrink-0 text-center'>
+                          <Button
+                            variant='ghost'
+                            size='icon'
+                            onClick={() => handlePasteRow(rIdx)}
+                            className='text-muted-foreground hover:text-foreground h-6 w-6 self-center rounded-full p-0 hover:bg-transparent'
+                            title='Paste copied row below'
+                          >
+                            <ClipboardPaste className='h-3 w-3' />
+                          </Button>
+                        </TableCell>
+                      )}
+
                       <TableCell className='bg-muted flex w-10 flex-shrink-0 text-center'>
                         <Button
                           variant='ghost'

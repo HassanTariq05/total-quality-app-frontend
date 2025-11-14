@@ -36,7 +36,7 @@ export const useFormSubmission = (id: string) => {
 export const useGetFormSubmissionByOrgIdAndFormId = (
   organisationId: string,
   formId: string,
-  options?: { enabled?: boolean } // <-- accept options
+  options?: { enabled?: boolean }
 ) => {
   const { getByOrganisationIdAndFormId } = useFormSubmissionService()
 
@@ -45,8 +45,23 @@ export const useGetFormSubmissionByOrgIdAndFormId = (
       organisationId,
       formId
     ),
-    queryFn: () => getByOrganisationIdAndFormId(organisationId, formId),
-    enabled: !!formId && !!organisationId && (options?.enabled ?? true), // <-- merge with default
+    enabled: !!formId && !!organisationId && (options?.enabled ?? true),
+
+    retry: (failureCount, error: any) => {
+      if (error?.response?.status === 404) return false
+      return failureCount < 3
+    },
+
+    queryFn: async () => {
+      try {
+        return await getByOrganisationIdAndFormId(organisationId, formId)
+      } catch (error: any) {
+        if (error?.response?.status === 404) {
+          return null
+        }
+        throw error
+      }
+    },
   })
 }
 

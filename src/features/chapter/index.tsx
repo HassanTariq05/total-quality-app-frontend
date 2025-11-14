@@ -1,5 +1,7 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams } from '@tanstack/react-router'
+import { FormSchema } from '@/types/form'
+import { useFormBuilderStore } from '@/stores/useFormBuilderStore'
 import { cn } from '@/lib/utils'
 import { useChapter } from '@/hooks/use-chapters'
 import { useChecklists } from '@/hooks/use-checklists'
@@ -31,6 +33,18 @@ export function ChapterView() {
   const { data: chapter } = useChapter(chapterId)
   const { data: forms = [] } = useForms(chapterId)
   const { data: checklists = [] } = useChecklists(chapterId)
+  const { setForm } = useFormBuilderStore()
+
+  useEffect(() => {
+    const emptyForm: FormSchema = {
+      id: '',
+      title: '',
+      fields: [],
+      rows: [],
+      elements: [],
+    }
+    setForm(emptyForm)
+  }, [])
 
   const badgeColor = badgeTypes.get(chapter?.status?.toLowerCase())
 

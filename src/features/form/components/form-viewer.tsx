@@ -20,7 +20,7 @@ import { SignatureField } from './signature-field'
 
 type FormViewerProps = {
   formId: string
-  formSubmissionData: FormSubmission | undefined
+  formSubmissionData: FormSubmission | undefined | null
   isFetchingSubmissionData: boolean
 }
 

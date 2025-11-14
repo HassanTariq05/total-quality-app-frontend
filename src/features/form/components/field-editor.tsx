@@ -295,18 +295,17 @@ export const FieldEditor: React.FC<{
                     >
                       <div
                         className={cn(
-                          'group flex h-full min-h-[52px] w-full flex-col gap-2 p-2', // <-- flex-col here
+                          'group flex h-full min-h-[52px] w-full flex-col gap-2 p-2',
                           {
-                            'justify-start text-left':
+                            'justify-center text-left':
                               cell.alignment === 'left',
                             'justify-center text-center':
                               cell.alignment === 'center',
-                            'justify-end text-right':
+                            'justify-center text-right':
                               cell.alignment === 'right',
                           }
                         )}
                       >
-                        {/* Parent cell content */}
                         <div className='flex w-full items-center justify-between gap-2'>
                           <CellContent cell={cell} rIdx={rIdx} cIdx={cIdx} />
 

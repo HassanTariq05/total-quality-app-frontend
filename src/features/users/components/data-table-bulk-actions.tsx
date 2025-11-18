@@ -29,7 +29,7 @@ export function DataTableBulkActions<TData>({
       loading: `${status === 'active' ? 'Activating' : 'Deactivating'} users...`,
       success: () => {
         table.resetRowSelection()
-        return `${status === 'active' ? 'Activated' : 'Deactivated'} ${selectedUsers.length} user${selectedUsers.length > 1 ? 's' : ''}`
+        return `${status === 'active' ? 'Activated' : 'Deactivated'} ${selectedUsers?.length} user${selectedUsers?.length > 1 ? 's' : ''}`
       },
       error: `Error ${status === 'active' ? 'activating' : 'deactivating'} users`,
     })
@@ -42,7 +42,7 @@ export function DataTableBulkActions<TData>({
       loading: 'Inviting users...',
       success: () => {
         table.resetRowSelection()
-        return `Invited ${selectedUsers.length} user${selectedUsers.length > 1 ? 's' : ''}`
+        return `Invited ${selectedUsers?.length} user${selectedUsers?.length > 1 ? 's' : ''}`
       },
       error: 'Error inviting users',
     })

@@ -40,8 +40,8 @@ type FormMutateDrawerProps = {
 const formSchema = z.object({
   title: z
     .string()
-    .min(2, 'Chater name must be at least 2 characters.')
-    .max(30, 'Form name must not be longer than 30 characters.'),
+    .min(2, 'Form name must be at least 2 characters.')
+    .max(60, 'Form name must not be longer than 60 characters.'),
   status: z
     .enum(['Active', 'Inactive'])
     .refine((val) => !!val, { message: 'Please select a valid status.' }),

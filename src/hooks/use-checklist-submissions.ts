@@ -61,7 +61,7 @@ export const useCreateChecklistSubmission = () => {
   return useMutation({
     mutationFn: create,
     onSuccess: (_, variables) => {
-      toast.success('Checklist submitted successfully!')
+      toast.success('Checklist Submission submitted successfully!')
 
       queryClient.invalidateQueries({
         queryKey: checklistSubmissionQueryKeys.byOrganisationIdAndChecklistId(
@@ -83,17 +83,24 @@ export const useUpdateChecklistSubmission = () => {
   return useMutation({
     mutationFn: ({ id, payload }: { id: string; payload: any }) =>
       update(id, payload),
-    onSuccess: (_, { id }) => {
-      toast.success('Checklist updated successfully!')
-      queryClient.invalidateQueries({
-        queryKey: checklistSubmissionQueryKeys.byId(id),
-      })
+    onSuccess: (_, { payload }) => {
+      toast.success('Checklist Submission updated successfully!')
+
+      if (payload.organisationId && payload.checklistId) {
+        queryClient.invalidateQueries({
+          queryKey: checklistSubmissionQueryKeys.byOrganisationIdAndChecklistId(
+            payload.organisationId,
+            payload.checklistId
+          ),
+        })
+      }
+
       queryClient.invalidateQueries({
         queryKey: checklistSubmissionQueryKeys.all,
       })
     },
     onError: () => {
-      toast.error('Failed to update checklist.')
+      toast.error('Failed to update checklist submission.')
     },
   })
 }
@@ -105,13 +112,14 @@ export const useDeleteChecklistSubmission = () => {
   return useMutation({
     mutationFn: remove,
     onSuccess: () => {
-      toast.success('ChecklistSubmission deleted successfully!')
+      toast.success('Checklist Submission deleted successfully!')
       queryClient.invalidateQueries({
-        queryKey: checklistSubmissionQueryKeys.all,
+        queryKey: ['checklistSubmissionsOrgId'],
+        exact: false,
       })
     },
     onError: () => {
-      toast.error('Failed to delete checklistSubmission.')
+      toast.error('Failed to delete checklist Submission.')
     },
   })
 }

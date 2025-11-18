@@ -5,12 +5,9 @@ import { Button } from '@/components/ui/button'
 import { FieldEditor } from './field-editor'
 
 export const FormBuilder: React.FC<{
-  mode: any
-  setMode: any
   formId: string
   formData: FormFormat | undefined
-  formType: any
-}> = ({ mode, formId, formData, formType }) => {
+}> = ({ formId, formData }) => {
   const { form, addField } = useFormBuilderStore()
 
   return (
@@ -18,17 +15,17 @@ export const FormBuilder: React.FC<{
       <div className='space-y-4'>
         {form.fields.map((f: any) => (
           <FieldEditor
-            formType={formType}
+            formType={formData ? 'update' : 'create'}
             formId={formId}
             formFormatId={formData?.id}
-            editorMode={mode}
+            editorMode={'builder'}
             key={f.id}
             field={f}
           />
         ))}
       </div>
 
-      {form.fields.length === 0 && (
+      {form.fields?.length === 0 && (
         <div className='border-muted-foreground/30 bg-muted/30 flex h-[60vh] flex-col items-center justify-center rounded-lg border border-dashed p-10 text-center'>
           <div className='bg-primary/10 mb-4 rounded-full p-4'>
             <svg
@@ -61,12 +58,12 @@ export const FormBuilder: React.FC<{
         </div>
       )}
 
-      {/* <div className='mt-6'>
+      <div className='mt-6'>
         <h3 className='mb-2 font-medium'>Generated JSON</h3>
         <pre className='text-primary-foreground overflow-auto rounded bg-gray-800 p-3 text-sm'>
           {JSON.stringify(form, null, 2)}
         </pre>
-      </div> */}
+      </div>
     </div>
   )
 }

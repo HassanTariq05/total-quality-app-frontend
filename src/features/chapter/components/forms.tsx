@@ -1,15 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { getRouteApi } from '@tanstack/react-router'
 import {
-  type SortingState,
-  type VisibilityState,
   flexRender,
   getCoreRowModel,
-  getFacetedRowModel,
-  getFacetedUniqueValues,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
 import { cn } from '@/lib/utils'
@@ -30,13 +23,25 @@ const route = getRouteApi('/_authenticated/chapter/$chapterId')
 
 type DataTableProps = {
   data: any
+  page: number
+  pageSize: number
+  totalPages: number
+  onPageChange: (page: number) => void
+  onPageSizeChange: (size: number) => void
 }
 
-export function Forms({ data }: DataTableProps) {
+export function Forms({
+  data,
+  page,
+  pageSize,
+  totalPages,
+  onPageChange,
+  onPageSizeChange,
+}: DataTableProps) {
   // Local UI-only states
-  const [rowSelection, setRowSelection] = useState({})
-  const [sorting, setSorting] = useState<SortingState>([])
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
+  // const [rowSelection, setRowSelection] = useState({})
+  // const [sorting, setSorting] = useState<SortingState>([])
+  // const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
 
   // Local state management for table (uncomment to use local-only state, not synced with URL)
   // const [globalFilter, onGlobalFilterChange] = useState('')
@@ -44,15 +49,7 @@ export function Forms({ data }: DataTableProps) {
   // const [pagination, onPaginationChange] = useState<PaginationState>({ pageIndex: 0, pageSize: 10 })
 
   // Synced with URL states (updated to match route search schema defaults)
-  const {
-    globalFilter,
-    onGlobalFilterChange,
-    columnFilters,
-    onColumnFiltersChange,
-    pagination,
-    onPaginationChange,
-    ensurePageInRange,
-  } = useTableUrlState({
+  const { ensurePageInRange } = useTableUrlState({
     search: route.useSearch(),
     navigate: route.useNavigate(),
     pagination: { defaultPage: 1, defaultPageSize: 10 },
@@ -65,33 +62,26 @@ export function Forms({ data }: DataTableProps) {
     data,
     columns,
     state: {
-      sorting,
-      columnVisibility,
-      rowSelection,
-      columnFilters,
-      globalFilter,
-      pagination,
+      pagination: {
+        pageIndex: page,
+        pageSize,
+      },
     },
-    enableRowSelection: true,
-    onRowSelectionChange: setRowSelection,
-    onSortingChange: setSorting,
-    onColumnVisibilityChange: setColumnVisibility,
-    globalFilterFn: (row, _columnId, filterValue) => {
-      const id = String(row.getValue('id')).toLowerCase()
-      const title = String(row.getValue('title')).toLowerCase()
-      const searchValue = String(filterValue).toLowerCase()
+    manualPagination: true,
+    pageCount: totalPages,
 
-      return id.includes(searchValue) || title.includes(searchValue)
+    onPaginationChange: (updater) => {
+      const newState =
+        typeof updater === 'function'
+          ? updater({ pageIndex: page, pageSize })
+          : updater
+
+      // Push BOTH page and pageSize upward
+      onPageChange(newState.pageIndex)
+      onPageSizeChange(newState.pageSize)
     },
+
     getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFacetedRowModel: getFacetedRowModel(),
-    getFacetedUniqueValues: getFacetedUniqueValues(),
-    onPaginationChange,
-    onGlobalFilterChange,
-    onColumnFiltersChange,
   })
 
   const pageCount = table.getPageCount()
@@ -164,7 +154,7 @@ export function Forms({ data }: DataTableProps) {
             ) : (
               <TableRow>
                 <TableCell
-                  colSpan={columns.length}
+                  colSpan={columns?.length}
                   className='h-24 text-center'
                 >
                   No results.
@@ -174,7 +164,11 @@ export function Forms({ data }: DataTableProps) {
           </TableBody>
         </Table>
       </div>
-      <DataTablePagination table={table} className='mt-auto' />
+      <DataTablePagination
+        table={table}
+        onPageSizeChange={onPageSizeChange}
+        className='mt-auto'
+      />
       <DataTableBulkActions table={table} />
     </div>
   )

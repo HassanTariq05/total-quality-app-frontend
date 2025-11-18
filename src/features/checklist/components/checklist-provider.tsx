@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import useDialogState from '@/hooks/use-dialog-state'
-import { type Checklist } from '../data/schema'
+import { SubmissionsSchema } from '../data/schema'
 
 type ChecklistsDialogType =
   | 'create'
@@ -14,8 +14,8 @@ type ChecklistsDialogType =
 type ChecklistsContextType = {
   open: ChecklistsDialogType | null
   setOpen: (str: ChecklistsDialogType | null) => void
-  currentRow: Checklist | null
-  setCurrentRow: React.Dispatch<React.SetStateAction<Checklist | null>>
+  currentRow: SubmissionsSchema | null
+  setCurrentRow: React.Dispatch<React.SetStateAction<SubmissionsSchema | null>>
 }
 
 const ChecklistsContext = React.createContext<ChecklistsContextType | null>(
@@ -28,7 +28,7 @@ export function ChecklistsProvider({
   children: React.ReactNode
 }) {
   const [open, setOpen] = useDialogState<ChecklistsDialogType>(null)
-  const [currentRow, setCurrentRow] = useState<Checklist | null>(null)
+  const [currentRow, setCurrentRow] = useState<SubmissionsSchema | null>(null)
 
   return (
     <ChecklistsContext value={{ open, setOpen, currentRow, setCurrentRow }}>

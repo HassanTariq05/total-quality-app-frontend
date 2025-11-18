@@ -1,4 +1,9 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  keepPreviousData,
+} from '@tanstack/react-query'
 import { useChecklistService } from '@/services/checklist-services/checklist-services'
 import { toast } from 'sonner'
 
@@ -7,13 +12,18 @@ export const checklistQueryKeys = {
   byId: (id: string) => ['checklists', id] as const,
 }
 
-export const useChecklists = (chapterId: string) => {
+export const useChecklists = (
+  chapterId: string,
+  page: number = 0,
+  size: number = 10
+) => {
   const { getAll } = useChecklistService()
 
   return useQuery({
-    queryKey: checklistQueryKeys.byId(chapterId),
-    queryFn: () => getAll(chapterId),
+    queryKey: [...checklistQueryKeys.byId(chapterId), { page, size }],
+    queryFn: () => getAll(chapterId, page, size),
     enabled: !!chapterId,
+    placeholderData: keepPreviousData,
   })
 }
 

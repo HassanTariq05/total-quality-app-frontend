@@ -26,7 +26,7 @@ const profileFormSchema = z.object({
   name: z
     .string()
     .min(2, 'Accreditation name must be at least 2 characters.')
-    .max(30, 'Accreditation name must not be longer than 30 characters.'),
+    .max(60, 'Accreditation name must not be longer than 60 characters.'),
   status: z
     .enum(['Active', 'Inactive'])
     .refine((val) => !!val, { message: 'Please select a valid status.' }),

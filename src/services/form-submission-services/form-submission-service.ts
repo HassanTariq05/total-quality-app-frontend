@@ -3,6 +3,9 @@ import { useApiClient } from '@/lib/axios'
 export interface FormSubmission {
   id: string
   data: string
+  formId: string
+  name: string
+  description: string
   //   description?: string
   //   status: 'Active' | 'Inactive'
 }
@@ -10,9 +13,17 @@ export interface FormSubmission {
 export type CreateFormSubmissionPayload = {
   formId: string
   organisationId: string
+  name: string
+  description: string
+}
+
+export type UpdateFormSubmissionPayload = {
+  formId: string
+  organisationId: string
+  name: string
+  description: string
   data: string
 }
-export type UpdateFormSubmissionPayload = Partial<CreateFormSubmissionPayload>
 
 export const useFormSubmissionService = () => {
   const apiClient = useApiClient()
@@ -22,8 +33,10 @@ export const useFormSubmissionService = () => {
     return data
   }
 
-  const getById = async (id: string): Promise<FormSubmission> => {
-    const { data } = await apiClient.get(`/formSubmissions/${id}`)
+  const getById = async (submissionId: string): Promise<FormSubmission> => {
+    const { data } = await apiClient.get(
+      `/formSubmissions/getBySubmissionId/${submissionId}`
+    )
     return data
   }
 

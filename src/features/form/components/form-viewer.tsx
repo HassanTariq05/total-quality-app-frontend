@@ -7,10 +7,7 @@ import { Loader2 } from 'lucide-react'
 import { useAuthStore } from '@/stores/auth-store'
 import { useFormBuilderStore } from '@/stores/useFormBuilderStore'
 import { cn } from '@/lib/utils'
-import {
-  useCreateFormSubmission,
-  useUpdateFormSubmission,
-} from '@/hooks/use-form-submissions'
+import { useUpdateFormSubmission } from '@/hooks/use-form-submissions'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -38,7 +35,6 @@ export const FormViewer: React.FC<FormViewerProps> = ({
     setFormData((prev) => ({ ...prev, [id]: value }))
   }
 
-  const createFormSubmissionMutation = useCreateFormSubmission()
   const updateFormSubmissionMutation = useUpdateFormSubmission()
 
   useEffect(() => {
@@ -50,19 +46,17 @@ export const FormViewer: React.FC<FormViewerProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (formSubmissionData?.data) {
+    if (formSubmissionData?.id) {
       const data: UpdateFormSubmissionPayload = {
         data: JSON.stringify(formData),
+        formId: formId,
+        organisationId: auth?.user?.organisation?.id || '',
+        name: formSubmissionData?.name,
+        description: formSubmissionData?.description,
       }
       updateFormSubmissionMutation.mutate({
         id: formSubmissionData?.id || '',
         payload: data,
-      })
-    } else {
-      createFormSubmissionMutation.mutate({
-        formId: formId,
-        data: JSON.stringify(formData),
-        organisationId: auth?.user?.organisation?.id || '',
       })
     }
   }
@@ -131,7 +125,7 @@ export const FormViewer: React.FC<FormViewerProps> = ({
                             >
                               <div
                                 className={cn(
-                                  'flex h-full min-h-[52px] w-full flex-col gap-2 p-2'
+                                  'flex h-full min-h-[52px] w-full flex-col justify-center gap-2 p-2'
                                 )}
                               >
                                 <div
@@ -287,15 +281,13 @@ export const FormViewer: React.FC<FormViewerProps> = ({
         ))}
       </div>
 
-      {form.fields.length !== 0 && (
+      {form.fields?.length !== 0 && (
         <div className='flex justify-end pt-4'>
-          <Button type='submit'>
-            {formSubmissionData?.data ? 'Update Form' : 'Submit Form'}
-          </Button>
+          <Button type='submit'>Update Form</Button>
         </div>
       )}
 
-      {form.fields.length === 0 && (
+      {form.fields?.length === 0 && (
         <div className='border-muted-foreground/30 bg-muted/30 flex h-[60vh] flex-col items-center justify-center rounded-lg border border-dashed p-10 text-center'>
           <div className='bg-primary/10 mb-4 rounded-full p-4'>
             <svg
@@ -323,12 +315,12 @@ export const FormViewer: React.FC<FormViewerProps> = ({
         </div>
       )}
 
-      {/* <div className='mt-6'>
+      <div className='mt-6'>
         <h3 className='mb-2 font-medium'>Filled Values</h3>
         <pre className='rounded bg-gray-900 p-3 text-sm text-gray-100'>
           {JSON.stringify(formData, null, 2)}
         </pre>
-      </div> */}
+      </div>
     </form>
   )
 }

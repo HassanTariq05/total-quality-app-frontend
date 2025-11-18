@@ -7,10 +7,7 @@ import { Loader2 } from 'lucide-react'
 import { useAuthStore } from '@/stores/auth-store'
 import { useFormBuilderStore } from '@/stores/useFormBuilderStore'
 import { cn } from '@/lib/utils'
-import {
-  useCreateChecklistSubmission,
-  useUpdateChecklistSubmission,
-} from '@/hooks/use-checklist-submissions'
+import { useUpdateChecklistSubmission } from '@/hooks/use-checklist-submissions'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -38,7 +35,6 @@ export const ChecklistViewer: React.FC<ChecklistViewerProps> = ({
     setFormData((prev) => ({ ...prev, [fieldId]: value }))
   }
 
-  const createChecklistSubmissionMutation = useCreateChecklistSubmission()
   const updateChecklistSubmissionMutation = useUpdateChecklistSubmission()
 
   useEffect(() => {
@@ -50,19 +46,17 @@ export const ChecklistViewer: React.FC<ChecklistViewerProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (checklistSubmissionData?.data) {
+    if (checklistSubmissionData?.id) {
       const data: UpdateChecklistSubmissionPayload = {
         data: JSON.stringify(formData),
+        checklistId: checklistId,
+        organisationId: auth?.user?.organisation?.id || '',
+        name: checklistSubmissionData?.name,
+        description: checklistSubmissionData?.description,
       }
       updateChecklistSubmissionMutation.mutate({
         id: checklistSubmissionData?.id || '',
         payload: data,
-      })
-    } else {
-      createChecklistSubmissionMutation.mutate({
-        checklistId: checklistId,
-        data: JSON.stringify(formData),
-        organisationId: auth?.user?.organisation?.id || '',
       })
     }
   }
@@ -131,7 +125,7 @@ export const ChecklistViewer: React.FC<ChecklistViewerProps> = ({
                             >
                               <div
                                 className={cn(
-                                  'flex h-full min-h-[52px] w-full flex-col gap-2 p-2'
+                                  'flex h-full min-h-[52px] w-full flex-col justify-center gap-2 p-2'
                                 )}
                               >
                                 <div
@@ -287,17 +281,13 @@ export const ChecklistViewer: React.FC<ChecklistViewerProps> = ({
         ))}
       </div>
 
-      {form.fields.length !== 0 && (
+      {form.fields?.length !== 0 && (
         <div className='flex justify-end pt-4'>
-          <Button type='submit'>
-            {checklistSubmissionData?.data
-              ? 'Update Checklist'
-              : 'Submit Checklist'}
-          </Button>
+          <Button type='submit'>Update Checklist</Button>
         </div>
       )}
 
-      {form.fields.length === 0 && (
+      {form.fields?.length === 0 && (
         <div className='border-muted-foreground/30 bg-muted/30 flex h-[60vh] flex-col items-center justify-center rounded-lg border border-dashed p-10 text-center'>
           <div className='bg-primary/10 mb-4 rounded-full p-4'>
             <svg
@@ -326,11 +316,11 @@ export const ChecklistViewer: React.FC<ChecklistViewerProps> = ({
       )}
 
       {/* <div className='mt-6'>
-        <h3 className='mb-2 font-medium'>Filled Values</h3>
-        <pre className='rounded bg-gray-900 p-3 text-sm text-gray-100'>
-          {JSON.stringify(formData, null, 2)}
-        </pre>
-      </div> */}
+          <h3 className='mb-2 font-medium'>Filled Values</h3>
+          <pre className='rounded bg-gray-900 p-3 text-sm text-gray-100'>
+            {JSON.stringify(formData, null, 2)}
+          </pre>
+        </div> */}
     </form>
   )
 }

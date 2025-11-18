@@ -46,8 +46,8 @@ export function TasksMultiDeleteDialog<TData>({
       loading: 'Deleting chapters...',
       success: () => {
         table.resetRowSelection()
-        return `Deleted ${selectedRows.length} ${
-          selectedRows.length > 1 ? 'chapters' : 'chapter'
+        return `Deleted ${selectedRows?.length} ${
+          selectedRows?.length > 1 ? 'chapters' : 'chapter'
         }`
       },
       error: 'Error',
@@ -66,8 +66,8 @@ export function TasksMultiDeleteDialog<TData>({
             className='stroke-destructive me-1 inline-block'
             size={18}
           />{' '}
-          Delete {selectedRows.length}{' '}
-          {selectedRows.length > 1 ? 'chapters' : 'chapter'}
+          Delete {selectedRows?.length}{' '}
+          {selectedRows?.length > 1 ? 'chapters' : 'chapter'}
         </span>
       }
       desc={

@@ -10,7 +10,7 @@ import { IconSidebarInset } from '@/assets/custom/icon-sidebar-inset'
 import { IconSidebarSidebar } from '@/assets/custom/icon-sidebar-sidebar'
 import { IconThemeDark } from '@/assets/custom/icon-theme-dark'
 import { IconThemeLight } from '@/assets/custom/icon-theme-light'
-import { IconThemeSystem } from '@/assets/custom/icon-theme-system'
+// import { IconThemeSystem } from '@/assets/custom/icon-theme-system'
 import { cn } from '@/lib/utils'
 import { useDirection } from '@/context/direction-provider'
 import { type Collapsible, useLayout } from '@/context/layout-provider'
@@ -185,11 +185,11 @@ function ThemeConfig() {
         aria-describedby='theme-description'
       >
         {[
-          {
-            value: 'system',
-            label: 'System',
-            icon: IconThemeSystem,
-          },
+          // {
+          //   value: 'system',
+          //   label: 'System',
+          //   icon: IconThemeSystem,
+          // },
           {
             value: 'light',
             label: 'Light',

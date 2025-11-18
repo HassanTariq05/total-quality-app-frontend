@@ -56,10 +56,10 @@ export const useGetFormSubmissionByOrgIdAndFormId = (
       try {
         return await getByOrganisationIdAndFormId(organisationId, formId)
       } catch (error: any) {
-        if (error?.response?.status === 404) {
-          return null
-        }
-        throw error
+        // if (error?.response?.status === 404) {
+        //   return null
+        // }
+        // throw error
       }
     },
   })
@@ -72,7 +72,7 @@ export const useCreateFormSubmission = () => {
   return useMutation({
     mutationFn: create,
     onSuccess: (_, variables) => {
-      toast.success('Form submitted successfully!')
+      toast.success('Form submission created successfully!')
 
       queryClient.invalidateQueries({
         queryKey: formSubmissionQueryKeys.byOrganisationIdAndFormId(
@@ -94,11 +94,18 @@ export const useUpdateFormSubmission = () => {
   return useMutation({
     mutationFn: ({ id, payload }: { id: string; payload: any }) =>
       update(id, payload),
-    onSuccess: (_, { id }) => {
-      toast.success('Form updated successfully!')
-      queryClient.invalidateQueries({
-        queryKey: formSubmissionQueryKeys.byId(id),
-      })
+    onSuccess: (_, { payload }) => {
+      toast.success('Form Submission updated successfully!')
+
+      if (payload.organisationId && payload.formId) {
+        queryClient.invalidateQueries({
+          queryKey: formSubmissionQueryKeys.byOrganisationIdAndFormId(
+            payload.organisationId,
+            payload.formId
+          ),
+        })
+      }
+
       queryClient.invalidateQueries({ queryKey: formSubmissionQueryKeys.all })
     },
     onError: () => {
@@ -112,10 +119,14 @@ export const useDeleteFormSubmission = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: remove,
+    mutationFn: (id: string) => remove(id),
     onSuccess: () => {
-      toast.success('FormSubmission deleted successfully!')
-      queryClient.invalidateQueries({ queryKey: formSubmissionQueryKeys.all })
+      toast.success('Form Submission deleted successfully!')
+
+      queryClient.invalidateQueries({
+        queryKey: ['formSubmissionsOrgId'],
+        exact: false,
+      })
     },
     onError: () => {
       toast.error('Failed to delete formSubmission.')

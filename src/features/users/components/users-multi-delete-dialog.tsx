@@ -39,8 +39,8 @@ export function UsersMultiDeleteDialog<TData>({
       loading: 'Deleting users...',
       success: () => {
         table.resetRowSelection()
-        return `Deleted ${selectedRows.length} ${
-          selectedRows.length > 1 ? 'users' : 'user'
+        return `Deleted ${selectedRows?.length} ${
+          selectedRows?.length > 1 ? 'users' : 'user'
         }`
       },
       error: 'Error',
@@ -59,8 +59,8 @@ export function UsersMultiDeleteDialog<TData>({
             className='stroke-destructive me-1 inline-block'
             size={18}
           />{' '}
-          Delete {selectedRows.length}{' '}
-          {selectedRows.length > 1 ? 'users' : 'user'}
+          Delete {selectedRows?.length}{' '}
+          {selectedRows?.length > 1 ? 'users' : 'user'}
         </span>
       }
       desc={

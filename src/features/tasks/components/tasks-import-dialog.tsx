@@ -25,7 +25,7 @@ import { Input } from '@/components/ui/input'
 const formSchema = z.object({
   file: z
     .instanceof(FileList)
-    .refine((files) => files.length > 0, {
+    .refine((files) => files?.length > 0, {
       message: 'Please upload a file',
     })
     .refine(

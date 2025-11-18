@@ -116,7 +116,7 @@ export function NewChat({ users, onOpenChange, open }: NewChatProps) {
           <Button
             variant={'default'}
             onClick={() => showSubmittedData(selectedUsers)}
-            disabled={selectedUsers.length === 0}
+            disabled={selectedUsers?.length === 0}
           >
             Chat
           </Button>

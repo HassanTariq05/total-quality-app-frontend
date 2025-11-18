@@ -1,20 +1,9 @@
 import { z } from 'zod'
 
-// We're keeping a simple non-relational schema here.
-// IRL, you will have a schema for your data models.
-export const formSchema = z.object({
+export const FormSubmissionsSchema = z.object({
   id: z.string(),
-  title: z.string(),
-  description: z.string(),
-  status: z.any(),
-  // .string()
-  // .transform((val) => val.trim()) // remove spaces
-  // .refine((val) => ['active', 'inactive'].includes(val.toLowerCase()), {
-  //   message: 'Please select a valid status.',
-  // })
-  // .transform(
-  //   (val) => val.charAt(0).toUpperCase() + val.slice(1).toLowerCase()
-  // ),
+  name: z.string().nullable(),
+  description: z.string().nullable(),
 })
 
-export type Checklist = z.infer<typeof formSchema>
+export type SubmissionsSchema = z.infer<typeof FormSubmissionsSchema>

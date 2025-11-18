@@ -23,6 +23,7 @@ import { Input } from '@/components/ui/input'
 import { Table, TableRow, TableCell, TableBody } from '@/components/ui/table'
 import { DeleteDialog } from '@/features/accreditation/components/delete-dialog'
 import { CellContent } from './cell-content'
+import { useForms } from './form-provider'
 import { CellEditorModal } from './table-cell-editor-modal'
 
 export const FieldEditor: React.FC<{
@@ -34,9 +35,10 @@ export const FieldEditor: React.FC<{
 }> = ({ field, editorMode, formId, formType, formFormatId }) => {
   const { updateField, removeField, form } = useFormBuilderStore()
 
+  const { open, setOpen } = useForms()
+
   const [modalOpen, setModalOpen] = useState(false)
   const [copiedRow, setCopiedRow] = useState<any[] | null>(null)
-  const [openDeleteModal, setOpenDeleteModal] = useState(false)
   const [deleteFormId, setDeleteFormId] = useState('')
   const [editingCell, setEditingCell] = useState<{
     row: number
@@ -44,6 +46,7 @@ export const FieldEditor: React.FC<{
     childIdx?: string
     type: 'label' | 'field' | 'checkbox'
     value: string
+    identifier?: string
     placeholder: string
     bg?: string
     alignment?: string
@@ -63,6 +66,7 @@ export const FieldEditor: React.FC<{
       type: cell.type,
       placeholder: cell.placeholder,
       value: cell.value || (cell.type === 'label' ? 'Label' : ''),
+      identifier: cell.identifier,
       bg: cell.bg || '#1f1f1f',
       alignment: cell.alignment || 'Field',
       cellFlex: cell.cellFlex || 1,
@@ -74,6 +78,7 @@ export const FieldEditor: React.FC<{
   const handleSaveCell = (
     type: 'label' | 'field' | 'checkbox' | 'date' | 'signature',
     value: string,
+    identifier: string,
     bg?: string,
     placeholder?: string,
     alignment?: string,
@@ -95,6 +100,7 @@ export const FieldEditor: React.FC<{
                   id: child.id || uuidv4(),
                   type,
                   value: value || (type === 'label' ? 'Label' : ''),
+                  identifier,
                   bg: bg || child.bg,
                   placeholder: placeholder ?? child.placeholder,
                   alignment: alignment ?? child.alignment,
@@ -110,6 +116,7 @@ export const FieldEditor: React.FC<{
           id: c.id || uuidv4(),
           type,
           value: value || (type === 'label' ? 'Label' : ''),
+          identifier,
           bg: bg || c.bg,
           placeholder: placeholder ?? c.placeholder,
           alignment: alignment ?? c.alignment,
@@ -147,6 +154,7 @@ export const FieldEditor: React.FC<{
         id: uuidv4(),
         type: 'field',
         value: '',
+        identifier: '',
         bg: 'bg-card/40',
         placeholder: 'Field',
       },
@@ -163,6 +171,7 @@ export const FieldEditor: React.FC<{
               id: uuidv4(),
               type: 'field',
               value: '',
+              identifier: '',
               bg: 'bg-card/40',
               placeholder: 'Field',
               alignment: 'left',
@@ -245,6 +254,7 @@ export const FieldEditor: React.FC<{
           id: uuidv4(),
           type: 'field',
           value: '',
+          identifier: '',
           placeholder: 'Field',
         }
         return {
@@ -269,7 +279,7 @@ export const FieldEditor: React.FC<{
           variant='ghost'
           size='icon'
           onClick={() => {
-            setOpenDeleteModal(true)
+            setOpen('delete')
             setDeleteFormId(field.id)
           }}
           className='text-destructive hover:text-destructive/80'
@@ -492,6 +502,7 @@ export const FieldEditor: React.FC<{
           onClose={() => setModalOpen(false)}
           cellType={editingCell.type}
           value={editingCell.value}
+          identifier={editingCell.identifier}
           bg={editingCell.bg}
           alignment={editingCell.alignment}
           placeholder={editingCell.placeholder}
@@ -501,10 +512,10 @@ export const FieldEditor: React.FC<{
       )}
 
       <DeleteDialog
-        open={openDeleteModal}
+        open={open === 'delete'}
         title='Confirm'
         description='Are you sure to delete this form format?'
-        onOpenChange={() => setOpenDeleteModal(openDeleteModal)}
+        onOpenChange={() => setOpen('delete')}
         onConfirm={() => handleDeleteForm()}
       />
     </Card>

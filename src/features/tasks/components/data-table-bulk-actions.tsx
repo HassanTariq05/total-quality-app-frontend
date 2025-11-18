@@ -36,7 +36,7 @@ export function DataTableBulkActions<TData>({
       loading: 'Updating status...',
       success: () => {
         table.resetRowSelection()
-        return `Status updated to "${status}" for ${selectedTasks.length} task${selectedTasks.length > 1 ? 's' : ''}.`
+        return `Status updated to "${status}" for ${selectedTasks?.length} task${selectedTasks?.length > 1 ? 's' : ''}.`
       },
       error: 'Error',
     })
@@ -49,7 +49,7 @@ export function DataTableBulkActions<TData>({
       loading: 'Updating priority...',
       success: () => {
         table.resetRowSelection()
-        return `Priority updated to "${priority}" for ${selectedTasks.length} task${selectedTasks.length > 1 ? 's' : ''}.`
+        return `Priority updated to "${priority}" for ${selectedTasks?.length} task${selectedTasks?.length > 1 ? 's' : ''}.`
       },
       error: 'Error',
     })
@@ -62,7 +62,7 @@ export function DataTableBulkActions<TData>({
       loading: 'Exporting tasks...',
       success: () => {
         table.resetRowSelection()
-        return `Exported ${selectedTasks.length} task${selectedTasks.length > 1 ? 's' : ''} to CSV.`
+        return `Exported ${selectedTasks?.length} task${selectedTasks?.length > 1 ? 's' : ''} to CSV.`
       },
       error: 'Error',
     })

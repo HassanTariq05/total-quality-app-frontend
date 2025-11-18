@@ -17,12 +17,12 @@ export const useChecklistFormats = (chapterId: string) => {
   })
 }
 
-export const useChecklistFormat = (id: string) => {
-  const { getById } = useChecklistFormatService()
+export const useChecklistFormat = (id?: string) => {
+  const { getByChecklistId } = useChecklistFormatService()
 
   return useQuery({
-    queryKey: checklistFormatQueryKeys.byId(id),
-    queryFn: () => getById(id),
+    queryKey: checklistFormatQueryKeys.byId(id ?? ''),
+    queryFn: () => getByChecklistId(id!),
     enabled: !!id,
   })
 }
@@ -44,7 +44,7 @@ export const useCreateChecklistFormat = () => {
   return useMutation({
     mutationFn: create,
     onSuccess: () => {
-      toast.success('Form Format created successfully!')
+      toast.success('Checklist Format created successfully!')
       queryClient.invalidateQueries({ queryKey: checklistFormatQueryKeys.all })
     },
     onError: () => {
@@ -61,7 +61,7 @@ export const useUpdateChecklistFormat = () => {
     mutationFn: ({ id, payload }: { id: string; payload: any }) =>
       update(id, payload),
     onSuccess: (_, { id }) => {
-      toast.success('Form Format updated successfully!')
+      toast.success('Checklist Format updated successfully!')
       queryClient.invalidateQueries({
         queryKey: checklistFormatQueryKeys.byId(id),
       })
@@ -80,7 +80,7 @@ export const useDeleteChecklistFormat = () => {
   return useMutation({
     mutationFn: remove,
     onSuccess: () => {
-      toast.success('Form Format deleted successfully!')
+      toast.success('Checklist Format deleted successfully!')
       queryClient.invalidateQueries({ queryKey: checklistFormatQueryKeys.all })
     },
     onError: () => {

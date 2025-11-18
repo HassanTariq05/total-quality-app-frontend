@@ -98,7 +98,7 @@ export function DataTableFacetedFilter<TData, TValue>({
                       }
                       const filterValues = Array.from(selectedValues)
                       column?.setFilterValue(
-                        filterValues.length ? filterValues : undefined
+                        filterValues?.length ? filterValues : undefined
                       )
                     }}
                   >

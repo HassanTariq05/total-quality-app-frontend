@@ -40,7 +40,11 @@ import { Route as AuthenticatedSettingsAppearanceRouteImport } from './routes/_a
 import { Route as AuthenticatedSettingsAccountRouteImport } from './routes/_authenticated/settings/account'
 import { Route as AuthenticatedErrorsErrorRouteImport } from './routes/_authenticated/errors/$error'
 import { Route as AuthenticatedFormFormIdRouteRouteImport } from './routes/_authenticated/form/$formId/route'
+import { Route as AuthenticatedFormSubmissionFormSubmissionIdRouteRouteImport } from './routes/_authenticated/form-submission/$formSubmissionId/route'
+import { Route as AuthenticatedFormEditorFormIdRouteRouteImport } from './routes/_authenticated/form-editor/$formId/route'
 import { Route as AuthenticatedChecklistChecklistIdRouteRouteImport } from './routes/_authenticated/checklist/$checklistId/route'
+import { Route as AuthenticatedChecklistSubmissionChecklistSubmissionIdRouteRouteImport } from './routes/_authenticated/checklist-submission/$checklistSubmissionId/route'
+import { Route as AuthenticatedChecklistEditorChecklistIdRouteRouteImport } from './routes/_authenticated/checklist-editor/$checklistId/route'
 import { Route as AuthenticatedChapterChapterIdRouteRouteImport } from './routes/_authenticated/chapter/$chapterId/route'
 import { Route as AuthenticatedAccreditationCreateRouteRouteImport } from './routes/_authenticated/accreditation/create/route'
 import { Route as AuthenticatedAccreditationAccreditationIdRouteRouteImport } from './routes/_authenticated/accreditation/$accreditationId/route'
@@ -207,10 +211,34 @@ const AuthenticatedFormFormIdRouteRoute =
     path: '/form/$formId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedFormSubmissionFormSubmissionIdRouteRoute =
+  AuthenticatedFormSubmissionFormSubmissionIdRouteRouteImport.update({
+    id: '/form-submission/$formSubmissionId',
+    path: '/form-submission/$formSubmissionId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedFormEditorFormIdRouteRoute =
+  AuthenticatedFormEditorFormIdRouteRouteImport.update({
+    id: '/form-editor/$formId',
+    path: '/form-editor/$formId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedChecklistChecklistIdRouteRoute =
   AuthenticatedChecklistChecklistIdRouteRouteImport.update({
     id: '/checklist/$checklistId',
     path: '/checklist/$checklistId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedChecklistSubmissionChecklistSubmissionIdRouteRoute =
+  AuthenticatedChecklistSubmissionChecklistSubmissionIdRouteRouteImport.update({
+    id: '/checklist-submission/$checklistSubmissionId',
+    path: '/checklist-submission/$checklistSubmissionId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedChecklistEditorChecklistIdRouteRoute =
+  AuthenticatedChecklistEditorChecklistIdRouteRouteImport.update({
+    id: '/checklist-editor/$checklistId',
+    path: '/checklist-editor/$checklistId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedChapterChapterIdRouteRoute =
@@ -249,7 +277,11 @@ export interface FileRoutesByFullPath {
   '/accreditation/$accreditationId': typeof AuthenticatedAccreditationAccreditationIdRouteRoute
   '/accreditation/create': typeof AuthenticatedAccreditationCreateRouteRoute
   '/chapter/$chapterId': typeof AuthenticatedChapterChapterIdRouteRoute
+  '/checklist-editor/$checklistId': typeof AuthenticatedChecklistEditorChecklistIdRouteRoute
+  '/checklist-submission/$checklistSubmissionId': typeof AuthenticatedChecklistSubmissionChecklistSubmissionIdRouteRoute
   '/checklist/$checklistId': typeof AuthenticatedChecklistChecklistIdRouteRoute
+  '/form-editor/$formId': typeof AuthenticatedFormEditorFormIdRouteRoute
+  '/form-submission/$formSubmissionId': typeof AuthenticatedFormSubmissionFormSubmissionIdRouteRoute
   '/form/$formId': typeof AuthenticatedFormFormIdRouteRoute
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/settings/account': typeof AuthenticatedSettingsAccountRoute
@@ -282,7 +314,11 @@ export interface FileRoutesByTo {
   '/accreditation/$accreditationId': typeof AuthenticatedAccreditationAccreditationIdRouteRoute
   '/accreditation/create': typeof AuthenticatedAccreditationCreateRouteRoute
   '/chapter/$chapterId': typeof AuthenticatedChapterChapterIdRouteRoute
+  '/checklist-editor/$checklistId': typeof AuthenticatedChecklistEditorChecklistIdRouteRoute
+  '/checklist-submission/$checklistSubmissionId': typeof AuthenticatedChecklistSubmissionChecklistSubmissionIdRouteRoute
   '/checklist/$checklistId': typeof AuthenticatedChecklistChecklistIdRouteRoute
+  '/form-editor/$formId': typeof AuthenticatedFormEditorFormIdRouteRoute
+  '/form-submission/$formSubmissionId': typeof AuthenticatedFormSubmissionFormSubmissionIdRouteRoute
   '/form/$formId': typeof AuthenticatedFormFormIdRouteRoute
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/settings/account': typeof AuthenticatedSettingsAccountRoute
@@ -320,7 +356,11 @@ export interface FileRoutesById {
   '/_authenticated/accreditation/$accreditationId': typeof AuthenticatedAccreditationAccreditationIdRouteRoute
   '/_authenticated/accreditation/create': typeof AuthenticatedAccreditationCreateRouteRoute
   '/_authenticated/chapter/$chapterId': typeof AuthenticatedChapterChapterIdRouteRoute
+  '/_authenticated/checklist-editor/$checklistId': typeof AuthenticatedChecklistEditorChecklistIdRouteRoute
+  '/_authenticated/checklist-submission/$checklistSubmissionId': typeof AuthenticatedChecklistSubmissionChecklistSubmissionIdRouteRoute
   '/_authenticated/checklist/$checklistId': typeof AuthenticatedChecklistChecklistIdRouteRoute
+  '/_authenticated/form-editor/$formId': typeof AuthenticatedFormEditorFormIdRouteRoute
+  '/_authenticated/form-submission/$formSubmissionId': typeof AuthenticatedFormSubmissionFormSubmissionIdRouteRoute
   '/_authenticated/form/$formId': typeof AuthenticatedFormFormIdRouteRoute
   '/_authenticated/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/_authenticated/settings/account': typeof AuthenticatedSettingsAccountRoute
@@ -356,7 +396,11 @@ export interface FileRouteTypes {
     | '/accreditation/$accreditationId'
     | '/accreditation/create'
     | '/chapter/$chapterId'
+    | '/checklist-editor/$checklistId'
+    | '/checklist-submission/$checklistSubmissionId'
     | '/checklist/$checklistId'
+    | '/form-editor/$formId'
+    | '/form-submission/$formSubmissionId'
     | '/form/$formId'
     | '/errors/$error'
     | '/settings/account'
@@ -389,7 +433,11 @@ export interface FileRouteTypes {
     | '/accreditation/$accreditationId'
     | '/accreditation/create'
     | '/chapter/$chapterId'
+    | '/checklist-editor/$checklistId'
+    | '/checklist-submission/$checklistSubmissionId'
     | '/checklist/$checklistId'
+    | '/form-editor/$formId'
+    | '/form-submission/$formSubmissionId'
     | '/form/$formId'
     | '/errors/$error'
     | '/settings/account'
@@ -426,7 +474,11 @@ export interface FileRouteTypes {
     | '/_authenticated/accreditation/$accreditationId'
     | '/_authenticated/accreditation/create'
     | '/_authenticated/chapter/$chapterId'
+    | '/_authenticated/checklist-editor/$checklistId'
+    | '/_authenticated/checklist-submission/$checklistSubmissionId'
     | '/_authenticated/checklist/$checklistId'
+    | '/_authenticated/form-editor/$formId'
+    | '/_authenticated/form-submission/$formSubmissionId'
     | '/_authenticated/form/$formId'
     | '/_authenticated/errors/$error'
     | '/_authenticated/settings/account'
@@ -678,11 +730,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedFormFormIdRouteRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/form-submission/$formSubmissionId': {
+      id: '/_authenticated/form-submission/$formSubmissionId'
+      path: '/form-submission/$formSubmissionId'
+      fullPath: '/form-submission/$formSubmissionId'
+      preLoaderRoute: typeof AuthenticatedFormSubmissionFormSubmissionIdRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/form-editor/$formId': {
+      id: '/_authenticated/form-editor/$formId'
+      path: '/form-editor/$formId'
+      fullPath: '/form-editor/$formId'
+      preLoaderRoute: typeof AuthenticatedFormEditorFormIdRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/checklist/$checklistId': {
       id: '/_authenticated/checklist/$checklistId'
       path: '/checklist/$checklistId'
       fullPath: '/checklist/$checklistId'
       preLoaderRoute: typeof AuthenticatedChecklistChecklistIdRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/checklist-submission/$checklistSubmissionId': {
+      id: '/_authenticated/checklist-submission/$checklistSubmissionId'
+      path: '/checklist-submission/$checklistSubmissionId'
+      fullPath: '/checklist-submission/$checklistSubmissionId'
+      preLoaderRoute: typeof AuthenticatedChecklistSubmissionChecklistSubmissionIdRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/checklist-editor/$checklistId': {
+      id: '/_authenticated/checklist-editor/$checklistId'
+      path: '/checklist-editor/$checklistId'
+      fullPath: '/checklist-editor/$checklistId'
+      preLoaderRoute: typeof AuthenticatedChecklistEditorChecklistIdRouteRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/chapter/$chapterId': {
@@ -738,7 +818,11 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAccreditationAccreditationIdRouteRoute: typeof AuthenticatedAccreditationAccreditationIdRouteRoute
   AuthenticatedAccreditationCreateRouteRoute: typeof AuthenticatedAccreditationCreateRouteRoute
   AuthenticatedChapterChapterIdRouteRoute: typeof AuthenticatedChapterChapterIdRouteRoute
+  AuthenticatedChecklistEditorChecklistIdRouteRoute: typeof AuthenticatedChecklistEditorChecklistIdRouteRoute
+  AuthenticatedChecklistSubmissionChecklistSubmissionIdRouteRoute: typeof AuthenticatedChecklistSubmissionChecklistSubmissionIdRouteRoute
   AuthenticatedChecklistChecklistIdRouteRoute: typeof AuthenticatedChecklistChecklistIdRouteRoute
+  AuthenticatedFormEditorFormIdRouteRoute: typeof AuthenticatedFormEditorFormIdRouteRoute
+  AuthenticatedFormSubmissionFormSubmissionIdRouteRoute: typeof AuthenticatedFormSubmissionFormSubmissionIdRouteRoute
   AuthenticatedFormFormIdRouteRoute: typeof AuthenticatedFormFormIdRouteRoute
   AuthenticatedErrorsErrorRoute: typeof AuthenticatedErrorsErrorRoute
   AuthenticatedAppsIndexRoute: typeof AuthenticatedAppsIndexRoute
@@ -757,8 +841,16 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedAccreditationCreateRouteRoute,
   AuthenticatedChapterChapterIdRouteRoute:
     AuthenticatedChapterChapterIdRouteRoute,
+  AuthenticatedChecklistEditorChecklistIdRouteRoute:
+    AuthenticatedChecklistEditorChecklistIdRouteRoute,
+  AuthenticatedChecklistSubmissionChecklistSubmissionIdRouteRoute:
+    AuthenticatedChecklistSubmissionChecklistSubmissionIdRouteRoute,
   AuthenticatedChecklistChecklistIdRouteRoute:
     AuthenticatedChecklistChecklistIdRouteRoute,
+  AuthenticatedFormEditorFormIdRouteRoute:
+    AuthenticatedFormEditorFormIdRouteRoute,
+  AuthenticatedFormSubmissionFormSubmissionIdRouteRoute:
+    AuthenticatedFormSubmissionFormSubmissionIdRouteRoute,
   AuthenticatedFormFormIdRouteRoute: AuthenticatedFormFormIdRouteRoute,
   AuthenticatedErrorsErrorRoute: AuthenticatedErrorsErrorRoute,
   AuthenticatedAppsIndexRoute: AuthenticatedAppsIndexRoute,

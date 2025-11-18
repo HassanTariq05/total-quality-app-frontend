@@ -99,7 +99,7 @@ export function useTableUrlState(
       } else {
         // default to array type
         const value = (deserialize(raw) as unknown[]) ?? []
-        if (Array.isArray(value) && value.length > 0) {
+        if (Array.isArray(value) && value?.length > 0) {
           collected.push({ id: cfg.columnId, value })
         }
       }
@@ -177,7 +177,7 @@ export function useTableUrlState(
         const value = Array.isArray(found?.value)
           ? (found!.value as unknown[])
           : []
-        patch[cfg.searchKey] = value.length > 0 ? serialize(value) : undefined
+        patch[cfg.searchKey] = value?.length > 0 ? serialize(value) : undefined
       }
     }
 

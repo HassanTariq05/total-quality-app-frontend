@@ -17,12 +17,12 @@ export const useFormFormats = (chapterId: string) => {
   })
 }
 
-export const useFormFormat = (id: string) => {
+export const useFormFormat = (id?: string) => {
   const { getByFormId } = useFormFormatService()
 
   return useQuery({
-    queryKey: formFormatQueryKeys.byId(id),
-    queryFn: () => getByFormId(id),
+    queryKey: formFormatQueryKeys.byId(id ?? ''),
+    queryFn: () => getByFormId(id!),
     enabled: !!id,
   })
 }

@@ -5,12 +5,9 @@ import { Button } from '@/components/ui/button'
 import { FieldEditor } from './field-editor'
 
 export const ChecklistBuilder: React.FC<{
-  mode: any
-  setMode: any
   checklistId: string
-  formData: ChecklistFormat | undefined
-  checklistType: any
-}> = ({ mode, checklistId, formData, checklistType }) => {
+  checklistData: ChecklistFormat | undefined
+}> = ({ checklistId, checklistData }) => {
   const { form, addField } = useFormBuilderStore()
 
   return (
@@ -18,17 +15,17 @@ export const ChecklistBuilder: React.FC<{
       <div className='space-y-4'>
         {form.fields.map((f: any) => (
           <FieldEditor
-            formType={checklistType}
+            formType={checklistData ? 'update' : 'create'}
             checklistId={checklistId}
-            formFormatId={formData?.id}
-            editorMode={mode}
+            formFormatId={checklistData?.id}
+            editorMode={'builder'}
             key={f.id}
             field={f}
           />
         ))}
       </div>
 
-      {form.fields.length === 0 && (
+      {form.fields?.length === 0 && (
         <div className='border-muted-foreground/30 bg-muted/30 flex h-[60vh] flex-col items-center justify-center rounded-lg border border-dashed p-10 text-center'>
           <div className='bg-primary/10 mb-4 rounded-full p-4'>
             <svg

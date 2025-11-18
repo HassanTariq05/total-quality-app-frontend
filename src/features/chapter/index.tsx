@@ -7,8 +7,10 @@ import { useChapter } from '@/hooks/use-chapters'
 import { useChecklists } from '@/hooks/use-checklists'
 import { useForms } from '@/hooks/use-forms'
 import { Badge } from '@/components/ui/badge'
+import { InfoSkeleton } from '@/components/ui/info-skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ConfigDrawer } from '@/components/config-drawer'
+import { DataTableSkeleton } from '@/components/data-table/data-table-skeleton'
 import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
 import { ProfileDropdown } from '@/components/profile-dropdown'
@@ -30,9 +32,28 @@ export function ChapterView() {
 
   const { chapterId } = params
 
-  const { data: chapter } = useChapter(chapterId)
-  const { data: forms = [] } = useForms(chapterId)
-  const { data: checklists = [] } = useChecklists(chapterId)
+  const [formPage, setFormPage] = useState(0)
+  const [formPageSize, setFormPageSize] = useState(10)
+
+  const [checklistPage, setChecklistPage] = useState(0)
+  const [checklistPageSize, setChecklistPageSize] = useState(10)
+
+  const { data: chapter, isLoading: isFetchingChapters } = useChapter(chapterId)
+  const { data: formsData = null, isLoading: isFetchingForms } = useForms(
+    chapterId,
+    formPage,
+    formPageSize
+  )
+
+  const forms = formsData?.content || []
+  const totalFormPages = formsData?.totalPages || 0
+
+  const { data: checklistsData = null, isLoading: isFetchingChecklists } =
+    useChecklists(chapterId, checklistPage, checklistPageSize)
+
+  const checklists = checklistsData?.content || []
+  const totalChecklistPages = checklistsData?.totalPages || 0
+
   const { setForm } = useFormBuilderStore()
 
   useEffect(() => {
@@ -61,35 +82,42 @@ export function ChapterView() {
       </Header>
 
       <Main className='flex flex-1 flex-col gap-4 sm:gap-6'>
-        <ChapterBreadcrumb
-          chapterId={chapterId}
-          chapterName={chapter?.title || ''}
-          accreditationId={chapter?.accreditation?.id || ''}
-          accreditationName={chapter?.accreditation?.name || ''}
-        />
-        <div className='mb-0 flex items-center justify-between space-y-2'>
-          <div className='m-0'>
-            <div className='flex items-center gap-2'>
-              <h2 className='text-2xl font-bold tracking-tight'>
-                {chapter?.title}
-              </h2>
-              <Badge
-                variant='outline'
-                className={cn(
-                  'h-6 min-h-0 px-2 py-0.5 text-sm capitalize',
-                  badgeColor
-                )}
-              >
-                {chapter?.status}
-              </Badge>
-            </div>
+        {isFetchingChapters ? (
+          <InfoSkeleton />
+        ) : (
+          <>
+            <ChapterBreadcrumb
+              chapterId={chapterId}
+              chapterName={chapter?.title || ''}
+              accreditationId={chapter?.accreditation?.id || ''}
+              accreditationName={chapter?.accreditation?.name || ''}
+            />
+            <div className='mb-0 flex items-center justify-between space-y-2'>
+              <div className='m-0'>
+                <div className='flex items-center gap-2'>
+                  <h2 className='text-2xl font-bold tracking-tight'>
+                    {chapter?.title}
+                  </h2>
+                  <Badge
+                    variant='outline'
+                    className={cn(
+                      'h-6 min-h-0 px-2 py-0.5 text-sm capitalize',
+                      badgeColor
+                    )}
+                  >
+                    {chapter?.status}
+                  </Badge>
+                </div>
 
-            <p className='text-muted-foreground'>{chapter?.description}</p>
-          </div>
-          <div className='flex items-center space-x-2'>
-            <FormsPrimaryButtons selectedTab={selectedTab} />
-          </div>
-        </div>
+                <p className='text-muted-foreground'>{chapter?.description}</p>
+              </div>
+              <div className='flex items-center space-x-2'>
+                <FormsPrimaryButtons selectedTab={selectedTab} />
+              </div>
+            </div>
+          </>
+        )}
+
         <Tabs
           orientation='vertical'
           value={selectedTab}
@@ -104,11 +132,33 @@ export function ChapterView() {
           </div>
 
           <TabsContent value='forms' className='space-y-4'>
-            <Forms data={forms} />
+            {isFetchingForms ? (
+              <DataTableSkeleton />
+            ) : (
+              <Forms
+                data={forms}
+                page={formPage}
+                pageSize={formPageSize}
+                totalPages={totalFormPages}
+                onPageChange={setFormPage}
+                onPageSizeChange={setFormPageSize}
+              />
+            )}
           </TabsContent>
 
           <TabsContent value='checklists' className='space-y-4'>
-            <Checklists data={checklists} />
+            {isFetchingChecklists ? (
+              <DataTableSkeleton />
+            ) : (
+              <Checklists
+                data={checklists}
+                page={checklistPage}
+                pageSize={checklistPageSize}
+                totalPages={totalChecklistPages}
+                onPageChange={setChecklistPage}
+                onPageSizeChange={setChecklistPageSize}
+              />
+            )}
           </TabsContent>
         </Tabs>
       </Main>

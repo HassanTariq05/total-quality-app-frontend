@@ -1,12 +1,38 @@
 import { useApiClient } from '@/lib/axios'
+import { Accreditation } from '../accreditation-services/accreditation-services'
 
 export interface ChecklistFormat {
+  id: string
+  format: string
+  checklist: Checklist
+  number: number
+  form: Checklist
+}
+
+export interface ChecklistFormat1 {
   id: string
   format: string
   checklistId: string
 }
 
-export type CreateChecklistFormatPayload = Omit<ChecklistFormat, 'id'>
+interface Checklist {
+  id: string
+  number: string
+  status: string
+  title: string
+  description: string
+  chapter: Chapter
+}
+
+interface Chapter {
+  accreditation: Accreditation
+  description: string
+  id: string
+  status: string
+  title: string
+}
+
+export type CreateChecklistFormatPayload = Omit<ChecklistFormat1, 'id'>
 export type UpdateChecklistFormatPayload = Partial<CreateChecklistFormatPayload>
 
 export const useChecklistFormatService = () => {

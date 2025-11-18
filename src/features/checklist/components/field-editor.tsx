@@ -23,6 +23,7 @@ import { Input } from '@/components/ui/input'
 import { Table, TableRow, TableCell, TableBody } from '@/components/ui/table'
 import { DeleteDialog } from '@/features/accreditation/components/delete-dialog'
 import { CellContent } from './cell-content'
+import { useChecklists } from './checklist-provider'
 import { CellEditorModal } from './table-cell-editor-modal'
 
 export const FieldEditor: React.FC<{
@@ -34,10 +35,11 @@ export const FieldEditor: React.FC<{
 }> = ({ field, editorMode, checklistId, formType, formFormatId }) => {
   const { updateField, removeField, form } = useFormBuilderStore()
 
+  const { open, setOpen } = useChecklists()
+
   const [modalOpen, setModalOpen] = useState(false)
   const [copiedRow, setCopiedRow] = useState<any[] | null>(null)
-  const [openDeleteModal, setOpenDeleteModal] = useState(false)
-  const [deleteChecklistId, setDeleteChecklistId] = useState('')
+  const [deleteFormId, setDeleteFormId] = useState('')
   const [editingCell, setEditingCell] = useState<{
     row: number
     col: number
@@ -64,9 +66,10 @@ export const FieldEditor: React.FC<{
       placeholder: cell.placeholder,
       value: cell.value || (cell.type === 'label' ? 'Label' : ''),
       bg: cell.bg || '#1f1f1f',
-      alignment: cell?.alignment || 'Field',
-      cellFlex: cell?.cellFlex || 1,
+      alignment: cell.alignment || 'Field',
+      cellFlex: cell.cellFlex || 1,
     })
+
     setModalOpen(true)
   }
 
@@ -233,8 +236,8 @@ export const FieldEditor: React.FC<{
     }
   }
 
-  const handleDeleteChecklist = () => {
-    removeField(deleteChecklistId)
+  const handleDeleteForm = () => {
+    removeField(deleteFormId)
     deleteChecklistFormatMutation.mutate(formFormatId || '')
   }
 
@@ -271,8 +274,8 @@ export const FieldEditor: React.FC<{
           variant='ghost'
           size='icon'
           onClick={() => {
-            setOpenDeleteModal(true)
-            setDeleteChecklistId(field.id)
+            setOpen('delete')
+            setDeleteFormId(field.id)
           }}
           className='text-destructive hover:text-destructive/80'
         >
@@ -297,18 +300,17 @@ export const FieldEditor: React.FC<{
                     >
                       <div
                         className={cn(
-                          'group flex h-full min-h-[52px] w-full flex-col gap-2 p-2', // <-- flex-col here
+                          'group flex h-full min-h-[52px] w-full flex-col gap-2 p-2',
                           {
-                            'justify-start text-left':
+                            'justify-center text-left':
                               cell.alignment === 'left',
                             'justify-center text-center':
                               cell.alignment === 'center',
-                            'justify-end text-right':
+                            'justify-center text-right':
                               cell.alignment === 'right',
                           }
                         )}
                       >
-                        {/* Parent cell content */}
                         <div className='flex w-full items-center justify-between gap-2'>
                           <CellContent cell={cell} rIdx={rIdx} cIdx={cIdx} />
 
@@ -347,6 +349,7 @@ export const FieldEditor: React.FC<{
                           )}
                         </div>
 
+                        {/* Children cells stacked vertically */}
                         {cell.children?.map((child: any, childIdx: string) => (
                           <div
                             key={child.id}
@@ -503,11 +506,11 @@ export const FieldEditor: React.FC<{
       )}
 
       <DeleteDialog
-        open={openDeleteModal}
+        open={open === 'delete'}
         title='Confirm'
         description='Are you sure to delete this checklist format?'
-        onOpenChange={() => setOpenDeleteModal(openDeleteModal)}
-        onConfirm={() => handleDeleteChecklist()}
+        onOpenChange={() => setOpen('delete')}
+        onConfirm={() => handleDeleteForm()}
       />
     </Card>
   )

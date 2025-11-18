@@ -3,17 +3,24 @@ import { useApiClient } from '@/lib/axios'
 export interface ChecklistSubmission {
   id: string
   data: string
-  //   description?: string
-  //   status: 'Active' | 'Inactive'
+  checklistId: string
+  name: string
+  description: string
 }
 
 export type CreateChecklistSubmissionPayload = {
   checklistId: string
   organisationId: string
+  name: string
+  description: string
+}
+export type UpdateChecklistSubmissionPayload = {
+  checklistId: string
+  organisationId: string
+  name: string
+  description: string
   data: string
 }
-export type UpdateChecklistSubmissionPayload =
-  Partial<CreateChecklistSubmissionPayload>
 
 export const useChecklistSubmissionService = () => {
   const apiClient = useApiClient()
@@ -23,8 +30,12 @@ export const useChecklistSubmissionService = () => {
     return data
   }
 
-  const getById = async (id: string): Promise<ChecklistSubmission> => {
-    const { data } = await apiClient.get(`/checklistSubmissions/${id}`)
+  const getById = async (
+    submissionId: string
+  ): Promise<ChecklistSubmission> => {
+    const { data } = await apiClient.get(
+      `/checklistSubmissions/getBySubmissionId/${submissionId}`
+    )
     return data
   }
 

@@ -45,13 +45,13 @@ export function ThemeSwitch() {
             className={cn('ms-auto', theme !== 'dark' && 'hidden')}
           />
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme('system')}>
+        {/* <DropdownMenuItem onClick={() => setTheme('system')}>
           System
           <Check
             size={14}
             className={cn('ms-auto', theme !== 'system' && 'hidden')}
           />
-        </DropdownMenuItem>
+        </DropdownMenuItem> */}
       </DropdownMenuContent>
     </DropdownMenu>
   )

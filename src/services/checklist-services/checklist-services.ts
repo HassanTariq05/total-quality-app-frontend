@@ -17,6 +17,14 @@ export interface Checklist {
   }
 }
 
+export interface ChecklistPaginatedResponse {
+  content: Checklist[]
+  totalPages: number
+  size: number
+  number: number
+  totalElements: number
+}
+
 export interface ChecklistFormat {
   id: string
   format: string
@@ -31,9 +39,19 @@ export type UpdateChecklistPayload = Partial<CreateChecklistPayload>
 export const useChecklistService = () => {
   const apiClient = useApiClient()
 
-  const getAll = async (chapterId: string): Promise<Checklist[]> => {
+  const getAll = async (
+    chapterId: string,
+    page = 0,
+    size = 10
+  ): Promise<ChecklistPaginatedResponse> => {
     const { data } = await apiClient.get(
-      `/checklists/getAllByChapterId/${chapterId}`
+      `/checklists/getAllByChapterId/${chapterId}`,
+      {
+        params: {
+          page,
+          size,
+        },
+      }
     )
     return data
   }
@@ -43,7 +61,7 @@ export const useChecklistService = () => {
     return data
   }
 
-  const getFormFormatByFormId = async (
+  const getChecklistFormatByFormId = async (
     checklistId: string
   ): Promise<ChecklistFormat> => {
     const { data } = await apiClient.get(
@@ -71,5 +89,5 @@ export const useChecklistService = () => {
     await apiClient.delete(`/checklists/${id}`)
   }
 
-  return { getAll, getById, getFormFormatByFormId, create, update, remove }
+  return { getAll, getById, getChecklistFormatByFormId, create, update, remove }
 }

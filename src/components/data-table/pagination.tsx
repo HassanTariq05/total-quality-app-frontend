@@ -18,11 +18,13 @@ import {
 type DataTablePaginationProps<TData> = {
   table: Table<TData>
   className?: string
+  onPageSizeChange?: (size: number) => void
 }
 
 export function DataTablePagination<TData>({
   table,
   className,
+  onPageSizeChange,
 }: DataTablePaginationProps<TData>) {
   const currentPage = table.getState().pagination.pageIndex + 1
   const totalPages = table.getPageCount()
@@ -45,7 +47,11 @@ export function DataTablePagination<TData>({
           <Select
             value={`${table.getState().pagination.pageSize}`}
             onValueChange={(value) => {
-              table.setPageSize(Number(value))
+              if (onPageSizeChange) {
+                onPageSizeChange(Number(value))
+              } else {
+                table.setPageSize(Number(value))
+              }
             }}
           >
             <SelectTrigger className='h-8 w-[70px]'>

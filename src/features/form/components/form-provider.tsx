@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import useDialogState from '@/hooks/use-dialog-state'
-import { type Form } from '../data/schema'
+import { type SubmissionsSchema } from '../data/schema'
 
 type FormsDialogType =
   | 'create'
@@ -14,15 +14,15 @@ type FormsDialogType =
 type FormsContextType = {
   open: FormsDialogType | null
   setOpen: (str: FormsDialogType | null) => void
-  currentRow: Form | null
-  setCurrentRow: React.Dispatch<React.SetStateAction<Form | null>>
+  currentRow: SubmissionsSchema | null
+  setCurrentRow: React.Dispatch<React.SetStateAction<SubmissionsSchema | null>>
 }
 
 const FormsContext = React.createContext<FormsContextType | null>(null)
 
 export function FormsProvider({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useDialogState<FormsDialogType>(null)
-  const [currentRow, setCurrentRow] = useState<Form | null>(null)
+  const [currentRow, setCurrentRow] = useState<SubmissionsSchema | null>(null)
 
   return (
     <FormsContext value={{ open, setOpen, currentRow, setCurrentRow }}>

@@ -1,4 +1,9 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  keepPreviousData,
+} from '@tanstack/react-query'
 import { useFormService } from '@/services/form-services/form-services'
 import { toast } from 'sonner'
 
@@ -7,13 +12,18 @@ export const formQueryKeys = {
   byId: (id: string) => ['forms', id] as const,
 }
 
-export const useForms = (chapterId: string) => {
+export const useForms = (
+  chapterId: string,
+  page: number = 0,
+  size: number = 10
+) => {
   const { getAll } = useFormService()
 
   return useQuery({
-    queryKey: formQueryKeys.byId(chapterId),
-    queryFn: () => getAll(chapterId),
+    queryKey: [...formQueryKeys.byId(chapterId), { page, size }],
+    queryFn: () => getAll(chapterId, page, size),
     enabled: !!chapterId,
+    placeholderData: keepPreviousData,
   })
 }
 

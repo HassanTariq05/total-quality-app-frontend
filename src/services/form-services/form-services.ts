@@ -1,3 +1,4 @@
+import { Page } from '@/types/generic/types'
 import { useApiClient } from '@/lib/axios'
 
 export interface Form {
@@ -27,9 +28,19 @@ export type UpdateFormPayload = Partial<CreateFormPayload>
 export const useFormService = () => {
   const apiClient = useApiClient()
 
-  const getAll = async (chapterId: string): Promise<Form[]> => {
+  const getAll = async (
+    chapterId: string,
+    page = 0,
+    size = 10
+  ): Promise<Page<Form>> => {
     const { data } = await apiClient.get(
-      `/forms/getAllByChapterId/${chapterId}`
+      `/forms/getAllByChapterId/${chapterId}`,
+      {
+        params: {
+          page,
+          size,
+        },
+      }
     )
     return data
   }

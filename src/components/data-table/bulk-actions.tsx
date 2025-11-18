@@ -33,7 +33,7 @@ export function DataTableBulkActions<TData>({
   children,
 }: DataTableBulkActionsProps<TData>): React.ReactNode | null {
   const selectedRows = table.getFilteredSelectedRowModel().rows
-  const selectedCount = selectedRows.length
+  const selectedCount = selectedRows?.length
   const toolbarRef = useRef<HTMLDivElement>(null)
   const [announcement, setAnnouncement] = useState('')
 
@@ -68,14 +68,14 @@ export function DataTableBulkActions<TData>({
     switch (event.key) {
       case 'ArrowRight': {
         event.preventDefault()
-        const nextIndex = (currentIndex + 1) % buttons.length
+        const nextIndex = (currentIndex + 1) % buttons?.length
         buttons[nextIndex]?.focus()
         break
       }
       case 'ArrowLeft': {
         event.preventDefault()
         const prevIndex =
-          currentIndex === 0 ? buttons.length - 1 : currentIndex - 1
+          currentIndex === 0 ? buttons?.length - 1 : currentIndex - 1
         buttons[prevIndex]?.focus()
         break
       }
@@ -85,7 +85,7 @@ export function DataTableBulkActions<TData>({
         break
       case 'End':
         event.preventDefault()
-        buttons[buttons.length - 1]?.focus()
+        buttons[buttons?.length - 1]?.focus()
         break
       case 'Escape': {
         // Check if the Escape key came from a dropdown trigger or content

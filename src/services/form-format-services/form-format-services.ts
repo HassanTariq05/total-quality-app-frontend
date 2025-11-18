@@ -1,12 +1,38 @@
 import { useApiClient } from '@/lib/axios'
+import { Accreditation } from '../accreditation-services/accreditation-services'
 
 export interface FormFormat {
   id: string
   format: string
   formId: string
+  number: number
+  form: Form
 }
 
-export type CreateFormFormatPayload = Omit<FormFormat, 'id'>
+export interface FormFormat1 {
+  id: string
+  format: string
+  formId: string
+}
+
+interface Form {
+  id: string
+  number: string
+  status: string
+  title: string
+  description: string
+  chapter: Chapter
+}
+
+interface Chapter {
+  accreditation: Accreditation
+  description: string
+  id: string
+  status: string
+  title: string
+}
+
+export type CreateFormFormatPayload = Omit<FormFormat1, 'id'>
 export type UpdateFormFormatPayload = Partial<CreateFormFormatPayload>
 
 export const useFormFormatService = () => {

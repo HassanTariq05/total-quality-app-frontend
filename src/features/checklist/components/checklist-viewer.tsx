@@ -39,16 +39,72 @@ export const ChecklistViewer: React.FC<ChecklistViewerProps> = ({
 
   useEffect(() => {
     if (checklistSubmissionData?.data) {
-      setFormData(JSON.parse(checklistSubmissionData?.data || '{}'))
+      const parsed = JSON.parse(checklistSubmissionData.data || '[]')
+
+      if (Array.isArray(parsed)) {
+        const mapped: Record<string, any> = {}
+        parsed.forEach((item: any) => {
+          mapped[item.id] = item.value
+        })
+        setFormData(mapped)
+      } else {
+        setFormData(parsed)
+      }
     }
   }, [checklistSubmissionData])
+
+  const buildSubmissionData = () => {
+    const result: any[] = []
+
+    const collectIdentifiers = (items: any[]) => {
+      items.forEach((item) => {
+        if (item.id) {
+          result.push({
+            id: item.id,
+            identifier: item.identifier,
+            value: formData[item.id] ?? null,
+          })
+        }
+
+        if (item.rows) {
+          item.rows.forEach((row: any[]) =>
+            row.forEach((cell: any) => {
+              if (cell.id) {
+                result.push({
+                  id: cell.id,
+                  identifier: cell.identifier,
+                  value: formData[cell.id] ?? null,
+                })
+              }
+
+              if (cell.children) {
+                cell.children.forEach((child: any) => {
+                  result.push({
+                    id: child.id,
+                    identifier: child.identifier,
+                    value: formData[child.id] ?? null,
+                  })
+                })
+              }
+            })
+          )
+        }
+      })
+    }
+
+    collectIdentifiers(form.fields)
+
+    return result
+  }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
 
+    const structuredData = buildSubmissionData()
+
     if (checklistSubmissionData?.id) {
       const data: UpdateChecklistSubmissionPayload = {
-        data: JSON.stringify(formData),
+        data: JSON.stringify(structuredData),
         checklistId: checklistId,
         organisationId: auth?.user?.organisation?.id || '',
         name: checklistSubmissionData?.name,

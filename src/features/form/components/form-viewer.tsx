@@ -39,21 +39,78 @@ export const FormViewer: React.FC<FormViewerProps> = ({
 
   useEffect(() => {
     if (formSubmissionData?.data) {
-      setFormData(JSON.parse(formSubmissionData?.data || '{}'))
+      const parsed = JSON.parse(formSubmissionData.data || '[]')
+
+      if (Array.isArray(parsed)) {
+        const mapped: Record<string, any> = {}
+        parsed.forEach((item: any) => {
+          mapped[item.id] = item.value
+        })
+        setFormData(mapped)
+      } else {
+        setFormData(parsed)
+      }
     }
   }, [formSubmissionData])
+
+  const buildSubmissionData = () => {
+    const result: any[] = []
+
+    const collectIdentifiers = (items: any[]) => {
+      items.forEach((item) => {
+        if (item.id) {
+          result.push({
+            id: item.id,
+            identifier: item.identifier,
+            value: formData[item.id] ?? null,
+          })
+        }
+
+        if (item.rows) {
+          item.rows.forEach((row: any[]) =>
+            row.forEach((cell: any) => {
+              if (cell.id) {
+                result.push({
+                  id: cell.id,
+                  identifier: cell.identifier,
+                  value: formData[cell.id] ?? null,
+                })
+              }
+
+              if (cell.children) {
+                cell.children.forEach((child: any) => {
+                  result.push({
+                    id: child.id,
+                    identifier: child.identifier,
+                    value: formData[child.id] ?? null,
+                  })
+                })
+              }
+            })
+          )
+        }
+      })
+    }
+
+    collectIdentifiers(form.fields)
+
+    return result
+  }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
 
+    const structuredData = buildSubmissionData()
+
     if (formSubmissionData?.id) {
       const data: UpdateFormSubmissionPayload = {
-        data: JSON.stringify(formData),
+        data: JSON.stringify(structuredData),
         formId: formId,
         organisationId: auth?.user?.organisation?.id || '',
         name: formSubmissionData?.name,
         description: formSubmissionData?.description,
       }
+
       updateFormSubmissionMutation.mutate({
         id: formSubmissionData?.id || '',
         payload: data,

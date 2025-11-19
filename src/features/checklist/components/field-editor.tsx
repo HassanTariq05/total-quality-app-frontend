@@ -46,6 +46,7 @@ export const FieldEditor: React.FC<{
     childIdx?: string
     type: 'label' | 'field' | 'checkbox'
     value: string
+    identifier?: string
     placeholder: string
     bg?: string
     alignment?: string
@@ -65,6 +66,7 @@ export const FieldEditor: React.FC<{
       type: cell.type,
       placeholder: cell.placeholder,
       value: cell.value || (cell.type === 'label' ? 'Label' : ''),
+      identifier: cell.identifier,
       bg: cell.bg || '#1f1f1f',
       alignment: cell.alignment || 'Field',
       cellFlex: cell.cellFlex || 1,
@@ -76,6 +78,7 @@ export const FieldEditor: React.FC<{
   const handleSaveCell = (
     type: 'label' | 'field' | 'checkbox' | 'date' | 'signature',
     value: string,
+    identifier: string,
     bg?: string,
     placeholder?: string,
     alignment?: string,
@@ -97,6 +100,7 @@ export const FieldEditor: React.FC<{
                   id: child.id || uuidv4(),
                   type,
                   value: value || (type === 'label' ? 'Label' : ''),
+                  identifier,
                   bg: bg || child.bg,
                   placeholder: placeholder ?? child.placeholder,
                   alignment: alignment ?? child.alignment,
@@ -112,6 +116,7 @@ export const FieldEditor: React.FC<{
           id: c.id || uuidv4(),
           type,
           value: value || (type === 'label' ? 'Label' : ''),
+          identifier,
           bg: bg || c.bg,
           placeholder: placeholder ?? c.placeholder,
           alignment: alignment ?? c.alignment,
@@ -149,6 +154,7 @@ export const FieldEditor: React.FC<{
         id: uuidv4(),
         type: 'field',
         value: '',
+        identifier: '',
         bg: 'bg-card/40',
         placeholder: 'Field',
       },
@@ -165,6 +171,7 @@ export const FieldEditor: React.FC<{
               id: uuidv4(),
               type: 'field',
               value: '',
+              identifier: '',
               bg: 'bg-card/40',
               placeholder: 'Field',
               alignment: 'left',
@@ -250,6 +257,7 @@ export const FieldEditor: React.FC<{
           id: uuidv4(),
           type: 'field',
           value: '',
+          identifier: '',
           placeholder: 'Field',
         }
         return {
@@ -497,6 +505,7 @@ export const FieldEditor: React.FC<{
           onClose={() => setModalOpen(false)}
           cellType={editingCell.type}
           value={editingCell.value}
+          identifier={editingCell.identifier}
           bg={editingCell.bg}
           alignment={editingCell.alignment}
           placeholder={editingCell.placeholder}

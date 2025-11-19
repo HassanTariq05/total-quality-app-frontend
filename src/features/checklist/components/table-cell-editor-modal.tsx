@@ -23,6 +23,7 @@ interface CellEditorModalProps {
   onClose: () => void
   cellType: 'label' | 'field' | 'checkbox' | 'date' | 'signature' | null
   value: string
+  identifier?: string
   bg?: string
   placeholder?: string
   alignment?: string
@@ -30,6 +31,7 @@ interface CellEditorModalProps {
   onSave: (
     type: 'label' | 'field' | 'checkbox' | 'date' | 'signature',
     value: string,
+    identifier: string,
     bg: string,
     placeholder: string,
     alignment: string,
@@ -59,6 +61,7 @@ export const CellEditorModal: React.FC<CellEditorModalProps> = ({
   onClose,
   cellType,
   value,
+  identifier,
   onSave,
   bg,
   placeholder,
@@ -69,6 +72,9 @@ export const CellEditorModal: React.FC<CellEditorModalProps> = ({
     'label' | 'field' | 'checkbox' | 'date' | 'signature'
   >(cellType || 'field')
   const [textValue, setTextValue] = useState(value || '')
+  const [identifierFieldValue, setIdentifierFieldValue] = useState(
+    identifier || ''
+  )
   const [cellBg, setCellBg] = useState<string>('')
 
   const [placeholderCell, setPlaceholderCell] = useState<string>(
@@ -81,11 +87,20 @@ export const CellEditorModal: React.FC<CellEditorModalProps> = ({
   React.useEffect(() => {
     setSelectedType(cellType || 'field')
     setTextValue(value || '')
+    setIdentifierFieldValue(identifier || '')
     setCellBg(bg || '')
-  }, [cellType, value, open])
+  }, [cellType, value, open, identifier])
 
   const handleSave = () => {
-    onSave(selectedType, textValue, cellBg, placeholderCell, alignCell, flex)
+    onSave(
+      selectedType,
+      textValue,
+      identifierFieldValue,
+      cellBg,
+      placeholderCell,
+      alignCell,
+      flex
+    )
     onClose()
   }
 
@@ -185,6 +200,21 @@ export const CellEditorModal: React.FC<CellEditorModalProps> = ({
               placeholder='e.g. 1, 2, 3'
             />
           </div>
+
+          {selectedType !== 'label' && (
+            <div className='space-y-1'>
+              <Label htmlFor='cell-identifier'>Identifier</Label>
+              <Input
+                id='cell-identifier'
+                value={identifierFieldValue}
+                onChange={(e) => {
+                  setIdentifierFieldValue(e.target.value)
+                }}
+                className='w-full'
+                placeholder='property_identifier'
+              />
+            </div>
+          )}
 
           {/* Background Color Selector as Dropdown */}
           {(selectedType === 'label' ||

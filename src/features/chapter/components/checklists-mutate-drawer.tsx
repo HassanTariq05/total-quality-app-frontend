@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Loader2 } from 'lucide-react'
 import { useCreateChecklist, useUpdateChecklist } from '@/hooks/use-checklists'
 import { Button } from '@/components/ui/button'
 import {
@@ -166,7 +167,18 @@ export function ChecklistsMutateDrawer({
           <SheetClose asChild>
             <Button variant='outline'>Close</Button>
           </SheetClose>
-          <Button form='forms-checklist' type='submit'>
+          <Button
+            form='forms-checklist'
+            type='submit'
+            disabled={
+              createChecklistMutation.isPending ||
+              updateChecklistMutation.isPending
+            }
+          >
+            {(createChecklistMutation.isPending ||
+              updateChecklistMutation.isPending) && (
+              <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+            )}
             Save changes
           </Button>
         </SheetFooter>

@@ -39,6 +39,7 @@ import { Route as AuthenticatedSettingsDisplayRouteImport } from './routes/_auth
 import { Route as AuthenticatedSettingsAppearanceRouteImport } from './routes/_authenticated/settings/appearance'
 import { Route as AuthenticatedSettingsAccountRouteImport } from './routes/_authenticated/settings/account'
 import { Route as AuthenticatedErrorsErrorRouteImport } from './routes/_authenticated/errors/$error'
+import { Route as AuthenticatedPolicyPolicyIdRouteRouteImport } from './routes/_authenticated/policy/$policyId/route'
 import { Route as AuthenticatedFormFormIdRouteRouteImport } from './routes/_authenticated/form/$formId/route'
 import { Route as AuthenticatedFormSubmissionFormSubmissionIdRouteRouteImport } from './routes/_authenticated/form-submission/$formSubmissionId/route'
 import { Route as AuthenticatedFormEditorFormIdRouteRouteImport } from './routes/_authenticated/form-editor/$formId/route'
@@ -205,6 +206,12 @@ const AuthenticatedErrorsErrorRoute =
     path: '/errors/$error',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedPolicyPolicyIdRouteRoute =
+  AuthenticatedPolicyPolicyIdRouteRouteImport.update({
+    id: '/policy/$policyId',
+    path: '/policy/$policyId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedFormFormIdRouteRoute =
   AuthenticatedFormFormIdRouteRouteImport.update({
     id: '/form/$formId',
@@ -283,6 +290,7 @@ export interface FileRoutesByFullPath {
   '/form-editor/$formId': typeof AuthenticatedFormEditorFormIdRouteRoute
   '/form-submission/$formSubmissionId': typeof AuthenticatedFormSubmissionFormSubmissionIdRouteRoute
   '/form/$formId': typeof AuthenticatedFormFormIdRouteRoute
+  '/policy/$policyId': typeof AuthenticatedPolicyPolicyIdRouteRoute
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/settings/account': typeof AuthenticatedSettingsAccountRoute
   '/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
@@ -320,6 +328,7 @@ export interface FileRoutesByTo {
   '/form-editor/$formId': typeof AuthenticatedFormEditorFormIdRouteRoute
   '/form-submission/$formSubmissionId': typeof AuthenticatedFormSubmissionFormSubmissionIdRouteRoute
   '/form/$formId': typeof AuthenticatedFormFormIdRouteRoute
+  '/policy/$policyId': typeof AuthenticatedPolicyPolicyIdRouteRoute
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/settings/account': typeof AuthenticatedSettingsAccountRoute
   '/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
@@ -362,6 +371,7 @@ export interface FileRoutesById {
   '/_authenticated/form-editor/$formId': typeof AuthenticatedFormEditorFormIdRouteRoute
   '/_authenticated/form-submission/$formSubmissionId': typeof AuthenticatedFormSubmissionFormSubmissionIdRouteRoute
   '/_authenticated/form/$formId': typeof AuthenticatedFormFormIdRouteRoute
+  '/_authenticated/policy/$policyId': typeof AuthenticatedPolicyPolicyIdRouteRoute
   '/_authenticated/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/_authenticated/settings/account': typeof AuthenticatedSettingsAccountRoute
   '/_authenticated/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
@@ -402,6 +412,7 @@ export interface FileRouteTypes {
     | '/form-editor/$formId'
     | '/form-submission/$formSubmissionId'
     | '/form/$formId'
+    | '/policy/$policyId'
     | '/errors/$error'
     | '/settings/account'
     | '/settings/appearance'
@@ -439,6 +450,7 @@ export interface FileRouteTypes {
     | '/form-editor/$formId'
     | '/form-submission/$formSubmissionId'
     | '/form/$formId'
+    | '/policy/$policyId'
     | '/errors/$error'
     | '/settings/account'
     | '/settings/appearance'
@@ -480,6 +492,7 @@ export interface FileRouteTypes {
     | '/_authenticated/form-editor/$formId'
     | '/_authenticated/form-submission/$formSubmissionId'
     | '/_authenticated/form/$formId'
+    | '/_authenticated/policy/$policyId'
     | '/_authenticated/errors/$error'
     | '/_authenticated/settings/account'
     | '/_authenticated/settings/appearance'
@@ -723,6 +736,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedErrorsErrorRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/policy/$policyId': {
+      id: '/_authenticated/policy/$policyId'
+      path: '/policy/$policyId'
+      fullPath: '/policy/$policyId'
+      preLoaderRoute: typeof AuthenticatedPolicyPolicyIdRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/form/$formId': {
       id: '/_authenticated/form/$formId'
       path: '/form/$formId'
@@ -824,6 +844,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedFormEditorFormIdRouteRoute: typeof AuthenticatedFormEditorFormIdRouteRoute
   AuthenticatedFormSubmissionFormSubmissionIdRouteRoute: typeof AuthenticatedFormSubmissionFormSubmissionIdRouteRoute
   AuthenticatedFormFormIdRouteRoute: typeof AuthenticatedFormFormIdRouteRoute
+  AuthenticatedPolicyPolicyIdRouteRoute: typeof AuthenticatedPolicyPolicyIdRouteRoute
   AuthenticatedErrorsErrorRoute: typeof AuthenticatedErrorsErrorRoute
   AuthenticatedAppsIndexRoute: typeof AuthenticatedAppsIndexRoute
   AuthenticatedChatsIndexRoute: typeof AuthenticatedChatsIndexRoute
@@ -852,6 +873,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedFormSubmissionFormSubmissionIdRouteRoute:
     AuthenticatedFormSubmissionFormSubmissionIdRouteRoute,
   AuthenticatedFormFormIdRouteRoute: AuthenticatedFormFormIdRouteRoute,
+  AuthenticatedPolicyPolicyIdRouteRoute: AuthenticatedPolicyPolicyIdRouteRoute,
   AuthenticatedErrorsErrorRoute: AuthenticatedErrorsErrorRoute,
   AuthenticatedAppsIndexRoute: AuthenticatedAppsIndexRoute,
   AuthenticatedChatsIndexRoute: AuthenticatedChatsIndexRoute,

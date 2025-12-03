@@ -7,9 +7,6 @@ export const useApiClient = (): AxiosInstance => {
 
   const apiClient: AxiosInstance = axios.create({
     baseURL: import.meta.env.VITE_API_BASE_URL,
-    headers: {
-      'Content-Type': 'application/json',
-    },
     withCredentials: true,
   })
 
@@ -27,7 +24,7 @@ export const useApiClient = (): AxiosInstance => {
     (response) => response,
     (error: AxiosError) => {
       if (error.response?.status === 401) {
-        auth.reset()
+        // auth.reset()
       }
       return Promise.reject(error)
     }
@@ -62,7 +59,7 @@ export const useAuthApiClient = (): AxiosInstance => {
     (response) => response,
     (error: AxiosError) => {
       if (error.response?.status === 401) {
-        auth.reset()
+        // auth.reset()
       }
       return Promise.reject(error)
     }

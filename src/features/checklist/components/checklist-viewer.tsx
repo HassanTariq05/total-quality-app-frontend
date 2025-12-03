@@ -165,13 +165,21 @@ export const ChecklistViewer: React.FC<ChecklistViewerProps> = ({
               )}
 
               {field.type === 'table' && (
-                <div className='overflow-x-auto rounded'>
-                  <Table className='w-full table-fixed'>
+                <div className='overflow-visible rounded'>
+                  <Table className='w-full overflow-visible'>
                     <TableBody>
                       {field.rows.map((row: any, rIdx: number) => (
                         <TableRow
                           key={rIdx}
-                          className='flex w-full items-center justify-center'
+                          className='flex items-center justify-center'
+                          style={{
+                            width: form?.formWidth
+                              ? `${form?.formWidth}px`
+                              : '100%',
+                            maxWidth: form?.formWidth
+                              ? `${form?.formWidth}px`
+                              : '100%',
+                          }}
                         >
                           {row.map((cell: any) => (
                             <TableCell
@@ -187,7 +195,8 @@ export const ChecklistViewer: React.FC<ChecklistViewerProps> = ({
                                 <div
                                   className={cn('flex items-center gap-2', {
                                     'justify-start text-left':
-                                      cell.alignment === 'left',
+                                      cell.alignment === 'left' ||
+                                      cell.alignment == 'Field',
                                     'justify-center text-center':
                                       cell.alignment === 'center',
                                     'justify-end text-right':
@@ -198,6 +207,32 @@ export const ChecklistViewer: React.FC<ChecklistViewerProps> = ({
                                     <span className='text-sm break-words whitespace-normal'>
                                       {cell.value}
                                     </span>
+                                  )}
+
+                                  {cell.type === 'link' && (
+                                    <button
+                                      type='button'
+                                      onClick={() => {
+                                        if (cell.linkUrl) {
+                                          const url =
+                                            cell.linkUrl.startsWith(
+                                              'http://'
+                                            ) ||
+                                            cell.linkUrl.startsWith('https://')
+                                              ? cell.linkUrl
+                                              : `https://${cell.linkUrl}`
+
+                                          window.open(
+                                            url,
+                                            '_blank',
+                                            'noopener,noreferrer'
+                                          )
+                                        }
+                                      }}
+                                      className='cursor-pointer text-left text-sm break-words whitespace-normal text-blue-600 underline'
+                                    >
+                                      {cell.linkText || 'Open link'}
+                                    </button>
                                   )}
 
                                   {cell.type === 'field' && (
@@ -320,6 +355,31 @@ export const ChecklistViewer: React.FC<ChecklistViewerProps> = ({
                                           }
                                         />
                                       )}
+
+                                      {child.type === 'link' && (
+                                        <button
+                                          type='button'
+                                          onClick={() => {
+                                            if (child.linkUrl) {
+                                              const raw = child.linkUrl.trim()
+                                              const url =
+                                                raw.startsWith('http://') ||
+                                                raw.startsWith('https://')
+                                                  ? raw
+                                                  : `https://${raw}`
+
+                                              window.open(
+                                                url,
+                                                '_blank',
+                                                'noopener,noreferrer'
+                                              )
+                                            }
+                                          }}
+                                          className='cursor-pointer text-left text-sm break-words whitespace-normal text-blue-600 underline'
+                                        >
+                                          {child.linkText || 'Open link'}
+                                        </button>
+                                      )}
                                     </div>
                                   </div>
                                 ))}
@@ -339,7 +399,15 @@ export const ChecklistViewer: React.FC<ChecklistViewerProps> = ({
 
       {form.fields?.length !== 0 && (
         <div className='flex justify-end pt-4'>
-          <Button type='submit'>Update Checklist</Button>
+          <Button
+            type='submit'
+            disabled={updateChecklistSubmissionMutation.isPending}
+          >
+            {updateChecklistSubmissionMutation.isPending && (
+              <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+            )}
+            Update Checklist
+          </Button>
         </div>
       )}
 
@@ -372,11 +440,11 @@ export const ChecklistViewer: React.FC<ChecklistViewerProps> = ({
       )}
 
       {/* <div className='mt-6'>
-          <h3 className='mb-2 font-medium'>Filled Values</h3>
-          <pre className='rounded bg-gray-900 p-3 text-sm text-gray-100'>
-            {JSON.stringify(formData, null, 2)}
-          </pre>
-        </div> */}
+        <h3 className='mb-2 font-medium'>Filled Values</h3>
+        <pre className='rounded bg-gray-900 p-3 text-sm text-gray-100'>
+          {JSON.stringify(formData, null, 2)}
+        </pre>
+      </div> */}
     </form>
   )
 }

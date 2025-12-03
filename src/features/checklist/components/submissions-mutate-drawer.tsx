@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Loader2 } from 'lucide-react'
 import { useAuthStore } from '@/stores/auth-store'
 import {
   useCreateChecklistSubmission,
@@ -108,7 +109,7 @@ export function FormsMutateDrawer({
         </SheetHeader>
         <Form {...form}>
           <form
-            id='forms-form'
+            id='forms-submission'
             onSubmit={form.handleSubmit(onSubmit)}
             className='flex-1 space-y-6 overflow-y-auto px-4'
           >
@@ -148,7 +149,18 @@ export function FormsMutateDrawer({
           <SheetClose asChild>
             <Button variant='outline'>Close</Button>
           </SheetClose>
-          <Button form='forms-form' type='submit'>
+          <Button
+            form='forms-submission'
+            type='submit'
+            disabled={
+              createChecklistSubmissionMutation.isPending ||
+              updateChecklistSubmissionMutation.isPending
+            }
+          >
+            {(createChecklistSubmissionMutation.isPending ||
+              updateChecklistSubmissionMutation.isPending) && (
+              <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+            )}
             Save changes
           </Button>
         </SheetFooter>

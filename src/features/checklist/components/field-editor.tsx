@@ -8,6 +8,7 @@ import {
   Copy,
   ClipboardPaste,
   PlusSquare,
+  Loader2,
 } from 'lucide-react'
 import { v4 as uuidv4 } from 'uuid'
 import { useFormBuilderStore } from '@/stores/useFormBuilderStore'
@@ -22,8 +23,10 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Table, TableRow, TableCell, TableBody } from '@/components/ui/table'
 import { DeleteDialog } from '@/features/accreditation/components/delete-dialog'
+import { HeaderDropdown } from './HeaderDropdown'
 import { CellContent } from './cell-content'
 import { useChecklists } from './checklist-provider'
+import { SettingsModal } from './settings-modal'
 import { CellEditorModal } from './table-cell-editor-modal'
 
 export const FieldEditor: React.FC<{
@@ -33,11 +36,13 @@ export const FieldEditor: React.FC<{
   formType: string
   formFormatId: string | undefined
 }> = ({ field, editorMode, checklistId, formType, formFormatId }) => {
-  const { updateField, removeField, form } = useFormBuilderStore()
+  const { updateField, removeField, form, updateFormWidth } =
+    useFormBuilderStore()
 
   const { open, setOpen } = useChecklists()
 
   const [modalOpen, setModalOpen] = useState(false)
+  const [settingsModalOpen, setSettingsModalOpen] = useState(false)
   const [copiedRow, setCopiedRow] = useState<any[] | null>(null)
   const [deleteFormId, setDeleteFormId] = useState('')
   const [editingCell, setEditingCell] = useState<{
@@ -51,6 +56,8 @@ export const FieldEditor: React.FC<{
     bg?: string
     alignment?: string
     cellFlex?: number
+    linkTextValue?: string
+    linkUrlValue?: string
   } | null>(null)
 
   const openModal = (
@@ -68,29 +75,55 @@ export const FieldEditor: React.FC<{
       value: cell.value || (cell.type === 'label' ? 'Label' : ''),
       identifier: cell.identifier,
       bg: cell.bg || '#1f1f1f',
-      alignment: cell.alignment || 'Field',
+      alignment: cell.alignment || 'left',
       cellFlex: cell.cellFlex || 1,
+      linkTextValue: cell.linkText,
+      linkUrlValue: cell.linkUrl,
     })
 
     setModalOpen(true)
   }
 
+  const handleSaveSettings = (inputWidth: number | undefined) => {
+    const width = inputWidth && inputWidth > 0 ? inputWidth : null
+    updateFormWidth(width)
+  }
+
   const handleSaveCell = (
-    type: 'label' | 'field' | 'checkbox' | 'date' | 'signature',
+    type: 'label' | 'field' | 'checkbox' | 'date' | 'signature' | 'link',
     value: string,
     identifier: string,
     bg?: string,
     placeholder?: string,
     alignment?: string,
-    cellFlex?: number
+    cellFlex?: number,
+    linkText?: string,
+    linkUrl?: string
   ) => {
     if (!editingCell) return
     const { row, col, childIdx } = editingCell
 
+    const isLink = type === 'link'
+
     const newRows = field.rows.map((r: any, rIdx: any) => {
       if (rIdx !== row) return r
+
       return r.map((c: any, cIdx: any) => {
         if (cIdx !== col) return c
+
+        const baseUpdate = {
+          type,
+          value: !isLink ? value || (type === 'label' ? 'Label' : '') : '',
+          identifier,
+          bg: bg || c.bg,
+          placeholder: placeholder ?? c.placeholder,
+          alignment: alignment ?? c.alignment,
+          cellFlex: cellFlex ?? c.cellFlex,
+          ...(isLink && {
+            linkText: linkText || value,
+            linkUrl: linkUrl || '',
+          }),
+        }
 
         if (typeof childIdx === 'number') {
           const updatedChildren = c.children.map((child: any, i: number) =>
@@ -98,13 +131,7 @@ export const FieldEditor: React.FC<{
               ? {
                   ...child,
                   id: child.id || uuidv4(),
-                  type,
-                  value: value || (type === 'label' ? 'Label' : ''),
-                  identifier,
-                  bg: bg || child.bg,
-                  placeholder: placeholder ?? child.placeholder,
-                  alignment: alignment ?? child.alignment,
-                  cellFlex: cellFlex ?? child.cellFlex,
+                  ...baseUpdate,
                 }
               : child
           )
@@ -114,13 +141,7 @@ export const FieldEditor: React.FC<{
         return {
           ...c,
           id: c.id || uuidv4(),
-          type,
-          value: value || (type === 'label' ? 'Label' : ''),
-          identifier,
-          bg: bg || c.bg,
-          placeholder: placeholder ?? c.placeholder,
-          alignment: alignment ?? c.alignment,
-          cellFlex: cellFlex ?? c.cellFlex,
+          ...baseUpdate,
         }
       })
     })
@@ -270,6 +291,9 @@ export const FieldEditor: React.FC<{
     updateField(field.id, { rows: newRows })
   }
 
+  const effectiveWidth =
+    form.formWidth && form.formWidth > 0 ? form.formWidth : null
+
   return (
     <Card className='bg-card text-card-foreground border-border shadow-sm'>
       <CardHeader className='flex items-center justify-between'>
@@ -278,37 +302,46 @@ export const FieldEditor: React.FC<{
           value={field.label}
           onChange={(e) => updateField(field.id, { label: e.target.value })}
         />
-        <Button
-          variant='ghost'
-          size='icon'
-          onClick={() => {
+        <HeaderDropdown
+          fieldId={field.id}
+          onOpenDelete={() => {
             setOpen('delete')
             setDeleteFormId(field.id)
           }}
-          className='text-destructive hover:text-destructive/80'
-        >
-          <X className='h-4 w-4' />
-        </Button>
+          onOpenSettings={() => {
+            setSettingsModalOpen(true)
+          }}
+        />
       </CardHeader>
 
       <CardContent>
         <div className='max-h-none overflow-visible rounded'>
-          <Table className='w-full table-fixed overflow-visible'>
+          <Table className='w-full overflow-visible'>
             <TableBody>
               {field.rows.map((row: any, rIdx: any) => (
                 <TableRow
                   key={rIdx}
-                  className='flex w-full items-center justify-center'
+                  className='flex items-center justify-center'
+                  style={{
+                    width: effectiveWidth ? `${effectiveWidth}px` : '100%',
+                    maxWidth: effectiveWidth ? `${effectiveWidth}px` : '100%',
+                  }}
                 >
                   {row.map((cell: any, cIdx: any) => (
                     <TableCell
                       key={cIdx}
-                      className={cn('h-full p-0', cell.bg || 'bg-muted')}
-                      style={{ flex: cell.cellFlex ?? 1 }}
+                      className={cn(
+                        'h-full flex-shrink-0 p-0',
+                        cell.bg || 'bg-muted'
+                      )}
+                      style={{
+                        flex: cell.cellFlex ?? 1,
+                        minWidth: 0,
+                      }}
                     >
                       <div
                         className={cn(
-                          'group flex h-full min-h-[52px] w-full flex-col gap-2 p-2',
+                          'group relative flex h-full min-h-[52px] w-full flex-col gap-2 p-2',
                           {
                             'justify-center text-left':
                               cell.alignment === 'left',
@@ -323,16 +356,17 @@ export const FieldEditor: React.FC<{
                           <CellContent cell={cell} rIdx={rIdx} cIdx={cIdx} />
 
                           {editorMode === 'builder' && (
-                            <div className='hidden items-center gap-1 group-hover:flex'>
+                            <div className='bg-background/90 ring-border absolute top-0 -right-6 z-20 hidden items-center gap-1 rounded-md p-1 shadow-sm ring-1 group-hover:flex'>
                               <Button
                                 variant='ghost'
                                 size='icon'
                                 onClick={() => openModal(rIdx, cIdx, cell)}
-                                className='text-muted-foreground h-5 w-5 p-0'
+                                className='text-muted-foreground hover:text-foreground h-5 w-5 p-0'
                                 title='Edit cell'
                               >
                                 <Pencil className='h-3 w-3' />
                               </Button>
+
                               <Button
                                 variant='ghost'
                                 size='icon'
@@ -344,11 +378,12 @@ export const FieldEditor: React.FC<{
                               >
                                 <PlusSquare className='h-3 w-3' />
                               </Button>
+
                               <Button
                                 variant='ghost'
                                 size='icon'
                                 onClick={() => handleDeleteCell(rIdx, cIdx)}
-                                className='text-muted-foreground h-5 w-5 p-0'
+                                className='text-muted-foreground hover:text-destructive h-5 w-5 p-0'
                                 title='Delete cell'
                               >
                                 <X className='h-3 w-3' />
@@ -357,7 +392,6 @@ export const FieldEditor: React.FC<{
                           )}
                         </div>
 
-                        {/* Children cells stacked vertically */}
                         {cell.children?.map((child: any, childIdx: string) => (
                           <div
                             key={child.id}
@@ -493,8 +527,16 @@ export const FieldEditor: React.FC<{
             size='sm'
             className='bg-primary hover:bg-primary/90 text-primary-foreground'
             onClick={handleSubmit}
+            disabled={
+              createChecklistFormatMutation.isPending ||
+              updateChecklistFormatMutation.isPending
+            }
           >
-            {formType === 'create' ? 'Create' : 'Update'}
+            {(createChecklistFormatMutation.isPending ||
+              updateChecklistFormatMutation.isPending) && (
+              <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+            )}
+            Save changes
           </Button>
         </div>
       </CardContent>
@@ -510,7 +552,18 @@ export const FieldEditor: React.FC<{
           alignment={editingCell.alignment}
           placeholder={editingCell.placeholder}
           cellFlex={editingCell.cellFlex}
+          linkTextValue={editingCell.linkTextValue}
+          linkUrlValue={editingCell.linkUrlValue}
           onSave={handleSaveCell}
+        />
+      )}
+
+      {settingsModalOpen && (
+        <SettingsModal
+          open={settingsModalOpen}
+          onClose={() => setSettingsModalOpen(false)}
+          formWidthValue={effectiveWidth}
+          onSave={handleSaveSettings}
         />
       )}
 

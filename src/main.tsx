@@ -17,7 +17,6 @@ import { ThemeProvider } from './context/theme-provider'
 import { UIProvider } from './context/ui-providor'
 // Generated Routes
 import { routeTree } from './routeTree.gen'
-import { useAuthStore } from './stores/auth-store'
 // Styles
 import './styles/index.css'
 
@@ -59,11 +58,11 @@ const queryClient = new QueryClient({
   queryCache: new QueryCache({
     onError: (error) => {
       if (error instanceof AxiosError) {
-        if (error.response?.status === 401) {
-          toast.error('Session expired!')
-          useAuthStore.getState().auth.reset()
-          window.location.href = '/sign-in'
-        }
+        // if (error.response?.status === 401) {
+        //   toast.error('Session expired!')
+        //   useAuthStore.getState().auth.reset()
+        //   window.location.href = '/sign-in'
+        // }
         if (error.response?.status === 500) {
           toast.error('Internal Server Error!')
           router.navigate({ to: '/500' })
@@ -76,7 +75,6 @@ const queryClient = new QueryClient({
   }),
 })
 
-// Create a new router instance
 const router = createRouter({
   routeTree,
   context: { queryClient },

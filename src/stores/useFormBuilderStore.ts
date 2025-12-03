@@ -8,10 +8,17 @@ interface FormBuilderState {
   updateField: (id: string, updates: Partial<FormField>) => void
   removeField: (id: string) => void
   setForm: (form: FormSchema) => void
+  updateFormWidth: (width: number | null) => void
 }
 
 export const useFormBuilderStore = create<FormBuilderState>((set) => ({
-  form: { id: 'form-1', title: 'Untitled Form', fields: [], elements: [] },
+  form: {
+    id: 'form-1',
+    title: 'Untitled Form',
+    fields: [],
+    elements: [],
+    formWidth: null,
+  },
 
   addField(type) {
     const base: any = {
@@ -51,5 +58,14 @@ export const useFormBuilderStore = create<FormBuilderState>((set) => ({
 
   setForm(form) {
     set({ form })
+  },
+
+  updateFormWidth(width) {
+    set((state) => ({
+      form: {
+        ...state.form,
+        formWidth: width,
+      },
+    }))
   },
 }))

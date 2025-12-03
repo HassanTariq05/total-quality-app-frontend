@@ -8,6 +8,7 @@ import {
   Copy,
   ClipboardPaste,
   PlusSquare,
+  Loader2,
 } from 'lucide-react'
 import { v4 as uuidv4 } from 'uuid'
 import { useFormBuilderStore } from '@/stores/useFormBuilderStore'
@@ -51,6 +52,8 @@ export const FieldEditor: React.FC<{
     bg?: string
     alignment?: string
     cellFlex?: number
+    linkTextValue?: string
+    linkUrlValue?: string
   } | null>(null)
 
   const openModal = (
@@ -68,7 +71,7 @@ export const FieldEditor: React.FC<{
       value: cell.value || (cell.type === 'label' ? 'Label' : ''),
       identifier: cell.identifier,
       bg: cell.bg || '#1f1f1f',
-      alignment: cell.alignment || 'Field',
+      alignment: cell.alignment || 'left',
       cellFlex: cell.cellFlex || 1,
     })
 
@@ -76,21 +79,40 @@ export const FieldEditor: React.FC<{
   }
 
   const handleSaveCell = (
-    type: 'label' | 'field' | 'checkbox' | 'date' | 'signature',
+    type: 'label' | 'field' | 'checkbox' | 'date' | 'signature' | 'link',
     value: string,
     identifier: string,
     bg?: string,
     placeholder?: string,
     alignment?: string,
-    cellFlex?: number
+    cellFlex?: number,
+    linkText?: string,
+    linkUrl?: string
   ) => {
     if (!editingCell) return
     const { row, col, childIdx } = editingCell
 
+    const isLink = type === 'link'
+
     const newRows = field.rows.map((r: any, rIdx: any) => {
       if (rIdx !== row) return r
+
       return r.map((c: any, cIdx: any) => {
         if (cIdx !== col) return c
+
+        const baseUpdate = {
+          type,
+          value: !isLink ? value || (type === 'label' ? 'Label' : '') : '',
+          identifier,
+          bg: bg || c.bg,
+          placeholder: placeholder ?? c.placeholder,
+          alignment: alignment ?? c.alignment,
+          cellFlex: cellFlex ?? c.cellFlex,
+          ...(isLink && {
+            linkText: linkText || value,
+            linkUrl: linkUrl || '',
+          }),
+        }
 
         if (typeof childIdx === 'number') {
           const updatedChildren = c.children.map((child: any, i: number) =>
@@ -98,13 +120,7 @@ export const FieldEditor: React.FC<{
               ? {
                   ...child,
                   id: child.id || uuidv4(),
-                  type,
-                  value: value || (type === 'label' ? 'Label' : ''),
-                  identifier,
-                  bg: bg || child.bg,
-                  placeholder: placeholder ?? child.placeholder,
-                  alignment: alignment ?? child.alignment,
-                  cellFlex: cellFlex ?? child.cellFlex,
+                  ...baseUpdate,
                 }
               : child
           )
@@ -114,20 +130,13 @@ export const FieldEditor: React.FC<{
         return {
           ...c,
           id: c.id || uuidv4(),
-          type,
-          value: value || (type === 'label' ? 'Label' : ''),
-          identifier,
-          bg: bg || c.bg,
-          placeholder: placeholder ?? c.placeholder,
-          alignment: alignment ?? c.alignment,
-          cellFlex: cellFlex ?? c.cellFlex,
+          ...baseUpdate,
         }
       })
     })
 
     updateField(field.id, { rows: newRows })
   }
-
   const handleDeleteChildCell = (
     rowIdx: string,
     colIdx: string,
@@ -490,8 +499,16 @@ export const FieldEditor: React.FC<{
             size='sm'
             className='bg-primary hover:bg-primary/90 text-primary-foreground'
             onClick={handleSubmit}
+            disabled={
+              createFormFormatMutation.isPending ||
+              updateFormFormatMutation.isPending
+            }
           >
-            {formType === 'create' ? 'Create' : 'Update'}
+            {(createFormFormatMutation.isPending ||
+              updateFormFormatMutation.isPending) && (
+              <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+            )}
+            Save changes
           </Button>
         </div>
       </CardContent>
@@ -507,6 +524,8 @@ export const FieldEditor: React.FC<{
           alignment={editingCell.alignment}
           placeholder={editingCell.placeholder}
           cellFlex={editingCell.cellFlex}
+          linkTextValue={editingCell.linkTextValue}
+          linkUrlValue={editingCell.linkUrlValue}
           onSave={handleSaveCell}
         />
       )}

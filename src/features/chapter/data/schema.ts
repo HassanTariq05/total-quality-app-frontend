@@ -17,4 +17,14 @@ export const chapterSchema = z.object({
   // ),
 })
 
+export const policySchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  documentName: z.string().nullable().optional(),
+  description: z.string(),
+  status: z.any(),
+})
+
 export type Chapter = z.infer<typeof chapterSchema>
+
+export type Policy = z.infer<typeof policySchema>

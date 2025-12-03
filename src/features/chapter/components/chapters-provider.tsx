@@ -1,10 +1,11 @@
 import React, { useState } from 'react'
 import useDialogState from '@/hooks/use-dialog-state'
-import { type Chapter } from '../data/schema'
+import { Policy, type Chapter } from '../data/schema'
 
 type ChaptersDialogType =
   | 'create'
   | 'create-checklist'
+  | 'create-policy'
   | 'update'
   | 'update-form'
   | 'delete'
@@ -13,19 +14,20 @@ type ChaptersDialogType =
   | 'delete'
   | 'delete-form'
   | 'delete-checklist'
+  | 'delete-policy'
 
 type ChaptersContextType = {
   open: ChaptersDialogType | null
   setOpen: (str: ChaptersDialogType | null) => void
-  currentRow: Chapter | null
-  setCurrentRow: React.Dispatch<React.SetStateAction<Chapter | null>>
+  currentRow: Chapter | Policy | null
+  setCurrentRow: React.Dispatch<React.SetStateAction<Chapter | Policy | null>>
 }
 
 const ChaptersContext = React.createContext<ChaptersContextType | null>(null)
 
 export function ChaptersProvider({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useDialogState<ChaptersDialogType>(null)
-  const [currentRow, setCurrentRow] = useState<Chapter | null>(null)
+  const [currentRow, setCurrentRow] = useState<Chapter | Policy | null>(null)
 
   return (
     <ChaptersContext value={{ open, setOpen, currentRow, setCurrentRow }}>

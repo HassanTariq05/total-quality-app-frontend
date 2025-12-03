@@ -28,14 +28,18 @@ interface CellEditorModalProps {
   placeholder?: string
   alignment?: string
   cellFlex?: number
+  linkTextValue?: string
+  linkUrlValue?: string
   onSave: (
-    type: 'label' | 'field' | 'checkbox' | 'date' | 'signature',
+    type: 'label' | 'field' | 'checkbox' | 'date' | 'signature' | 'link',
     value: string,
     identifier: string,
     bg: string,
     placeholder: string,
     alignment: string,
-    cellFlex: number
+    cellFlex: number,
+    linkText: string,
+    linkUrl: string
   ) => void
 }
 
@@ -67,11 +71,16 @@ export const CellEditorModal: React.FC<CellEditorModalProps> = ({
   placeholder,
   alignment,
   cellFlex,
+  linkTextValue,
+  linkUrlValue,
 }) => {
   const [selectedType, setSelectedType] = useState<
-    'label' | 'field' | 'checkbox' | 'date' | 'signature'
+    'label' | 'field' | 'checkbox' | 'date' | 'signature' | 'link'
   >(cellType || 'field')
   const [textValue, setTextValue] = useState(value || '')
+  const [linkText, setLinkText] = useState(linkTextValue || '')
+  const [linkUrl, setLinkUrl] = useState(linkUrlValue || '')
+
   const [identifierFieldValue, setIdentifierFieldValue] = useState(
     identifier || ''
   )
@@ -99,7 +108,9 @@ export const CellEditorModal: React.FC<CellEditorModalProps> = ({
       cellBg,
       placeholderCell,
       alignCell,
-      flex
+      flex,
+      linkText,
+      linkUrl
     )
     onClose()
   }
@@ -130,11 +141,12 @@ export const CellEditorModal: React.FC<CellEditorModalProps> = ({
                 <SelectItem value='checkbox'>Checkbox</SelectItem>
                 <SelectItem value='date'>Date</SelectItem>
                 <SelectItem value='signature'>Signature</SelectItem>
+                <SelectItem value='link'>Link</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
-          {selectedType !== 'signature' && (
+          {selectedType !== 'signature' && selectedType !== 'link' && (
             <div className='space-y-1'>
               <Label>
                 {selectedType === 'label'
@@ -156,9 +168,31 @@ export const CellEditorModal: React.FC<CellEditorModalProps> = ({
                     ? setPlaceholderCell(e.target.value)
                     : setTextValue(e.target.value)
                 }}
-                className='w-full'
               />
             </div>
+          )}
+
+          {/* Link Type Inputs */}
+          {selectedType === 'link' && (
+            <>
+              <div className='space-y-1'>
+                <Label>Link Text</Label>
+                <Input
+                  placeholder='e.g. Visit Website'
+                  value={linkText}
+                  onChange={(e) => setLinkText(e.target.value)}
+                />
+              </div>
+
+              <div className='space-y-1'>
+                <Label>Link URL</Label>
+                <Input
+                  placeholder='https://example.com'
+                  value={linkUrl}
+                  onChange={(e) => setLinkUrl(e.target.value)}
+                />
+              </div>
+            </>
           )}
 
           {selectedType !== 'signature' && (

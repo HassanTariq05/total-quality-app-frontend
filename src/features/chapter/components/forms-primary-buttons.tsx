@@ -20,6 +20,12 @@ export function FormsPrimaryButtons({ selectedTab }: { selectedTab: string }) {
           <span>Create Checklist</span> <Plus size={18} />
         </Button>
       )}
+
+      {selectedTab === 'policies' && (
+        <Button className='space-x-1' onClick={() => setOpen('create-policy')}>
+          <span>Initiate Policy</span> <Plus size={18} />
+        </Button>
+      )}
     </div>
   )
 }

@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Loader2 } from 'lucide-react'
 import { useCreateForm, useUpdateForm } from '@/hooks/use-forms'
 import { Button } from '@/components/ui/button'
 import {
@@ -166,7 +167,17 @@ export function FormsMutateDrawer({
           <SheetClose asChild>
             <Button variant='outline'>Close</Button>
           </SheetClose>
-          <Button form='forms-form' type='submit'>
+
+          <Button
+            form='forms-form'
+            type='submit'
+            disabled={
+              createFormMutation.isPending || updateFormMutation.isPending
+            }
+          >
+            {(createFormMutation.isPending || updateFormMutation.isPending) && (
+              <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+            )}
             Save changes
           </Button>
         </SheetFooter>

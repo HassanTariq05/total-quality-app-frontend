@@ -58,12 +58,12 @@ export const FormBuilder: React.FC<{
         </div>
       )}
 
-      <div className='mt-6'>
+      {/* <div className='mt-6'>
         <h3 className='mb-2 font-medium'>Generated JSON</h3>
         <pre className='text-primary-foreground overflow-auto rounded bg-gray-800 p-3 text-sm'>
           {JSON.stringify(form, null, 2)}
         </pre>
-      </div>
+      </div> */}
     </div>
   )
 }

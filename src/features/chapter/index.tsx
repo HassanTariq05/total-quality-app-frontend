@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils'
 import { useChapter } from '@/hooks/use-chapters'
 import { useChecklists } from '@/hooks/use-checklists'
 import { useForms } from '@/hooks/use-forms'
+import { usePolicies } from '@/hooks/use-policies'
 import { Badge } from '@/components/ui/badge'
 import { InfoSkeleton } from '@/components/ui/info-skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -14,7 +15,6 @@ import { DataTableSkeleton } from '@/components/data-table/data-table-skeleton'
 import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
 import { ProfileDropdown } from '@/components/profile-dropdown'
-import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { badgeTypes } from '../users/data/data'
 import { ChapterBreadcrumb } from './components/breadcrumb'
@@ -24,6 +24,8 @@ import { ChecklistsDialogs } from './components/checklists-dialogs'
 import { Forms } from './components/forms'
 import { FormsDialogs } from './components/forms-dialogs'
 import { FormsPrimaryButtons } from './components/forms-primary-buttons'
+import { Policies } from './components/policies'
+import { PoliciesDialogs } from './components/policies-dialogs'
 
 export function ChapterView() {
   const params = useParams({
@@ -37,6 +39,9 @@ export function ChapterView() {
 
   const [checklistPage, setChecklistPage] = useState(0)
   const [checklistPageSize, setChecklistPageSize] = useState(10)
+
+  const [policyPage, setPolicyPage] = useState(0)
+  const [policyPageSize, setPolicyPageSize] = useState(10)
 
   const { data: chapter, isLoading: isFetchingChapters } = useChapter(chapterId)
   const { data: formsData = null, isLoading: isFetchingForms } = useForms(
@@ -53,6 +58,12 @@ export function ChapterView() {
 
   const checklists = checklistsData?.content || []
   const totalChecklistPages = checklistsData?.totalPages || 0
+
+  const { data: policiesData = null, isLoading: isFetchingPolicies } =
+    usePolicies(chapterId, policyPage, policyPageSize)
+
+  const policies = policiesData?.content || []
+  const totalPolicyPages = policiesData?.totalPages || 0
 
   const { setForm } = useFormBuilderStore()
 
@@ -73,7 +84,6 @@ export function ChapterView() {
   return (
     <ChaptersProvider>
       <Header fixed>
-        <Search />
         <div className='ms-auto flex items-center space-x-4'>
           <ThemeSwitch />
           <ConfigDrawer />
@@ -128,6 +138,7 @@ export function ChapterView() {
             <TabsList>
               <TabsTrigger value='forms'>Forms</TabsTrigger>
               <TabsTrigger value='checklists'>Checklists</TabsTrigger>
+              {/* <TabsTrigger value='policies'>Policies</TabsTrigger> */}
             </TabsList>
           </div>
 
@@ -160,11 +171,27 @@ export function ChapterView() {
               />
             )}
           </TabsContent>
+
+          <TabsContent value='policies' className='space-y-4'>
+            {isFetchingPolicies ? (
+              <DataTableSkeleton />
+            ) : (
+              <Policies
+                data={policies}
+                page={policyPage}
+                pageSize={policyPageSize}
+                totalPages={totalPolicyPages}
+                onPageChange={setPolicyPage}
+                onPageSizeChange={setPolicyPageSize}
+              />
+            )}
+          </TabsContent>
         </Tabs>
       </Main>
 
       <FormsDialogs chapter={chapter} />
       <ChecklistsDialogs chapter={chapter} />
+      <PoliciesDialogs chapter={chapter} />
     </ChaptersProvider>
   )
 }

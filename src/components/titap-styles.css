@@ -1,0 +1,80 @@
+/* tiptap.css - Fix shadcn prose conflicts */
+.tiptap {
+  /* Reset shadcn's aggressive prose styles */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    margin-top: 1.5em !important;
+    margin-bottom: 0.5em !important;
+    font-weight: 600 !important;
+    line-height: 1.4 !important;
+  }
+
+  h1 {
+    font-size: 1.875rem !important;
+  } /* text-3xl */
+  h2 {
+    font-size: 1.5rem !important;
+  } /* text-2xl */
+  h3 {
+    font-size: 1.25rem !important;
+  } /* text-xl */
+
+  ul,
+  ol {
+    margin: 1em 0 !important;
+    padding-left: 1.5em !important;
+  }
+
+  li > p {
+    margin: 0 !important;
+  }
+
+  blockquote {
+    border-left: 4px solid rgb(99 102 241) !important; /* indigo-500 */
+    padding-left: 1em !important;
+    margin: 1em 0 !important;
+    font-style: italic !important;
+    color: rgb(100 116 139) !important; /* slate-500 */
+  }
+
+  hr {
+    margin: 2em 0 !important;
+    border-color: rgb(226 232 240) !important; /* slate-200 */
+  }
+
+  pre {
+    background: rgb(15 23 42) !important; /* slate-900 */
+    color: white !important;
+    padding: 1em !important;
+    border-radius: 0.5rem !important;
+    overflow-x: auto !important;
+  }
+
+  img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 0.5rem;
+    margin: 1em 0;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5em 0;
+  }
+
+  th,
+  td {
+    border: 1px solid rgb(226 232 240);
+    padding: 0.5em;
+    text-align: left;
+  }
+
+  th {
+    background: rgb(248 250 252);
+  }
+}

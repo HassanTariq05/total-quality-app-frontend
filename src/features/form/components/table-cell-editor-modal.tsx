@@ -17,6 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import TiptapEditor from '@/components/tiptap-editor'
 
 interface CellEditorModalProps {
   open: boolean
@@ -117,175 +118,190 @@ export const CellEditorModal: React.FC<CellEditorModalProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className='bg-background text-foreground sm:max-w-[400px]'>
-        <DialogHeader>
+      <DialogContent className='bg-background text-foreground flex max-h-[90vh] flex-col sm:max-w-[600px]'>
+        {/* This makes the header fixed */}
+        <DialogHeader className='flex-shrink-0'>
           <DialogTitle>Configure Cell</DialogTitle>
         </DialogHeader>
 
-        <div className='space-y-4'>
-          <div className='space-y-1'>
-            <Label>Select Type</Label>
-            <Select
-              value={selectedType}
-              onValueChange={(val) =>
-                setSelectedType(val as 'label' | 'field' | 'checkbox' | 'date')
-              }
-            >
-              <SelectTrigger>
-                <SelectValue placeholder='Select cell type' />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value='label'>Label</SelectItem>
-                <SelectItem value='field'>Field</SelectItem>
-                <SelectItem value='checkbox'>Checkbox</SelectItem>
-                <SelectItem value='date'>Date</SelectItem>
-                <SelectItem value='signature'>Signature</SelectItem>
-                <SelectItem value='link'>Link</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {selectedType !== 'signature' && selectedType !== 'link' && (
+        {/* This is the scrollable body */}
+        <div className='-mx-6 flex-1 overflow-y-auto px-1'>
+          <div className='space-y-4 px-6'>
             <div className='space-y-1'>
-              <Label>
-                {selectedType === 'label'
-                  ? 'Label Text'
-                  : selectedType === 'checkbox'
-                    ? 'Checkbox Label'
-                    : 'Field Placeholder'}
-              </Label>
-
-              <Input
-                placeholder={
-                  selectedType === 'field' ? 'Enter field placeholder' : ''
-                }
-                value={
-                  selectedType === 'field' ? placeholderCell || '' : textValue
-                }
-                onChange={(e) => {
-                  selectedType === 'field'
-                    ? setPlaceholderCell(e.target.value)
-                    : setTextValue(e.target.value)
-                }}
-              />
-            </div>
-          )}
-
-          {selectedType === 'link' && (
-            <>
-              <div className='space-y-1'>
-                <Label>Link Text</Label>
-                <Input
-                  placeholder='e.g. Visit Website'
-                  value={linkText}
-                  onChange={(e) => setLinkText(e.target.value)}
-                />
-              </div>
-
-              <div className='space-y-1'>
-                <Label>Link URL</Label>
-                <Input
-                  placeholder='https://example.com'
-                  value={linkUrl}
-                  onChange={(e) => setLinkUrl(e.target.value)}
-                />
-              </div>
-            </>
-          )}
-
-          {selectedType !== 'signature' && (
-            <div className='space-y-1'>
-              <Label>Text Alignment</Label>
+              <Label>Select Type</Label>
               <Select
-                value={alignCell}
-                onValueChange={(val) => setAlignCell(val)}
+                value={selectedType}
+                onValueChange={(val) =>
+                  setSelectedType(
+                    val as 'label' | 'field' | 'checkbox' | 'date'
+                  )
+                }
               >
-                <SelectTrigger className='flex items-center gap-2'>
-                  <span className='text-sm'>
-                    {ALIGN.find((c) => c.value === alignCell)?.name ||
-                      'Select alignment'}
-                  </span>
+                <SelectTrigger>
+                  <SelectValue placeholder='Select cell type' />
                 </SelectTrigger>
-                <SelectContent className='grid grid-cols-1 gap-2 p-2'>
-                  {ALIGN.map((align) => (
-                    <SelectItem
-                      key={align.value}
-                      value={align.value}
-                      className='p-1 text-sm'
-                    >
-                      {align.name}
-                    </SelectItem>
-                  ))}
+                <SelectContent>
+                  <SelectItem value='label'>Label</SelectItem>
+                  <SelectItem value='field'>Field</SelectItem>
+                  <SelectItem value='checkbox'>Checkbox</SelectItem>
+                  <SelectItem value='date'>Date</SelectItem>
+                  <SelectItem value='signature'>Signature</SelectItem>
+                  <SelectItem value='link'>Link</SelectItem>
                 </SelectContent>
               </Select>
             </div>
-          )}
 
-          <div className='space-y-1'>
-            <Label htmlFor='cell-flex'>Flex (relative width)</Label>
-            <Input
-              id='cell-flex'
-              type='number'
-              min={1}
-              value={flex || 1}
-              onChange={(e) => setFlex(Number(e.target.value))}
-              placeholder='e.g. 1, 2, 3'
-            />
-          </div>
+            {selectedType === 'label' && (
+              <div className='space-y-1'>
+                <Label>Label Content</Label>
+                <TiptapEditor value={textValue} onChange={setTextValue} />
+              </div>
+            )}
 
-          {selectedType !== 'label' && (
+            {selectedType !== 'label' &&
+              selectedType !== 'signature' &&
+              selectedType !== 'link' && (
+                <div className='space-y-1'>
+                  <Label>
+                    {selectedType === 'checkbox'
+                      ? 'Checkbox Label'
+                      : 'Field Placeholder'}
+                  </Label>
+
+                  <Input
+                    placeholder={
+                      selectedType === 'field' ? 'Enter field placeholder' : ''
+                    }
+                    value={
+                      selectedType === 'field'
+                        ? placeholderCell || ''
+                        : textValue
+                    }
+                    onChange={(e) => {
+                      selectedType === 'field'
+                        ? setPlaceholderCell(e.target.value)
+                        : setTextValue(e.target.value)
+                    }}
+                  />
+                </div>
+              )}
+
+            {selectedType === 'link' && (
+              <>
+                <div className='space-y-1'>
+                  <Label>Link Text</Label>
+                  <Input
+                    placeholder='e.g. Visit Website'
+                    value={linkText}
+                    onChange={(e) => setLinkText(e.target.value)}
+                  />
+                </div>
+
+                <div className='space-y-1'>
+                  <Label>Link URL</Label>
+                  <Input
+                    placeholder='https://example.com'
+                    value={linkUrl}
+                    onChange={(e) => setLinkUrl(e.target.value)}
+                  />
+                </div>
+              </>
+            )}
+
+            {selectedType !== 'signature' && (
+              <div className='space-y-1'>
+                <Label>Text Alignment</Label>
+                <Select
+                  value={alignCell}
+                  onValueChange={(val) => setAlignCell(val)}
+                >
+                  <SelectTrigger className='flex items-center gap-2'>
+                    <span className='text-sm'>
+                      {ALIGN.find((c) => c.value === alignCell)?.name ||
+                        'Select alignment'}
+                    </span>
+                  </SelectTrigger>
+                  <SelectContent className='grid grid-cols-1 gap-2 p-2'>
+                    {ALIGN.map((align) => (
+                      <SelectItem
+                        key={align.value}
+                        value={align.value}
+                        className='p-1 text-sm'
+                      >
+                        {align.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
             <div className='space-y-1'>
-              <Label htmlFor='cell-identifier'>Identifier</Label>
+              <Label htmlFor='cell-flex'>Flex (relative width)</Label>
               <Input
-                id='cell-identifier'
-                value={identifierFieldValue}
-                onChange={(e) => {
-                  setIdentifierFieldValue(e.target.value)
-                }}
-                className='w-full'
-                placeholder='property_identifier'
+                id='cell-flex'
+                type='number'
+                min={1}
+                value={flex || 1}
+                onChange={(e) => setFlex(Number(e.target.value))}
+                placeholder='e.g. 1, 2, 3'
               />
             </div>
-          )}
 
-          {(selectedType === 'label' ||
-            selectedType === 'checkbox' ||
-            selectedType === 'field') && (
-            <div className='space-y-1'>
-              <Label>Background Color</Label>
-              <Select value={cellBg} onValueChange={(val) => setCellBg(val)}>
-                <SelectTrigger className='flex items-center gap-2'>
-                  <div
-                    className={cn(
-                      'h-6 w-6 rounded border',
-                      cellBg || 'bg-muted'
-                    )}
-                  />
-                  <span className='text-sm'>
-                    {PRESET_COLORS.find((c) => c.className === cellBg)?.name ||
-                      'Select color'}
-                  </span>
-                </SelectTrigger>
-                <SelectContent className='grid grid-cols-3 gap-2 p-2'>
-                  {PRESET_COLORS.map((color) => (
-                    <SelectItem
-                      key={color.name}
-                      value={color.className}
-                      className='flex items-center gap-2 p-1'
-                    >
-                      <div
-                        className={cn(
-                          'h-6 w-6 rounded border',
-                          color.className
-                        )}
-                      />
-                      {color.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          )}
+            {selectedType !== 'label' && (
+              <div className='space-y-1'>
+                <Label htmlFor='cell-identifier'>Identifier</Label>
+                <Input
+                  id='cell-identifier'
+                  value={identifierFieldValue}
+                  onChange={(e) => {
+                    setIdentifierFieldValue(e.target.value)
+                  }}
+                  className='w-full'
+                  placeholder='property_identifier'
+                />
+              </div>
+            )}
+
+            {(selectedType === 'label' ||
+              selectedType === 'checkbox' ||
+              selectedType === 'field') && (
+              <div className='space-y-1'>
+                <Label>Background Color</Label>
+                <Select value={cellBg} onValueChange={(val) => setCellBg(val)}>
+                  <SelectTrigger className='flex items-center gap-2'>
+                    <div
+                      className={cn(
+                        'h-6 w-6 rounded border',
+                        cellBg || 'bg-muted'
+                      )}
+                    />
+                    <span className='text-sm'>
+                      {PRESET_COLORS.find((c) => c.className === cellBg)
+                        ?.name || 'Select color'}
+                    </span>
+                  </SelectTrigger>
+                  <SelectContent className='grid grid-cols-3 gap-2 p-2'>
+                    {PRESET_COLORS.map((color) => (
+                      <SelectItem
+                        key={color.name}
+                        value={color.className}
+                        className='flex items-center gap-2 p-1'
+                      >
+                        <div
+                          className={cn(
+                            'h-6 w-6 rounded border',
+                            color.className
+                          )}
+                        />
+                        {color.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+          </div>
         </div>
 
         <DialogFooter className='mt-6'>

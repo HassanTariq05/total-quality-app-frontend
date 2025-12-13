@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import useDialogState from '@/hooks/use-dialog-state'
-import { SubmissionsSchema } from '../data/schema'
+import { SubmissionsSchema } from '../data/policy-schema'
 
 type PoliciesDialogType =
   | 'create'

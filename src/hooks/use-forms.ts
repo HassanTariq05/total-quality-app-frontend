@@ -15,14 +15,15 @@ export const formQueryKeys = {
 export const useForms = (
   chapterId: string,
   page: number = 0,
-  size: number = 10
+  size: number = 10,
+  enabled: boolean = true
 ) => {
   const { getAll } = useFormService()
 
   return useQuery({
     queryKey: [...formQueryKeys.byId(chapterId), { page, size }],
     queryFn: () => getAll(chapterId, page, size),
-    enabled: !!chapterId,
+    enabled: !!chapterId && enabled,
     placeholderData: keepPreviousData,
   })
 }

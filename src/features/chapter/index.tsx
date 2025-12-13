@@ -32,6 +32,8 @@ export function ChapterView() {
     from: '/_authenticated/chapter/$chapterId',
   })
 
+  const [selectedTab, setSelectedTab] = useState<string>('forms')
+
   const { chapterId } = params
 
   const [formPage, setFormPage] = useState(0)
@@ -47,20 +49,31 @@ export function ChapterView() {
   const { data: formsData = null, isLoading: isFetchingForms } = useForms(
     chapterId,
     formPage,
-    formPageSize
+    formPageSize,
+    selectedTab === 'forms'
   )
 
   const forms = formsData?.content || []
   const totalFormPages = formsData?.totalPages || 0
 
   const { data: checklistsData = null, isLoading: isFetchingChecklists } =
-    useChecklists(chapterId, checklistPage, checklistPageSize)
+    useChecklists(
+      chapterId,
+      checklistPage,
+      checklistPageSize,
+      selectedTab === 'checklists'
+    )
 
   const checklists = checklistsData?.content || []
   const totalChecklistPages = checklistsData?.totalPages || 0
 
   const { data: policiesData = null, isLoading: isFetchingPolicies } =
-    usePolicies(chapterId, policyPage, policyPageSize)
+    usePolicies(
+      chapterId,
+      policyPage,
+      policyPageSize,
+      selectedTab === 'policies'
+    )
 
   const policies = policiesData?.content || []
   const totalPolicyPages = policiesData?.totalPages || 0
@@ -80,7 +93,6 @@ export function ChapterView() {
 
   const badgeColor = badgeTypes.get(chapter?.status?.toLowerCase())
 
-  const [selectedTab, setSelectedTab] = useState<string>('forms')
   return (
     <ChaptersProvider>
       <Header fixed>
@@ -138,7 +150,7 @@ export function ChapterView() {
             <TabsList>
               <TabsTrigger value='forms'>Forms</TabsTrigger>
               <TabsTrigger value='checklists'>Checklists</TabsTrigger>
-              {/* <TabsTrigger value='policies'>Policies</TabsTrigger> */}
+              <TabsTrigger value='policies'>Policies</TabsTrigger>
             </TabsList>
           </div>
 

@@ -15,14 +15,15 @@ export const checklistQueryKeys = {
 export const useChecklists = (
   chapterId: string,
   page: number = 0,
-  size: number = 10
+  size: number = 10,
+  enabled: boolean = true
 ) => {
   const { getAll } = useChecklistService()
 
   return useQuery({
     queryKey: [...checklistQueryKeys.byId(chapterId), { page, size }],
     queryFn: () => getAll(chapterId, page, size),
-    enabled: !!chapterId,
+    enabled: !!chapterId && enabled,
     placeholderData: keepPreviousData,
   })
 }

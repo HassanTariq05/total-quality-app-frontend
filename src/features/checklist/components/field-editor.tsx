@@ -27,7 +27,7 @@ import { HeaderDropdown } from './HeaderDropdown'
 import { CellContent } from './cell-content'
 import { useChecklists } from './checklist-provider'
 import { SettingsModal } from './settings-modal'
-import { CellEditorModal } from './table-cell-editor-modal'
+import CellEditorModal from './table-cell-editor-modal'
 
 export const FieldEditor: React.FC<{
   field: any

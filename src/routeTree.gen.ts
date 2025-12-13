@@ -40,6 +40,7 @@ import { Route as AuthenticatedSettingsAppearanceRouteImport } from './routes/_a
 import { Route as AuthenticatedSettingsAccountRouteImport } from './routes/_authenticated/settings/account'
 import { Route as AuthenticatedErrorsErrorRouteImport } from './routes/_authenticated/errors/$error'
 import { Route as AuthenticatedPolicyPolicyIdRouteRouteImport } from './routes/_authenticated/policy/$policyId/route'
+import { Route as AuthenticatedPolicyVersionPolicyVersionIdRouteRouteImport } from './routes/_authenticated/policy-version/$policyVersionId/route'
 import { Route as AuthenticatedFormFormIdRouteRouteImport } from './routes/_authenticated/form/$formId/route'
 import { Route as AuthenticatedFormSubmissionFormSubmissionIdRouteRouteImport } from './routes/_authenticated/form-submission/$formSubmissionId/route'
 import { Route as AuthenticatedFormEditorFormIdRouteRouteImport } from './routes/_authenticated/form-editor/$formId/route'
@@ -212,6 +213,12 @@ const AuthenticatedPolicyPolicyIdRouteRoute =
     path: '/policy/$policyId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedPolicyVersionPolicyVersionIdRouteRoute =
+  AuthenticatedPolicyVersionPolicyVersionIdRouteRouteImport.update({
+    id: '/policy-version/$policyVersionId',
+    path: '/policy-version/$policyVersionId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedFormFormIdRouteRoute =
   AuthenticatedFormFormIdRouteRouteImport.update({
     id: '/form/$formId',
@@ -290,6 +297,7 @@ export interface FileRoutesByFullPath {
   '/form-editor/$formId': typeof AuthenticatedFormEditorFormIdRouteRoute
   '/form-submission/$formSubmissionId': typeof AuthenticatedFormSubmissionFormSubmissionIdRouteRoute
   '/form/$formId': typeof AuthenticatedFormFormIdRouteRoute
+  '/policy-version/$policyVersionId': typeof AuthenticatedPolicyVersionPolicyVersionIdRouteRoute
   '/policy/$policyId': typeof AuthenticatedPolicyPolicyIdRouteRoute
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/settings/account': typeof AuthenticatedSettingsAccountRoute
@@ -328,6 +336,7 @@ export interface FileRoutesByTo {
   '/form-editor/$formId': typeof AuthenticatedFormEditorFormIdRouteRoute
   '/form-submission/$formSubmissionId': typeof AuthenticatedFormSubmissionFormSubmissionIdRouteRoute
   '/form/$formId': typeof AuthenticatedFormFormIdRouteRoute
+  '/policy-version/$policyVersionId': typeof AuthenticatedPolicyVersionPolicyVersionIdRouteRoute
   '/policy/$policyId': typeof AuthenticatedPolicyPolicyIdRouteRoute
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/settings/account': typeof AuthenticatedSettingsAccountRoute
@@ -371,6 +380,7 @@ export interface FileRoutesById {
   '/_authenticated/form-editor/$formId': typeof AuthenticatedFormEditorFormIdRouteRoute
   '/_authenticated/form-submission/$formSubmissionId': typeof AuthenticatedFormSubmissionFormSubmissionIdRouteRoute
   '/_authenticated/form/$formId': typeof AuthenticatedFormFormIdRouteRoute
+  '/_authenticated/policy-version/$policyVersionId': typeof AuthenticatedPolicyVersionPolicyVersionIdRouteRoute
   '/_authenticated/policy/$policyId': typeof AuthenticatedPolicyPolicyIdRouteRoute
   '/_authenticated/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/_authenticated/settings/account': typeof AuthenticatedSettingsAccountRoute
@@ -412,6 +422,7 @@ export interface FileRouteTypes {
     | '/form-editor/$formId'
     | '/form-submission/$formSubmissionId'
     | '/form/$formId'
+    | '/policy-version/$policyVersionId'
     | '/policy/$policyId'
     | '/errors/$error'
     | '/settings/account'
@@ -450,6 +461,7 @@ export interface FileRouteTypes {
     | '/form-editor/$formId'
     | '/form-submission/$formSubmissionId'
     | '/form/$formId'
+    | '/policy-version/$policyVersionId'
     | '/policy/$policyId'
     | '/errors/$error'
     | '/settings/account'
@@ -492,6 +504,7 @@ export interface FileRouteTypes {
     | '/_authenticated/form-editor/$formId'
     | '/_authenticated/form-submission/$formSubmissionId'
     | '/_authenticated/form/$formId'
+    | '/_authenticated/policy-version/$policyVersionId'
     | '/_authenticated/policy/$policyId'
     | '/_authenticated/errors/$error'
     | '/_authenticated/settings/account'
@@ -743,6 +756,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPolicyPolicyIdRouteRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/policy-version/$policyVersionId': {
+      id: '/_authenticated/policy-version/$policyVersionId'
+      path: '/policy-version/$policyVersionId'
+      fullPath: '/policy-version/$policyVersionId'
+      preLoaderRoute: typeof AuthenticatedPolicyVersionPolicyVersionIdRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/form/$formId': {
       id: '/_authenticated/form/$formId'
       path: '/form/$formId'
@@ -844,6 +864,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedFormEditorFormIdRouteRoute: typeof AuthenticatedFormEditorFormIdRouteRoute
   AuthenticatedFormSubmissionFormSubmissionIdRouteRoute: typeof AuthenticatedFormSubmissionFormSubmissionIdRouteRoute
   AuthenticatedFormFormIdRouteRoute: typeof AuthenticatedFormFormIdRouteRoute
+  AuthenticatedPolicyVersionPolicyVersionIdRouteRoute: typeof AuthenticatedPolicyVersionPolicyVersionIdRouteRoute
   AuthenticatedPolicyPolicyIdRouteRoute: typeof AuthenticatedPolicyPolicyIdRouteRoute
   AuthenticatedErrorsErrorRoute: typeof AuthenticatedErrorsErrorRoute
   AuthenticatedAppsIndexRoute: typeof AuthenticatedAppsIndexRoute
@@ -873,6 +894,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedFormSubmissionFormSubmissionIdRouteRoute:
     AuthenticatedFormSubmissionFormSubmissionIdRouteRoute,
   AuthenticatedFormFormIdRouteRoute: AuthenticatedFormFormIdRouteRoute,
+  AuthenticatedPolicyVersionPolicyVersionIdRouteRoute:
+    AuthenticatedPolicyVersionPolicyVersionIdRouteRoute,
   AuthenticatedPolicyPolicyIdRouteRoute: AuthenticatedPolicyPolicyIdRouteRoute,
   AuthenticatedErrorsErrorRoute: AuthenticatedErrorsErrorRoute,
   AuthenticatedAppsIndexRoute: AuthenticatedAppsIndexRoute,

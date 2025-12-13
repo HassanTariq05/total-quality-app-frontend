@@ -15,14 +15,15 @@ export const policyQueryKeys = {
 export const usePolicies = (
   chapterId: string,
   page: number = 0,
-  size: number = 10
+  size: number = 10,
+  enabled: boolean = true
 ) => {
   const { getAll } = usePolicyService()
 
   return useQuery({
     queryKey: [...policyQueryKeys.byId(chapterId), { page, size }],
     queryFn: () => getAll(chapterId, page, size),
-    enabled: !!chapterId,
+    enabled: !!chapterId && enabled,
     placeholderData: keepPreviousData,
   })
 }

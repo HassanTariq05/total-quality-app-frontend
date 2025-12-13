@@ -7,9 +7,9 @@ export function PolicyPrimaryButtons({
   handleExport: () => void
 }) {
   return (
-    <div className='flex gap-2'>
-      <Button className='space-x-1' onClick={() => handleExport()}>
-        <span>Download</span> <Download size={18} />
+    <div className='flex'>
+      <Button variant='ghost' className='h-7 w-7 p-0' onClick={handleExport}>
+        <Download size={14} />
       </Button>
     </div>
   )

@@ -1,9 +1,9 @@
 import { z } from 'zod'
 
-export const FormSubmissionsSchema = z.object({
+export const PolicyVersionsSchema = z.object({
   id: z.string(),
-  name: z.string().nullable(),
+  title: z.string().nullable(),
   description: z.string().nullable(),
 })
 
-export type SubmissionsSchema = z.infer<typeof FormSubmissionsSchema>
+export type VersionsSchema = z.infer<typeof PolicyVersionsSchema>

@@ -12,11 +12,15 @@ export const CellContent = ({ cell }: any) => {
   switch (cell.type) {
     case 'label':
       return (
-        <div className={cn('flex w-full', alignmentClass)}>
-          <span className='text-foreground text-sm break-words whitespace-normal'>
-            {cell.value}
-          </span>
-        </div>
+        <div
+          className={cn(
+            'w-full break-words whitespace-normal',
+            // apply heading sizes for injected HTML
+            '[&>h1]:text-2xl [&>h1]:font-semibold [&>h2]:text-xl [&>h3]:text-lg',
+            alignmentClass
+          )}
+          dangerouslySetInnerHTML={{ __html: String(cell.value) }}
+        />
       )
 
     case 'field':

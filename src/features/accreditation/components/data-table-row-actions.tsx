@@ -2,6 +2,7 @@ import { DotsHorizontalIcon } from '@radix-ui/react-icons'
 import { useNavigate } from '@tanstack/react-router'
 import { type Row } from '@tanstack/react-table'
 import { Trash2, Pencil, Eye } from 'lucide-react'
+import { useHasPermission } from '@/utils/permissions'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -11,6 +12,7 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { PERMISSIONS } from '@/features/manage-role/types/permissions'
 import { chapterSchema } from '../data/schema'
 import { useTasks } from './tasks-provider'
 
@@ -30,6 +32,10 @@ export function DataTableRowActions<TData>({
     navigate({ to: `/chapter/${id}` })
   }
 
+  const canViewChapters = useHasPermission(PERMISSIONS.VIEW_CHAPTER)
+  const canEditChapter = useHasPermission(PERMISSIONS.EDIT_CHAPTER)
+  const canDeleteChapter = useHasPermission(PERMISSIONS.DELETE_CHAPTER)
+
   return (
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
@@ -42,39 +48,48 @@ export function DataTableRowActions<TData>({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align='end' className='w-[160px]'>
-        <DropdownMenuItem
-          onClick={() => {
-            handleViewChapter(task?.id)
-          }}
-        >
-          View
-          <DropdownMenuShortcut>
-            <Eye size={16} />
-          </DropdownMenuShortcut>
-        </DropdownMenuItem>
-        <DropdownMenuItem
-          onClick={() => {
-            setCurrentRow(task)
-            setOpen('update')
-          }}
-        >
-          Edit
-          <DropdownMenuShortcut>
-            <Pencil size={16} />
-          </DropdownMenuShortcut>
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem
-          onClick={() => {
-            setCurrentRow(task)
-            setOpen('delete-chapter')
-          }}
-        >
-          Delete
-          <DropdownMenuShortcut>
-            <Trash2 size={16} />
-          </DropdownMenuShortcut>
-        </DropdownMenuItem>
+        {canViewChapters && (
+          <DropdownMenuItem
+            onClick={() => {
+              handleViewChapter(task?.id)
+            }}
+          >
+            View
+            <DropdownMenuShortcut>
+              <Eye size={16} />
+            </DropdownMenuShortcut>
+          </DropdownMenuItem>
+        )}
+        {canEditChapter && (
+          <DropdownMenuItem
+            onClick={() => {
+              setCurrentRow(task)
+              setOpen('update')
+            }}
+          >
+            Edit
+            <DropdownMenuShortcut>
+              <Pencil size={16} />
+            </DropdownMenuShortcut>
+          </DropdownMenuItem>
+        )}
+
+        {canDeleteChapter && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              onClick={() => {
+                setCurrentRow(task)
+                setOpen('delete-chapter')
+              }}
+            >
+              Delete
+              <DropdownMenuShortcut>
+                <Trash2 size={16} />
+              </DropdownMenuShortcut>
+            </DropdownMenuItem>
+          </>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   )

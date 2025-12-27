@@ -1,6 +1,7 @@
 import { type ColumnDef } from '@tanstack/react-table'
 import { Checkbox } from '@/components/ui/checkbox'
 import { DataTableColumnHeader } from '@/components/data-table'
+import { LongText } from '@/components/long-text'
 import { type Chapter } from '../data/schema'
 import { DataTableRowActions } from './data-table-row-actions-policies'
 
@@ -35,9 +36,7 @@ export const policyColumns: ColumnDef<Chapter>[] = [
       <DataTableColumnHeader column={column} title='Title' />
     ),
     cell: ({ row }) => (
-      <div className='max-w-[250px] truncate text-sm font-medium'>
-        {row.getValue('title')}
-      </div>
+      <LongText className='max-w-66'>{row.getValue('title')}</LongText>
     ),
     enableSorting: false,
     enableHiding: false,
@@ -50,11 +49,7 @@ export const policyColumns: ColumnDef<Chapter>[] = [
     meta: { className: 'ps-1', tdClassName: 'ps-4' },
     cell: ({ row }) => {
       return (
-        <div className='flex space-x-2'>
-          <span className='max-w-32 truncate font-medium sm:max-w-72 md:max-w-[31rem]'>
-            {row.getValue('description')}
-          </span>
-        </div>
+        <LongText className='max-w-116'>{row.getValue('description')}</LongText>
       )
     },
   },

@@ -1,9 +1,13 @@
 import { UsersActionDialog } from './users-action-dialog'
-import { UsersDeleteDialog } from './users-delete-dialog'
 import { UsersInviteDialog } from './users-invite-dialog'
 import { useUsers } from './users-provider'
 
-export function UsersDialogs() {
+interface Props {
+  roles: any
+  organizations: any
+}
+
+export function UsersDialogs({ roles, organizations }: Props) {
   const { open, setOpen, currentRow, setCurrentRow } = useUsers()
   return (
     <>
@@ -11,6 +15,8 @@ export function UsersDialogs() {
         key='user-add'
         open={open === 'add'}
         onOpenChange={() => setOpen('add')}
+        roles={roles}
+        organizations={organizations}
       />
 
       <UsersInviteDialog
@@ -31,9 +37,11 @@ export function UsersDialogs() {
               }, 500)
             }}
             currentRow={currentRow}
+            roles={roles}
+            organizations={organizations}
           />
 
-          <UsersDeleteDialog
+          {/* <UsersDeleteDialog
             key={`user-delete-${currentRow.id}`}
             open={open === 'delete'}
             onOpenChange={() => {
@@ -43,7 +51,7 @@ export function UsersDialogs() {
               }, 500)
             }}
             currentRow={currentRow}
-          />
+          /> */}
         </>
       )}
     </>

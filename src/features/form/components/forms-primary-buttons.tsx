@@ -1,7 +1,8 @@
 import { useNavigate } from '@tanstack/react-router'
 import { Eye, Plus } from 'lucide-react'
-import { useAuthStore } from '@/stores/auth-store'
+import { useHasPermission } from '@/utils/permissions'
 import { Button } from '@/components/ui/button'
+import { PERMISSIONS } from '@/features/manage-role/types/permissions'
 import { useSubmissions } from './submissions-provider'
 
 type Props = {
@@ -11,15 +12,20 @@ type Props = {
 export function SubmissionsPrimaryButtons({ formId }: Props) {
   const navigate = useNavigate()
   const { setOpen } = useSubmissions()
-  const { auth } = useAuthStore()
 
   const handleViewEditor = () => {
     navigate({ to: `/form-editor/${formId}` })
   }
 
+  const canEditForm = useHasPermission(PERMISSIONS.EDIT_FORM)
+
+  const canCreateFormSubmissions = useHasPermission(
+    PERMISSIONS.CREATE_FORM_SUBMISSION
+  )
+
   return (
     <div className='flex gap-2'>
-      {auth?.user?.email !== 'demo.user@pilotorg.com' && (
+      {canEditForm && (
         <Button
           variant={'outline'}
           className='space-x-1'
@@ -29,9 +35,11 @@ export function SubmissionsPrimaryButtons({ formId }: Props) {
         </Button>
       )}
 
-      <Button className='space-x-1' onClick={() => setOpen('create')}>
-        <span>Create Submission</span> <Plus size={18} />
-      </Button>
+      {canCreateFormSubmissions && (
+        <Button className='space-x-1' onClick={() => setOpen('create')}>
+          <span>Create Submission</span> <Plus size={18} />
+        </Button>
+      )}
     </div>
   )
 }

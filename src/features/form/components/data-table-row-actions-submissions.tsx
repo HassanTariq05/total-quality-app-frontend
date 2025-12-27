@@ -2,6 +2,7 @@ import { DotsHorizontalIcon } from '@radix-ui/react-icons'
 import { useNavigate } from '@tanstack/react-router'
 import { type Row } from '@tanstack/react-table'
 import { Trash2, Pencil, Eye } from 'lucide-react'
+import { useHasPermission } from '@/utils/permissions'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -11,6 +12,7 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { PERMISSIONS } from '@/features/manage-role/types/permissions'
 import { FormSubmissionsSchema } from '../data/schema'
 import { useSubmissions } from './submissions-provider'
 
@@ -30,6 +32,13 @@ export function DataTableRowActions<TData>({
   const handleViewForm = (id: string) => {
     navigate({ to: `/form-submission/${id}` })
   }
+
+  const canEditFormSubmission = useHasPermission(
+    PERMISSIONS.EDIT_FORM_SUBMISSION
+  )
+  const canDeleteFormSubmission = useHasPermission(
+    PERMISSIONS.DELETE_FORM_SUBMISSION
+  )
 
   return (
     <DropdownMenu modal={false}>
@@ -53,29 +62,36 @@ export function DataTableRowActions<TData>({
             <Eye size={16} />
           </DropdownMenuShortcut>
         </DropdownMenuItem>
-        <DropdownMenuItem
-          onClick={() => {
-            setCurrentRow(form)
-            setOpen('update-form')
-          }}
-        >
-          Edit
-          <DropdownMenuShortcut>
-            <Pencil size={16} />
-          </DropdownMenuShortcut>
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem
-          onClick={() => {
-            setCurrentRow(form)
-            setOpen('delete-form')
-          }}
-        >
-          Delete
-          <DropdownMenuShortcut>
-            <Trash2 size={16} />
-          </DropdownMenuShortcut>
-        </DropdownMenuItem>
+        {canEditFormSubmission && (
+          <>
+            <DropdownMenuItem
+              onClick={() => {
+                setCurrentRow(form)
+                setOpen('update-form')
+              }}
+            >
+              Edit
+              <DropdownMenuShortcut>
+                <Pencil size={16} />
+              </DropdownMenuShortcut>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+          </>
+        )}
+
+        {canDeleteFormSubmission && (
+          <DropdownMenuItem
+            onClick={() => {
+              setCurrentRow(form)
+              setOpen('delete-form')
+            }}
+          >
+            Delete
+            <DropdownMenuShortcut>
+              <Trash2 size={16} />
+            </DropdownMenuShortcut>
+          </DropdownMenuItem>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   )

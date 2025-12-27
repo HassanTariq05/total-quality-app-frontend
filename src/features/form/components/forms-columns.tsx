@@ -1,6 +1,7 @@
 import { type ColumnDef } from '@tanstack/react-table'
 import { Checkbox } from '@/components/ui/checkbox'
 import { DataTableColumnHeader } from '@/components/data-table'
+import { LongText } from '@/components/long-text'
 import { type SubmissionsSchema } from '../data/schema'
 import { DataTableRowActions } from './data-table-row-actions-submissions'
 
@@ -35,9 +36,7 @@ export const formColumns: ColumnDef<SubmissionsSchema>[] = [
       <DataTableColumnHeader column={column} title='Name' />
     ),
     cell: ({ row }) => (
-      <div className='max-w-[250px] truncate text-sm font-medium'>
-        {row.getValue('name')}
-      </div>
+      <LongText className='max-w-36'>{row.getValue('name')}</LongText>
     ),
     enableSorting: false,
     enableHiding: false,
@@ -51,9 +50,9 @@ export const formColumns: ColumnDef<SubmissionsSchema>[] = [
     cell: ({ row }) => {
       return (
         <div className='flex space-x-2'>
-          <span className='max-w-32 truncate font-medium sm:max-w-72 md:max-w-[31rem]'>
+          <LongText className='max-w-36'>
             {row.getValue('description')}
-          </span>
+          </LongText>
         </div>
       )
     },

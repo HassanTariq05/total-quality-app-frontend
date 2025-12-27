@@ -2,6 +2,7 @@ import { DotsHorizontalIcon } from '@radix-ui/react-icons'
 import { useNavigate } from '@tanstack/react-router'
 import { type Row } from '@tanstack/react-table'
 import { Trash2, Pencil, Eye } from 'lucide-react'
+import { useHasPermission } from '@/utils/permissions'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -11,6 +12,7 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { PERMISSIONS } from '@/features/manage-role/types/permissions'
 import { policySchema } from '../data/schema'
 import { useChapters } from './chapters-provider'
 
@@ -30,6 +32,9 @@ export function DataTableRowActions<TData>({
   const handleViewPolicy = (id: string) => {
     navigate({ to: `/policy/${id}` })
   }
+
+  const canEditPolicy = useHasPermission(PERMISSIONS.EDIT_POLICY)
+  const canDeletePolicy = useHasPermission(PERMISSIONS.DELETE_POLICY)
 
   return (
     <DropdownMenu modal={false}>
@@ -53,29 +58,37 @@ export function DataTableRowActions<TData>({
             <Eye size={16} />
           </DropdownMenuShortcut>
         </DropdownMenuItem>
-        <DropdownMenuItem
-          onClick={() => {
-            setCurrentRow(policy)
-            setOpen('update')
-          }}
-        >
-          Edit
-          <DropdownMenuShortcut>
-            <Pencil size={16} />
-          </DropdownMenuShortcut>
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem
-          onClick={() => {
-            setCurrentRow(policy)
-            setOpen('delete-policy')
-          }}
-        >
-          Delete
-          <DropdownMenuShortcut>
-            <Trash2 size={16} />
-          </DropdownMenuShortcut>
-        </DropdownMenuItem>
+
+        {canEditPolicy && (
+          <>
+            <DropdownMenuItem
+              onClick={() => {
+                setCurrentRow(policy)
+                setOpen('update')
+              }}
+            >
+              Edit
+              <DropdownMenuShortcut>
+                <Pencil size={16} />
+              </DropdownMenuShortcut>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+          </>
+        )}
+
+        {canDeletePolicy && (
+          <DropdownMenuItem
+            onClick={() => {
+              setCurrentRow(policy)
+              setOpen('delete-policy')
+            }}
+          >
+            Delete
+            <DropdownMenuShortcut>
+              <Trash2 size={16} />
+            </DropdownMenuShortcut>
+          </DropdownMenuItem>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   )

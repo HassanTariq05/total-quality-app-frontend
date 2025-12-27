@@ -1,5 +1,7 @@
 import { Loader2 } from 'lucide-react'
+import { useHasPermission } from '@/utils/permissions'
 import { Button } from '@/components/ui/button'
+import { PERMISSIONS } from '@/features/manage-role/types/permissions'
 
 export type PolicyAction =
   | 'SAVE_DRAFT'
@@ -28,34 +30,37 @@ export const Footer: React.FC<FooterProps> = ({
   isLoading,
   activeAction,
 }) => {
+  const canReviewPolicy = useHasPermission(PERMISSIONS.REVIEW_POLICY_VERSION)
+  const canEditPolicy = useHasPermission(PERMISSIONS.EDIT_POLICY_VERSION)
   return (
     <footer className='bg-background/25 supports-[backdrop-filter]:bg-background/60 sticky right-0 bottom-0 left-0 z-40 border-t backdrop-blur'>
-      {(status === 'DRAFT' || status === 'SENT_FOR_REVISION') && (
-        <div className='container flex h-12 max-w-screen-2xl items-center justify-end gap-2 px-4 sm:px-6 lg:px-8'>
-          <Button
-            disabled={isLoading}
-            variant='outline'
-            onClick={() => onAction('SAVE_DRAFT')}
-          >
-            {isLoading && activeAction === 'SAVE_DRAFT' && (
-              <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-            )}
-            Save Draft
-          </Button>
+      {(status === 'DRAFT' || status === 'SENT_FOR_REVISION') &&
+        canEditPolicy && (
+          <div className='container flex h-12 max-w-screen-2xl items-center justify-end gap-2 px-4 sm:px-6 lg:px-8'>
+            <Button
+              disabled={isLoading}
+              variant='outline'
+              onClick={() => onAction('SAVE_DRAFT')}
+            >
+              {isLoading && activeAction === 'SAVE_DRAFT' && (
+                <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+              )}
+              Save Draft
+            </Button>
 
-          <Button
-            disabled={isLoading}
-            onClick={() => onAction('SEND_FOR_APPROVAL')}
-          >
-            {isLoading && activeAction === 'SEND_FOR_APPROVAL' && (
-              <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-            )}
-            Send for Approval
-          </Button>
-        </div>
-      )}
+            <Button
+              disabled={isLoading}
+              onClick={() => onAction('SEND_FOR_APPROVAL')}
+            >
+              {isLoading && activeAction === 'SEND_FOR_APPROVAL' && (
+                <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+              )}
+              Send for Approval
+            </Button>
+          </div>
+        )}
 
-      {status === 'SENT_FOR_APPROVAL' && (
+      {status === 'SENT_FOR_APPROVAL' && canReviewPolicy && (
         <div className='container flex h-12 max-w-screen-2xl items-center justify-end gap-2 px-4 sm:px-6 lg:px-8'>
           <Button
             disabled={isLoading}

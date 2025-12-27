@@ -1,6 +1,7 @@
 import { useParams } from '@tanstack/react-router'
 import { useAuthStore } from '@/stores/auth-store'
 import { cn } from '@/lib/utils'
+import { useHasPermission } from '@/utils/permissions'
 import { useGetChecklistSubmissionByOrgIdAndChecklistId } from '@/hooks/use-checklist-submissions'
 import { useChecklist } from '@/hooks/use-checklists'
 import { Badge } from '@/components/ui/badge'
@@ -11,6 +12,7 @@ import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ThemeSwitch } from '@/components/theme-switch'
+import { PERMISSIONS } from '../manage-role/types/permissions'
 import { badgeTypes } from '../users/data/data'
 import { ChecklistBreadcrumb } from './components/breadcrumb'
 import { ChecklistSubmissions } from './components/checklist-submissions'
@@ -37,6 +39,11 @@ export function ChecklistView() {
       { enabled: true }
     )
 
+  const canViewChecklist = useHasPermission(PERMISSIONS.VIEW_CHECKLIST)
+  const canViewCheclistSubmissions = useHasPermission(
+    PERMISSIONS.VIEW_CHECKLIST_SUBMISSION
+  )
+
   return (
     <SubmissionsProvider>
       <Header fixed>
@@ -52,46 +59,54 @@ export function ChecklistView() {
           <InfoSkeleton />
         ) : (
           <>
-            <ChecklistBreadcrumb
-              chapterId={form?.chapter?.id || ''}
-              chapterName={form?.chapter?.title || ''}
-              accreditationId={form?.chapter?.accreditation?.id || ''}
-              accreditationName={form?.chapter?.accreditation?.name || ''}
-              checklistId={form?.id || ''}
-              checklistName={form?.title || ''}
-            />
+            {canViewChecklist && (
+              <>
+                <ChecklistBreadcrumb
+                  chapterId={form?.chapter?.id || ''}
+                  chapterName={form?.chapter?.title || ''}
+                  accreditationId={form?.chapter?.accreditation?.id || ''}
+                  accreditationName={form?.chapter?.accreditation?.name || ''}
+                  checklistId={form?.id || ''}
+                  checklistName={form?.title || ''}
+                />
 
-            <div className='flex items-center justify-between'>
-              <div>
-                <div className='flex items-center gap-2'>
-                  <h2 className='text-2xl font-bold tracking-tight'>
-                    {form?.title}
-                  </h2>
-                  <Badge
-                    variant='outline'
-                    className={cn(
-                      'h-6 min-h-0 px-2 py-0.5 text-sm capitalize',
-                      badgeColor
-                    )}
-                  >
-                    {form?.status}
-                  </Badge>
+                <div className='flex items-center justify-between'>
+                  <div>
+                    <div className='flex items-center gap-2'>
+                      <h2 className='text-2xl font-bold tracking-tight'>
+                        {form?.title}
+                      </h2>
+                      <Badge
+                        variant='outline'
+                        className={cn(
+                          'h-6 min-h-0 px-2 py-0.5 text-sm capitalize',
+                          badgeColor
+                        )}
+                      >
+                        {form?.status}
+                      </Badge>
+                    </div>
+
+                    <p className='text-muted-foreground'>{form?.description}</p>
+                  </div>
+
+                  <div className='flex items-center space-x-2'>
+                    <SubmissionsPrimaryButtons checklistId={form?.id || ''} />
+                  </div>
                 </div>
-
-                <p className='text-muted-foreground'>{form?.description}</p>
-              </div>
-
-              <div className='flex items-center space-x-2'>
-                <SubmissionsPrimaryButtons checklistId={form?.id || ''} />
-              </div>
-            </div>
+              </>
+            )}
           </>
         )}
 
         {isLoadingSubmissions ? (
           <DataTableSkeleton />
         ) : (
-          <ChecklistSubmissions data={submissions} />
+          <>
+            {canViewCheclistSubmissions && (
+              <ChecklistSubmissions data={submissions} />
+            )}
+          </>
         )}
       </Main>
 

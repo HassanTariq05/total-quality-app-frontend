@@ -3,6 +3,7 @@ import { useParams } from '@tanstack/react-router'
 import { FormSchema } from '@/types/form'
 import { useFormBuilderStore } from '@/stores/useFormBuilderStore'
 import { cn } from '@/lib/utils'
+import { useHasPermission } from '@/utils/permissions'
 import { useChapter } from '@/hooks/use-chapters'
 import { useChecklists } from '@/hooks/use-checklists'
 import { useForms } from '@/hooks/use-forms'
@@ -16,6 +17,7 @@ import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ThemeSwitch } from '@/components/theme-switch'
+import { PERMISSIONS } from '../manage-role/types/permissions'
 import { badgeTypes } from '../users/data/data'
 import { ChapterBreadcrumb } from './components/breadcrumb'
 import { ChaptersProvider } from './components/chapters-provider'
@@ -93,6 +95,17 @@ export function ChapterView() {
 
   const badgeColor = badgeTypes.get(chapter?.status?.toLowerCase())
 
+  const canViewChapter = useHasPermission(PERMISSIONS.VIEW_CHAPTER)
+  const canViewForms = useHasPermission(PERMISSIONS.VIEW_FORM)
+  const canEditForms = useHasPermission(PERMISSIONS.EDIT_FORM)
+  const canDeleteForms = useHasPermission(PERMISSIONS.DELETE_FORM)
+  const canViewChecklists = useHasPermission(PERMISSIONS.VIEW_CHECKLIST)
+  const canEditChecklists = useHasPermission(PERMISSIONS.EDIT_CHECKLIST)
+  const canDeleteChecklists = useHasPermission(PERMISSIONS.DELETE_CHECKLIST)
+  const canViewPolicy = useHasPermission(PERMISSIONS.VIEW_POLICY)
+  const canEditPolicy = useHasPermission(PERMISSIONS.EDIT_POLICY)
+  const canDeletePolicy = useHasPermission(PERMISSIONS.DELETE_POLICY)
+
   return (
     <ChaptersProvider>
       <Header fixed>
@@ -108,35 +121,41 @@ export function ChapterView() {
           <InfoSkeleton />
         ) : (
           <>
-            <ChapterBreadcrumb
-              chapterId={chapterId}
-              chapterName={chapter?.title || ''}
-              accreditationId={chapter?.accreditation?.id || ''}
-              accreditationName={chapter?.accreditation?.name || ''}
-            />
-            <div className='mb-0 flex items-center justify-between space-y-2'>
-              <div className='m-0'>
-                <div className='flex items-center gap-2'>
-                  <h2 className='text-2xl font-bold tracking-tight'>
-                    {chapter?.title}
-                  </h2>
-                  <Badge
-                    variant='outline'
-                    className={cn(
-                      'h-6 min-h-0 px-2 py-0.5 text-sm capitalize',
-                      badgeColor
-                    )}
-                  >
-                    {chapter?.status}
-                  </Badge>
-                </div>
+            {canViewChapter && (
+              <>
+                <ChapterBreadcrumb
+                  chapterId={chapterId}
+                  chapterName={chapter?.title || ''}
+                  accreditationId={chapter?.accreditation?.id || ''}
+                  accreditationName={chapter?.accreditation?.name || ''}
+                />
+                <div className='mb-0 flex items-center justify-between space-y-2'>
+                  <div className='m-0'>
+                    <div className='flex items-center gap-2'>
+                      <h2 className='text-2xl font-bold tracking-tight'>
+                        {chapter?.title}
+                      </h2>
+                      <Badge
+                        variant='outline'
+                        className={cn(
+                          'h-6 min-h-0 px-2 py-0.5 text-sm capitalize',
+                          badgeColor
+                        )}
+                      >
+                        {chapter?.status}
+                      </Badge>
+                    </div>
 
-                <p className='text-muted-foreground'>{chapter?.description}</p>
-              </div>
-              <div className='flex items-center space-x-2'>
-                <FormsPrimaryButtons selectedTab={selectedTab} />
-              </div>
-            </div>
+                    <p className='text-muted-foreground'>
+                      {chapter?.description}
+                    </p>
+                  </div>
+                  <div className='flex items-center space-x-2'>
+                    <FormsPrimaryButtons selectedTab={selectedTab} />
+                  </div>
+                </div>
+              </>
+            )}
           </>
         )}
 
@@ -148,9 +167,14 @@ export function ChapterView() {
         >
           <div className='w-full overflow-x-auto pb-2'>
             <TabsList>
-              <TabsTrigger value='forms'>Forms</TabsTrigger>
-              <TabsTrigger value='checklists'>Checklists</TabsTrigger>
-              <TabsTrigger value='policies'>Policies</TabsTrigger>
+              {canViewForms && <TabsTrigger value='forms'>Forms</TabsTrigger>}
+
+              {canViewChecklists && (
+                <TabsTrigger value='checklists'>Checklists</TabsTrigger>
+              )}
+              {canViewPolicy && (
+                <TabsTrigger value='policies'>Policies</TabsTrigger>
+              )}
             </TabsList>
           </div>
 
@@ -158,14 +182,18 @@ export function ChapterView() {
             {isFetchingForms ? (
               <DataTableSkeleton />
             ) : (
-              <Forms
-                data={forms}
-                page={formPage}
-                pageSize={formPageSize}
-                totalPages={totalFormPages}
-                onPageChange={setFormPage}
-                onPageSizeChange={setFormPageSize}
-              />
+              <>
+                {canViewForms && (
+                  <Forms
+                    data={forms}
+                    page={formPage}
+                    pageSize={formPageSize}
+                    totalPages={totalFormPages}
+                    onPageChange={setFormPage}
+                    onPageSizeChange={setFormPageSize}
+                  />
+                )}
+              </>
             )}
           </TabsContent>
 
@@ -173,14 +201,18 @@ export function ChapterView() {
             {isFetchingChecklists ? (
               <DataTableSkeleton />
             ) : (
-              <Checklists
-                data={checklists}
-                page={checklistPage}
-                pageSize={checklistPageSize}
-                totalPages={totalChecklistPages}
-                onPageChange={setChecklistPage}
-                onPageSizeChange={setChecklistPageSize}
-              />
+              <>
+                {canViewChecklists && (
+                  <Checklists
+                    data={checklists}
+                    page={checklistPage}
+                    pageSize={checklistPageSize}
+                    totalPages={totalChecklistPages}
+                    onPageChange={setChecklistPage}
+                    onPageSizeChange={setChecklistPageSize}
+                  />
+                )}
+              </>
             )}
           </TabsContent>
 
@@ -188,14 +220,18 @@ export function ChapterView() {
             {isFetchingPolicies ? (
               <DataTableSkeleton />
             ) : (
-              <Policies
-                data={policies}
-                page={policyPage}
-                pageSize={policyPageSize}
-                totalPages={totalPolicyPages}
-                onPageChange={setPolicyPage}
-                onPageSizeChange={setPolicyPageSize}
-              />
+              <>
+                {canViewPolicy && (
+                  <Policies
+                    data={policies}
+                    page={policyPage}
+                    pageSize={policyPageSize}
+                    totalPages={totalPolicyPages}
+                    onPageChange={setPolicyPage}
+                    onPageSizeChange={setPolicyPageSize}
+                  />
+                )}
+              </>
             )}
           </TabsContent>
         </Tabs>

@@ -3,7 +3,12 @@
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { showSubmittedData } from '@/lib/show-submitted-data'
+import { Organization } from '@/services/organization-services/types'
+import {
+  CreateUserPayload,
+  UpdateUserPayload,
+} from '@/services/user-services/user-services'
+import { useCreateUser, useUpdateUser } from '@/hooks/use-users'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -22,22 +27,27 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { PasswordInput } from '@/components/password-input'
 import { SelectDropdown } from '@/components/select-dropdown'
-import { roles } from '../data/data'
-import { type User } from '../data/schema'
 
 const formSchema = z
   .object({
-    firstName: z.string().min(1, 'First Name is required.'),
-    lastName: z.string().min(1, 'Last Name is required.'),
-    username: z.string().min(1, 'Username is required.'),
+    name: z.string().min(1, 'Name is required.'),
     phoneNumber: z.string().min(1, 'Phone number is required.'),
     email: z.email({
       error: (iss) => (iss.input === '' ? 'Email is required.' : undefined),
     }),
     password: z.string().transform((pwd) => pwd.trim()),
     role: z.string().min(1, 'Role is required.'),
+    organization: z.string().min(1, 'Organization is required.'),
+    status: z.string().min(1, 'Status is required.'),
     confirmPassword: z.string().transform((pwd) => pwd.trim()),
     isEdit: z.boolean(),
   })
@@ -94,15 +104,19 @@ const formSchema = z
 type UserForm = z.infer<typeof formSchema>
 
 type UserActionDialogProps = {
-  currentRow?: User
+  currentRow?: any
   open: boolean
   onOpenChange: (open: boolean) => void
+  roles: any
+  organizations: any
 }
 
 export function UsersActionDialog({
   currentRow,
   open,
   onOpenChange,
+  roles,
+  organizations,
 }: UserActionDialogProps) {
   const isEdit = !!currentRow
   const form = useForm<UserForm>({
@@ -110,16 +124,18 @@ export function UsersActionDialog({
     defaultValues: isEdit
       ? {
           ...currentRow,
+          organization: currentRow?.organisation?.id,
+          role: currentRow?.role?.id,
           password: '',
           confirmPassword: '',
           isEdit,
         }
       : {
-          firstName: '',
-          lastName: '',
-          username: '',
+          name: '',
           email: '',
           role: '',
+          organization: '',
+          status: '',
           phoneNumber: '',
           password: '',
           confirmPassword: '',
@@ -127,9 +143,37 @@ export function UsersActionDialog({
         },
   })
 
+  const createUserMutation = useCreateUser()
+  const updateUserMutation = useUpdateUser()
+
   const onSubmit = (values: UserForm) => {
+    if (isEdit) {
+      let payload: UpdateUserPayload = {
+        name: values.name,
+        email: values.email,
+        phoneNumber: values.phoneNumber,
+        password: values.password,
+        roleId: values.role,
+        organizationId: values.organization,
+        status: values.status,
+      }
+
+      updateUserMutation.mutate({ id: currentRow.id, payload })
+    } else {
+      let payload: CreateUserPayload = {
+        name: values.name,
+        email: values.email,
+        phoneNumber: values.phoneNumber,
+        password: values.password,
+        roleId: values.role,
+        organizationId: values.organization,
+        status: values.status,
+      }
+      createUserMutation.mutate(payload)
+    }
+
     form.reset()
-    showSubmittedData(values)
+    // showSubmittedData(values)
     onOpenChange(false)
   }
 
@@ -151,7 +195,7 @@ export function UsersActionDialog({
             Click save when you&apos;re done.
           </DialogDescription>
         </DialogHeader>
-        <div className='h-[26.25rem] w-[calc(100%+0.75rem)] overflow-y-auto py-1 pe-3'>
+        <div className='max-h-[80vh] w-full overflow-y-auto py-1 pe-3'>
           <Form {...form}>
             <form
               id='user-form'
@@ -160,56 +204,17 @@ export function UsersActionDialog({
             >
               <FormField
                 control={form.control}
-                name='firstName'
+                name='name'
                 render={({ field }) => (
                   <FormItem className='grid grid-cols-6 items-center space-y-0 gap-x-4 gap-y-1'>
                     <FormLabel className='col-span-2 text-end'>
-                      First Name
+                      Full Name
                     </FormLabel>
                     <FormControl>
                       <Input
-                        placeholder='John'
+                        placeholder='John Doe'
                         className='col-span-4'
                         autoComplete='off'
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage className='col-span-4 col-start-3' />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name='lastName'
-                render={({ field }) => (
-                  <FormItem className='grid grid-cols-6 items-center space-y-0 gap-x-4 gap-y-1'>
-                    <FormLabel className='col-span-2 text-end'>
-                      Last Name
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder='Doe'
-                        className='col-span-4'
-                        autoComplete='off'
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage className='col-span-4 col-start-3' />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name='username'
-                render={({ field }) => (
-                  <FormItem className='grid grid-cols-6 items-center space-y-0 gap-x-4 gap-y-1'>
-                    <FormLabel className='col-span-2 text-end'>
-                      Username
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder='john_doe'
-                        className='col-span-4'
                         {...field}
                       />
                     </FormControl>
@@ -264,12 +269,63 @@ export function UsersActionDialog({
                       onValueChange={field.onChange}
                       placeholder='Select a role'
                       className='col-span-4'
-                      items={roles.map(({ label, value }) => ({
-                        label,
-                        value,
+                      items={roles.map((role: any) => ({
+                        label: role.name,
+                        value: role.id,
                       }))}
                     />
                     <FormMessage className='col-span-4 col-start-3' />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name='organization'
+                render={({ field }) => (
+                  <FormItem className='grid grid-cols-6 items-center space-y-0 gap-x-4 gap-y-1'>
+                    <FormLabel className='col-span-2 text-end'>
+                      Organization
+                    </FormLabel>
+                    <SelectDropdown
+                      defaultValue={field.value}
+                      onValueChange={field.onChange}
+                      placeholder='Select an organization'
+                      className='col-span-4'
+                      items={organizations.map((org: Organization) => ({
+                        label: org.name,
+                        value: org.id,
+                      }))}
+                    />
+                    <FormMessage className='col-span-4 col-start-3' />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name='status'
+                render={({ field }) => (
+                  <FormItem className='flex items-center gap-4'>
+                    <FormLabel className='w-34 text-right'>Status</FormLabel>
+
+                    <div className='flex-1'>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder='Select Status' />
+                          </SelectTrigger>
+                        </FormControl>
+
+                        <SelectContent>
+                          <SelectItem value='active'>Active</SelectItem>
+                          <SelectItem value='inactive'>Inactive</SelectItem>
+                        </SelectContent>
+                      </Select>
+
+                      <FormMessage />
+                    </div>
                   </FormItem>
                 )}
               />

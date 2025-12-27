@@ -1,6 +1,7 @@
 import { type ColumnDef } from '@tanstack/react-table'
 import { Checkbox } from '@/components/ui/checkbox'
 import { DataTableColumnHeader } from '@/components/data-table'
+import { LongText } from '@/components/long-text'
 import { badgeTypes } from '@/features/users/data/data'
 import { type VersionsSchema } from '../data/schema'
 import { DataTableRowActions } from './data-table-row-actions-policy-versions'
@@ -52,11 +53,7 @@ export const PolicyVersionsColumns: ColumnDef<VersionsSchema>[] = [
     meta: { className: 'ps-1', tdClassName: 'ps-4' },
     cell: ({ row }) => {
       return (
-        <div className='flex space-x-2'>
-          <span className='max-w-32 truncate font-medium sm:max-w-72 md:max-w-[31rem]'>
-            {row.getValue('description')}
-          </span>
-        </div>
+        <LongText className='max-w-36'>{row.getValue('description')}</LongText>
       )
     },
   },

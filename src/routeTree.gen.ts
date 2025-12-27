@@ -25,6 +25,8 @@ import { Route as authForgotPasswordRouteImport } from './routes/(auth)/forgot-p
 import { Route as ClerkAuthenticatedRouteRouteImport } from './routes/clerk/_authenticated/route'
 import { Route as ClerkauthRouteRouteImport } from './routes/clerk/(auth)/route'
 import { Route as AuthenticatedSettingsRouteRouteImport } from './routes/_authenticated/settings/route'
+import { Route as AuthenticatedRolesRouteRouteImport } from './routes/_authenticated/roles/route'
+import { Route as AuthenticatedOrganizationsRouteRouteImport } from './routes/_authenticated/organizations/route'
 import { Route as AuthenticatedUsersIndexRouteImport } from './routes/_authenticated/users/index'
 import { Route as AuthenticatedTasksIndexRouteImport } from './routes/_authenticated/tasks/index'
 import { Route as AuthenticatedSettingsIndexRouteImport } from './routes/_authenticated/settings/index'
@@ -41,6 +43,7 @@ import { Route as AuthenticatedSettingsAccountRouteImport } from './routes/_auth
 import { Route as AuthenticatedErrorsErrorRouteImport } from './routes/_authenticated/errors/$error'
 import { Route as AuthenticatedPolicyPolicyIdRouteRouteImport } from './routes/_authenticated/policy/$policyId/route'
 import { Route as AuthenticatedPolicyVersionPolicyVersionIdRouteRouteImport } from './routes/_authenticated/policy-version/$policyVersionId/route'
+import { Route as AuthenticatedManageRoleRoleIdRouteRouteImport } from './routes/_authenticated/manage-role/$roleId/route'
 import { Route as AuthenticatedFormFormIdRouteRouteImport } from './routes/_authenticated/form/$formId/route'
 import { Route as AuthenticatedFormSubmissionFormSubmissionIdRouteRouteImport } from './routes/_authenticated/form-submission/$formSubmissionId/route'
 import { Route as AuthenticatedFormEditorFormIdRouteRouteImport } from './routes/_authenticated/form-editor/$formId/route'
@@ -127,6 +130,17 @@ const AuthenticatedSettingsRouteRoute =
   AuthenticatedSettingsRouteRouteImport.update({
     id: '/settings',
     path: '/settings',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedRolesRouteRoute = AuthenticatedRolesRouteRouteImport.update({
+  id: '/roles',
+  path: '/roles',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedOrganizationsRouteRoute =
+  AuthenticatedOrganizationsRouteRouteImport.update({
+    id: '/organizations',
+    path: '/organizations',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedUsersIndexRoute = AuthenticatedUsersIndexRouteImport.update({
@@ -219,6 +233,12 @@ const AuthenticatedPolicyVersionPolicyVersionIdRouteRoute =
     path: '/policy-version/$policyVersionId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedManageRoleRoleIdRouteRoute =
+  AuthenticatedManageRoleRoleIdRouteRouteImport.update({
+    id: '/manage-role/$roleId',
+    path: '/manage-role/$roleId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedFormFormIdRouteRoute =
   AuthenticatedFormFormIdRouteRouteImport.update({
     id: '/form/$formId',
@@ -276,6 +296,8 @@ const AuthenticatedAccreditationAccreditationIdRouteRoute =
 
 export interface FileRoutesByFullPath {
   '/clerk': typeof ClerkAuthenticatedRouteRouteWithChildren
+  '/organizations': typeof AuthenticatedOrganizationsRouteRoute
+  '/roles': typeof AuthenticatedRolesRouteRoute
   '/settings': typeof AuthenticatedSettingsRouteRouteWithChildren
   '/forgot-password': typeof authForgotPasswordRoute
   '/otp': typeof authOtpRoute
@@ -297,6 +319,7 @@ export interface FileRoutesByFullPath {
   '/form-editor/$formId': typeof AuthenticatedFormEditorFormIdRouteRoute
   '/form-submission/$formSubmissionId': typeof AuthenticatedFormSubmissionFormSubmissionIdRouteRoute
   '/form/$formId': typeof AuthenticatedFormFormIdRouteRoute
+  '/manage-role/$roleId': typeof AuthenticatedManageRoleRoleIdRouteRoute
   '/policy-version/$policyVersionId': typeof AuthenticatedPolicyVersionPolicyVersionIdRouteRoute
   '/policy/$policyId': typeof AuthenticatedPolicyPolicyIdRouteRoute
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
@@ -316,6 +339,8 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/clerk': typeof ClerkAuthenticatedRouteRouteWithChildren
+  '/organizations': typeof AuthenticatedOrganizationsRouteRoute
+  '/roles': typeof AuthenticatedRolesRouteRoute
   '/forgot-password': typeof authForgotPasswordRoute
   '/otp': typeof authOtpRoute
   '/sign-in': typeof authSignInRoute
@@ -336,6 +361,7 @@ export interface FileRoutesByTo {
   '/form-editor/$formId': typeof AuthenticatedFormEditorFormIdRouteRoute
   '/form-submission/$formSubmissionId': typeof AuthenticatedFormSubmissionFormSubmissionIdRouteRoute
   '/form/$formId': typeof AuthenticatedFormFormIdRouteRoute
+  '/manage-role/$roleId': typeof AuthenticatedManageRoleRoleIdRouteRoute
   '/policy-version/$policyVersionId': typeof AuthenticatedPolicyVersionPolicyVersionIdRouteRoute
   '/policy/$policyId': typeof AuthenticatedPolicyPolicyIdRouteRoute
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
@@ -357,6 +383,8 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/clerk': typeof ClerkRouteRouteWithChildren
+  '/_authenticated/organizations': typeof AuthenticatedOrganizationsRouteRoute
+  '/_authenticated/roles': typeof AuthenticatedRolesRouteRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRouteRouteWithChildren
   '/clerk/(auth)': typeof ClerkauthRouteRouteWithChildren
   '/clerk/_authenticated': typeof ClerkAuthenticatedRouteRouteWithChildren
@@ -380,6 +408,7 @@ export interface FileRoutesById {
   '/_authenticated/form-editor/$formId': typeof AuthenticatedFormEditorFormIdRouteRoute
   '/_authenticated/form-submission/$formSubmissionId': typeof AuthenticatedFormSubmissionFormSubmissionIdRouteRoute
   '/_authenticated/form/$formId': typeof AuthenticatedFormFormIdRouteRoute
+  '/_authenticated/manage-role/$roleId': typeof AuthenticatedManageRoleRoleIdRouteRoute
   '/_authenticated/policy-version/$policyVersionId': typeof AuthenticatedPolicyVersionPolicyVersionIdRouteRoute
   '/_authenticated/policy/$policyId': typeof AuthenticatedPolicyPolicyIdRouteRoute
   '/_authenticated/errors/$error': typeof AuthenticatedErrorsErrorRoute
@@ -401,6 +430,8 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/clerk'
+    | '/organizations'
+    | '/roles'
     | '/settings'
     | '/forgot-password'
     | '/otp'
@@ -422,6 +453,7 @@ export interface FileRouteTypes {
     | '/form-editor/$formId'
     | '/form-submission/$formSubmissionId'
     | '/form/$formId'
+    | '/manage-role/$roleId'
     | '/policy-version/$policyVersionId'
     | '/policy/$policyId'
     | '/errors/$error'
@@ -441,6 +473,8 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/clerk'
+    | '/organizations'
+    | '/roles'
     | '/forgot-password'
     | '/otp'
     | '/sign-in'
@@ -461,6 +495,7 @@ export interface FileRouteTypes {
     | '/form-editor/$formId'
     | '/form-submission/$formSubmissionId'
     | '/form/$formId'
+    | '/manage-role/$roleId'
     | '/policy-version/$policyVersionId'
     | '/policy/$policyId'
     | '/errors/$error'
@@ -481,6 +516,8 @@ export interface FileRouteTypes {
     | '__root__'
     | '/_authenticated'
     | '/clerk'
+    | '/_authenticated/organizations'
+    | '/_authenticated/roles'
     | '/_authenticated/settings'
     | '/clerk/(auth)'
     | '/clerk/_authenticated'
@@ -504,6 +541,7 @@ export interface FileRouteTypes {
     | '/_authenticated/form-editor/$formId'
     | '/_authenticated/form-submission/$formSubmissionId'
     | '/_authenticated/form/$formId'
+    | '/_authenticated/manage-role/$roleId'
     | '/_authenticated/policy-version/$policyVersionId'
     | '/_authenticated/policy/$policyId'
     | '/_authenticated/errors/$error'
@@ -651,6 +689,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSettingsRouteRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/roles': {
+      id: '/_authenticated/roles'
+      path: '/roles'
+      fullPath: '/roles'
+      preLoaderRoute: typeof AuthenticatedRolesRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/organizations': {
+      id: '/_authenticated/organizations'
+      path: '/organizations'
+      fullPath: '/organizations'
+      preLoaderRoute: typeof AuthenticatedOrganizationsRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/users/': {
       id: '/_authenticated/users/'
       path: '/users'
@@ -763,6 +815,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPolicyVersionPolicyVersionIdRouteRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/manage-role/$roleId': {
+      id: '/_authenticated/manage-role/$roleId'
+      path: '/manage-role/$roleId'
+      fullPath: '/manage-role/$roleId'
+      preLoaderRoute: typeof AuthenticatedManageRoleRoleIdRouteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/form/$formId': {
       id: '/_authenticated/form/$formId'
       path: '/form/$formId'
@@ -853,6 +912,8 @@ const AuthenticatedSettingsRouteRouteWithChildren =
   )
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedOrganizationsRouteRoute: typeof AuthenticatedOrganizationsRouteRoute
+  AuthenticatedRolesRouteRoute: typeof AuthenticatedRolesRouteRoute
   AuthenticatedSettingsRouteRoute: typeof AuthenticatedSettingsRouteRouteWithChildren
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
   AuthenticatedAccreditationAccreditationIdRouteRoute: typeof AuthenticatedAccreditationAccreditationIdRouteRoute
@@ -864,6 +925,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedFormEditorFormIdRouteRoute: typeof AuthenticatedFormEditorFormIdRouteRoute
   AuthenticatedFormSubmissionFormSubmissionIdRouteRoute: typeof AuthenticatedFormSubmissionFormSubmissionIdRouteRoute
   AuthenticatedFormFormIdRouteRoute: typeof AuthenticatedFormFormIdRouteRoute
+  AuthenticatedManageRoleRoleIdRouteRoute: typeof AuthenticatedManageRoleRoleIdRouteRoute
   AuthenticatedPolicyVersionPolicyVersionIdRouteRoute: typeof AuthenticatedPolicyVersionPolicyVersionIdRouteRoute
   AuthenticatedPolicyPolicyIdRouteRoute: typeof AuthenticatedPolicyPolicyIdRouteRoute
   AuthenticatedErrorsErrorRoute: typeof AuthenticatedErrorsErrorRoute
@@ -875,6 +937,8 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedOrganizationsRouteRoute: AuthenticatedOrganizationsRouteRoute,
+  AuthenticatedRolesRouteRoute: AuthenticatedRolesRouteRoute,
   AuthenticatedSettingsRouteRoute: AuthenticatedSettingsRouteRouteWithChildren,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
   AuthenticatedAccreditationAccreditationIdRouteRoute:
@@ -894,6 +958,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedFormSubmissionFormSubmissionIdRouteRoute:
     AuthenticatedFormSubmissionFormSubmissionIdRouteRoute,
   AuthenticatedFormFormIdRouteRoute: AuthenticatedFormFormIdRouteRoute,
+  AuthenticatedManageRoleRoleIdRouteRoute:
+    AuthenticatedManageRoleRoleIdRouteRoute,
   AuthenticatedPolicyVersionPolicyVersionIdRouteRoute:
     AuthenticatedPolicyVersionPolicyVersionIdRouteRoute,
   AuthenticatedPolicyPolicyIdRouteRoute: AuthenticatedPolicyPolicyIdRouteRoute,

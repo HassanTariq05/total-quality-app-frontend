@@ -1,9 +1,17 @@
-import { BadgePlus, LucideIcon } from 'lucide-react'
+import {
+  BadgePlus,
+  Building2,
+  Cog,
+  LucideIcon,
+  ShieldCheck,
+  Users,
+} from 'lucide-react'
 import DarkModeLogoCollapsed from '@/assets/total-quality-app-logo-dark-collapsed.png'
 // Adjust path
 import DarkModeLogo from '@/assets/total-quality-app-logo-dark.png'
 import LightModeLogoCollapsed from '@/assets/total-quality-app-logo-light-collapsed.png'
 import LightModeLogo from '@/assets/total-quality-app-logo-light.png'
+import { useAuthStore } from '@/stores/auth-store'
 import { useLayout } from '@/context/layout-provider'
 import { useTheme } from '@/context/theme-provider'
 import { useAccreditations } from '@/hooks/use-accreditations'
@@ -17,10 +25,15 @@ import {
 // import { AppTitle } from './app-title'
 import { sidebarData } from './data/sidebar-data'
 import { NavGroup } from './nav-group'
+import { SidebarData } from './types'
 
 export function AppSidebar() {
   const { collapsible, variant } = useLayout()
   const { data: accreditations } = useAccreditations()
+
+  const user = useAuthStore()
+
+  const isSuperAdmin = user?.auth?.user?.role?.name === 'Super Admin'
 
   const { theme } = useTheme()
 
@@ -35,16 +48,35 @@ export function AppSidebar() {
       url: `/accreditation/${acc.id}`,
     })) || []
 
-  accreditationItems.push({
-    title: 'Add Accreditation',
-    url: '/accreditation/create',
-    icon: BadgePlus,
-  })
+  isSuperAdmin
+    ? accreditationItems.push({
+        title: 'Add Accreditation',
+        url: '/accreditation/create',
+        icon: BadgePlus,
+      })
+    : []
 
-  const dynamicSidebarData = {
+  const administrationItem = {
+    title: 'Administration',
+    icon: Cog,
+    items: [
+      { title: 'Organizations', url: '/organizations', icon: Building2 },
+      { title: 'Roles', url: '/roles', icon: ShieldCheck },
+      { title: 'Users', url: '/users', icon: Users },
+    ],
+  }
+
+  const othersNavGroup = {
+    title: 'Others',
+    items: [administrationItem],
+  }
+
+  const dynamicSidebarData: SidebarData = {
     ...sidebarData,
-    navGroups: sidebarData.navGroups.map((group) => {
-      if (group.title === 'General') {
+    navGroups: [
+      ...sidebarData.navGroups.map((group) => {
+        if (group.title !== 'General') return group
+
         return {
           ...group,
           items: group.items.map((item) => {
@@ -54,9 +86,9 @@ export function AppSidebar() {
             return item
           }),
         }
-      }
-      return group
-    }),
+      }),
+      ...(isSuperAdmin ? [othersNavGroup] : []),
+    ] as any,
   }
 
   return (

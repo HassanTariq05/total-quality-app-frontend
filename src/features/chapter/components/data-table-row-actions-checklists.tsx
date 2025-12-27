@@ -2,6 +2,7 @@ import { DotsHorizontalIcon } from '@radix-ui/react-icons'
 import { useNavigate } from '@tanstack/react-router'
 import { type Row } from '@tanstack/react-table'
 import { Trash2, Pencil, Eye } from 'lucide-react'
+import { useHasPermission } from '@/utils/permissions'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -11,6 +12,7 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { PERMISSIONS } from '@/features/manage-role/types/permissions'
 import { chapterSchema } from '../data/schema'
 import { useChapters } from './chapters-provider'
 
@@ -30,6 +32,9 @@ export function DataTableRowActions<TData>({
   const handleViewChecklist = (id: string) => {
     navigate({ to: `/checklist/${id}` })
   }
+
+  const canEditChecklist = useHasPermission(PERMISSIONS.EDIT_CHECKLIST)
+  const canDeleteChecklist = useHasPermission(PERMISSIONS.DELETE_CHECKLIST)
 
   return (
     <DropdownMenu modal={false}>
@@ -53,29 +58,36 @@ export function DataTableRowActions<TData>({
             <Eye size={16} />
           </DropdownMenuShortcut>
         </DropdownMenuItem>
-        <DropdownMenuItem
-          onClick={() => {
-            setCurrentRow(checklist)
-            setOpen('update')
-          }}
-        >
-          Edit
-          <DropdownMenuShortcut>
-            <Pencil size={16} />
-          </DropdownMenuShortcut>
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem
-          onClick={() => {
-            setCurrentRow(checklist)
-            setOpen('delete-checklist')
-          }}
-        >
-          Delete
-          <DropdownMenuShortcut>
-            <Trash2 size={16} />
-          </DropdownMenuShortcut>
-        </DropdownMenuItem>
+        {canEditChecklist && (
+          <>
+            <DropdownMenuItem
+              onClick={() => {
+                setCurrentRow(checklist)
+                setOpen('update')
+              }}
+            >
+              Edit
+              <DropdownMenuShortcut>
+                <Pencil size={16} />
+              </DropdownMenuShortcut>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+          </>
+        )}
+
+        {canDeleteChecklist && (
+          <DropdownMenuItem
+            onClick={() => {
+              setCurrentRow(checklist)
+              setOpen('delete-checklist')
+            }}
+          >
+            Delete
+            <DropdownMenuShortcut>
+              <Trash2 size={16} />
+            </DropdownMenuShortcut>
+          </DropdownMenuItem>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   )

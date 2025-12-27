@@ -1,7 +1,8 @@
 import { useNavigate } from '@tanstack/react-router'
 import { Eye, Plus } from 'lucide-react'
-import { useAuthStore } from '@/stores/auth-store'
+import { useHasPermission } from '@/utils/permissions'
 import { Button } from '@/components/ui/button'
+import { PERMISSIONS } from '@/features/manage-role/types/permissions'
 import { useSubmissions } from './submissions-provider'
 
 type Props = {
@@ -11,15 +12,21 @@ type Props = {
 export function SubmissionsPrimaryButtons({ checklistId }: Props) {
   const navigate = useNavigate()
   const { setOpen } = useSubmissions()
-  const { auth } = useAuthStore()
 
   const handleViewEditor = () => {
     navigate({ to: `/checklist-editor/${checklistId}` })
   }
 
+  const canEditChecklistSubmission = useHasPermission(
+    PERMISSIONS.EDIT_CHECKLIST_SUBMISSION
+  )
+  const canCreateChecklistEditor = useHasPermission(
+    PERMISSIONS.CREATE_CHECKLIST_SUBMISSION
+  )
+
   return (
     <div className='flex gap-2'>
-      {auth?.user?.email !== 'demo.user@pilotorg.com' && (
+      {canEditChecklistSubmission && (
         <Button
           variant={'outline'}
           className='space-x-1'
@@ -29,9 +36,11 @@ export function SubmissionsPrimaryButtons({ checklistId }: Props) {
         </Button>
       )}
 
-      <Button className='space-x-1' onClick={() => setOpen('create')}>
-        <span>Create Submission</span> <Plus size={18} />
-      </Button>
+      {canCreateChecklistEditor && (
+        <Button className='space-x-1' onClick={() => setOpen('create')}>
+          <span>Create Submission</span> <Plus size={18} />
+        </Button>
+      )}
     </div>
   )
 }

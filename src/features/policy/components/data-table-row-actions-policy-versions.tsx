@@ -2,6 +2,7 @@ import { DotsHorizontalIcon } from '@radix-ui/react-icons'
 import { useNavigate } from '@tanstack/react-router'
 import { type Row } from '@tanstack/react-table'
 import { Trash2, Eye } from 'lucide-react'
+import { useHasPermission } from '@/utils/permissions'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -11,6 +12,7 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { PERMISSIONS } from '@/features/manage-role/types/permissions'
 import { PolicyVersionsSchema } from '../data/schema'
 import { usePolicyVersions } from './policy-versions-provider'
 
@@ -30,6 +32,10 @@ export function DataTableRowActions<TData>({
   const handleViewForm = (id: string) => {
     navigate({ to: `/policy-version/${id}` })
   }
+
+  const canDeletePolicyVersion = useHasPermission(
+    PERMISSIONS.DELETE_POLICY_VERSION
+  )
 
   return (
     <DropdownMenu modal={false}>
@@ -64,18 +70,22 @@ export function DataTableRowActions<TData>({
             <Pencil size={16} />
           </DropdownMenuShortcut>
         </DropdownMenuItem> */}
-        <DropdownMenuSeparator />
-        <DropdownMenuItem
-          onClick={() => {
-            setCurrentRow(form)
-            setOpen('delete')
-          }}
-        >
-          Delete
-          <DropdownMenuShortcut>
-            <Trash2 size={16} />
-          </DropdownMenuShortcut>
-        </DropdownMenuItem>
+        {canDeletePolicyVersion && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              onClick={() => {
+                setCurrentRow(form)
+                setOpen('delete')
+              }}
+            >
+              Delete
+              <DropdownMenuShortcut>
+                <Trash2 size={16} />
+              </DropdownMenuShortcut>
+            </DropdownMenuItem>
+          </>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   )

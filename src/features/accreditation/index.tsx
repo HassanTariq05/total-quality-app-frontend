@@ -1,5 +1,6 @@
 import { useParams } from '@tanstack/react-router'
 import { cn } from '@/lib/utils'
+import { useHasPermission } from '@/utils/permissions'
 import { useAccreditation } from '@/hooks/use-accreditations'
 import { useChapters } from '@/hooks/use-chapters'
 import { Badge } from '@/components/ui/badge'
@@ -11,6 +12,7 @@ import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ThemeSwitch } from '@/components/theme-switch'
+import { PERMISSIONS } from '../manage-role/types/permissions'
 import { badgeTypes } from '../users/data/data'
 import { AccreditaionBreadcrumb } from './components/breadcrumb'
 import { Chapters } from './components/chapters'
@@ -32,6 +34,9 @@ export function AccreditationView() {
     useChapters(accreditationId)
 
   const badgeColor = badgeTypes.get(accreditation?.status?.toLowerCase())
+
+  const canViewAccreditations = useHasPermission(PERMISSIONS.VIEW_ACCREDITATION)
+  const canViewChapters = useHasPermission(PERMISSIONS.VIEW_CHAPTER)
   return (
     <TasksProvider>
       <Header fixed>
@@ -47,40 +52,44 @@ export function AccreditationView() {
           <InfoSkeleton />
         ) : (
           <>
-            <AccreditaionBreadcrumb
-              accreditationId={accreditationId}
-              accreditationName={accreditation?.name || ''}
-            />
-            <div className='flex flex-wrap items-end justify-between gap-2'>
-              <div>
-                <div className='flex items-center gap-2'>
-                  <h2 className='text-2xl font-bold tracking-tight'>
-                    {accreditation?.name}
-                  </h2>
-                  <Badge
-                    variant='outline'
-                    className={cn(
-                      'h-6 min-h-0 px-2 py-0.5 text-sm capitalize',
-                      badgeColor
-                    )}
-                  >
-                    {accreditation?.status}
-                  </Badge>
-                </div>
+            {canViewAccreditations && (
+              <>
+                <AccreditaionBreadcrumb
+                  accreditationId={accreditationId}
+                  accreditationName={accreditation?.name || ''}
+                />
+                <div className='flex flex-wrap items-end justify-between gap-2'>
+                  <div>
+                    <div className='flex items-center gap-2'>
+                      <h2 className='text-2xl font-bold tracking-tight'>
+                        {accreditation?.name}
+                      </h2>
+                      <Badge
+                        variant='outline'
+                        className={cn(
+                          'h-6 min-h-0 px-2 py-0.5 text-sm capitalize',
+                          badgeColor
+                        )}
+                      >
+                        {accreditation?.status}
+                      </Badge>
+                    </div>
 
-                <p className='text-muted-foreground'>
-                  {accreditation?.description}
-                </p>
-              </div>
-              <TasksPrimaryButtons />
-            </div>
+                    <p className='text-muted-foreground'>
+                      {accreditation?.description}
+                    </p>
+                  </div>
+                  <TasksPrimaryButtons />
+                </div>
+              </>
+            )}
           </>
         )}
         <Separator />
         {isFetchingChapters ? (
           <DataTableSkeleton />
         ) : (
-          <Chapters data={chaptersData} />
+          <Chapters data={canViewChapters ? chaptersData : []} />
         )}
       </Main>
 

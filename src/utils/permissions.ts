@@ -6,19 +6,10 @@ export const hasPermission = (
   permission: PermissionValue
 ): boolean => {
   if (!user || !user.permissions) {
-    console.log(
-      `[Permission Check] User: ${user?.name ?? 'Unknown'} has no permissions`
-    )
     return false
   }
 
   const hasPerm = user.permissions.includes(permission)
-
-  console.log(
-    `[Permission Check] User: ${user.name} | Permission: ${permission} | Granted: ${hasPerm}`,
-    'User Permissions:',
-    user.permissions
-  )
 
   return hasPerm
 }

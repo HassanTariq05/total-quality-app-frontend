@@ -7,12 +7,14 @@ import { Loader2 } from 'lucide-react'
 import { useAuthStore } from '@/stores/auth-store'
 import { useFormBuilderStore } from '@/stores/useFormBuilderStore'
 import { cn } from '@/lib/utils'
+import { useHasPermission } from '@/utils/permissions'
 import { useUpdateChecklistSubmission } from '@/hooks/use-checklist-submissions'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
 import { Table, TableBody, TableRow, TableCell } from '@/components/ui/table'
+import { PERMISSIONS } from '@/features/manage-role/types/permissions'
 import { SignatureField } from './signature-field'
 
 type ChecklistViewerProps = {
@@ -28,6 +30,10 @@ export const ChecklistViewer: React.FC<ChecklistViewerProps> = ({
 }) => {
   const { form } = useFormBuilderStore()
   const { auth } = useAuthStore()
+
+  const canUpdateChecklist = useHasPermission(
+    PERMISSIONS.EDIT_CHECKLIST_SUBMISSION
+  )
 
   const [formData, setFormData] = useState<Record<string, any>>({})
 
@@ -403,7 +409,7 @@ export const ChecklistViewer: React.FC<ChecklistViewerProps> = ({
         ))}
       </div>
 
-      {form.fields?.length !== 0 && (
+      {form.fields?.length !== 0 && canUpdateChecklist && (
         <div className='flex justify-end pt-4'>
           <Button
             type='submit'

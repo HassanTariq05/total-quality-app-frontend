@@ -10,11 +10,23 @@ export const organizationQueryKeys = {
   byId: (id: string) => ['organizations', id] as const,
 }
 
-export const useOrganizations = () => {
-  const { getAll } = useOrganizationService()
+export const useOrganizations = (isSuperAdmin: boolean, orgId?: string) => {
+  const { getAll, getById } = useOrganizationService()
+
   return useQuery({
-    queryKey: organizationQueryKeys.all,
-    queryFn: () => getAll(),
+    queryKey: isSuperAdmin
+      ? organizationQueryKeys.all
+      : organizationQueryKeys.byId(orgId!),
+
+    queryFn: async () => {
+      if (isSuperAdmin) {
+        return getAll()
+      }
+      const org = await getById(orgId!)
+      return [org]
+    },
+
+    enabled: isSuperAdmin || !!orgId,
   })
 }
 

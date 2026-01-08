@@ -7,14 +7,17 @@ import { toast } from 'sonner'
 
 export const userQueryKeys = {
   all: ['users'] as const,
+  byOrg: (orgId: string) => ['users', 'org', orgId] as const,
   byId: (id: string) => ['users', id] as const,
 }
 
-export const useUsers = () => {
-  const { getAll } = useUserService()
+export const useUsers = (isSuperAdmin: boolean, orgId?: string) => {
+  const { getAll, getByOrgId } = useUserService()
+
   return useQuery({
-    queryKey: userQueryKeys.all,
-    queryFn: () => getAll(),
+    queryKey: isSuperAdmin ? userQueryKeys.all : userQueryKeys.byOrg(orgId!),
+    queryFn: () => (isSuperAdmin ? getAll() : getByOrgId(orgId!)),
+    enabled: isSuperAdmin || !!orgId,
   })
 }
 
@@ -27,6 +30,7 @@ export const useCreateUser = () => {
     onSuccess: () => {
       toast.success('User created successfully!')
       queryClient.invalidateQueries({ queryKey: userQueryKeys.all })
+      queryClient.invalidateQueries({ queryKey: ['users', 'org'] })
     },
     onError: () => {
       toast.error('Failed to create user.')
@@ -43,10 +47,9 @@ export const useUpdateUser = () => {
       update(id, payload),
     onSuccess: (_, { id }) => {
       toast.success('User updated successfully!')
-      queryClient.invalidateQueries({
-        queryKey: userQueryKeys.byId(id),
-      })
+      queryClient.invalidateQueries({ queryKey: userQueryKeys.byId(id) })
       queryClient.invalidateQueries({ queryKey: userQueryKeys.all })
+      queryClient.invalidateQueries({ queryKey: ['users', 'org'] })
     },
     onError: () => {
       toast.error('Failed to update user.')

@@ -24,7 +24,7 @@ export const useApiClient = (): AxiosInstance => {
     (response) => response,
     (error: AxiosError) => {
       if (error.response?.status === 401) {
-        // auth.reset()
+        auth.reset()
       }
       return Promise.reject(error)
     }
@@ -59,7 +59,7 @@ export const useAuthApiClient = (): AxiosInstance => {
     (response) => response,
     (error: AxiosError) => {
       if (error.response?.status === 401) {
-        // auth.reset()
+        auth.reset()
       }
       return Promise.reject(error)
     }

@@ -41,6 +41,11 @@ export const useUserService = () => {
     return data?.users
   }
 
+  const getByOrgId = async (orgId: string): Promise<User[]> => {
+    const { data } = await apiClient.get(`/users/org/${orgId}`)
+    return data?.users || []
+  }
+
   const create = async (payload: CreateUserPayload): Promise<User> => {
     const { data } = await apiClient.post('/register', payload)
     return data
@@ -54,5 +59,5 @@ export const useUserService = () => {
     return data
   }
 
-  return { getAll, create, update }
+  return { getAll, getByOrgId, create, update }
 }

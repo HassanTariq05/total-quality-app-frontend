@@ -1,11 +1,13 @@
 import { ReactNode, useEffect, useState } from 'react'
 import axios from 'axios'
+import { useRouter } from '@tanstack/react-router'
 import { Loader2 } from 'lucide-react'
 import { useAuthStore } from '@/stores/auth-store'
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const { auth } = useAuthStore()
   const [loading, setLoading] = useState(true)
+  const navigator = useRouter()
 
   useEffect(() => {
     const init = async () => {
@@ -25,8 +27,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         )
         auth.setUser(data.user)
       } catch (err) {
-        // auth.reset()
-        // navigate({ to: '/clerk/sign-in' })
+        auth.reset()
+        navigator.navigate({ to: '/sign-in' })
       } finally {
         setLoading(false)
       }

@@ -1,4 +1,6 @@
 import { getRouteApi } from '@tanstack/react-router'
+import { useAuthStore } from '@/stores/auth-store'
+import { useOrganizations } from '@/hooks/use-organizations'
 import { useRoles } from '@/hooks/use-roles'
 import { InfoSkeleton } from '@/components/ui/info-skeleton'
 import { ConfigDrawer } from '@/components/config-drawer'
@@ -19,7 +21,17 @@ export function Roles() {
   const search = route.useSearch()
   const navigate = route.useNavigate()
 
-  const { data: roles, isPending: isLoadingRoles } = useRoles()
+  const user = useAuthStore()
+
+  const isSuperAdmin = user?.auth?.user?.role?.name === 'Super Admin'
+
+  const orgId = user?.auth?.user?.organisation.id
+
+  const { data: roles, isPending: isLoadingRoles } = useRoles(
+    isSuperAdmin,
+    orgId
+  )
+  const { data: organizations } = useOrganizations(isSuperAdmin, orgId)
 
   return (
     <RolesProvider>
@@ -56,7 +68,7 @@ export function Roles() {
         )}
       </Main>
 
-      <RolesDialogs />
+      <RolesDialogs organizations={organizations} />
     </RolesProvider>
   )
 }

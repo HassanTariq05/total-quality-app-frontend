@@ -12,6 +12,7 @@ import DarkModeLogo from '@/assets/total-quality-app-logo-dark.png'
 import LightModeLogoCollapsed from '@/assets/total-quality-app-logo-light-collapsed.png'
 import LightModeLogo from '@/assets/total-quality-app-logo-light.png'
 import { useAuthStore } from '@/stores/auth-store'
+import { useHasPermission } from '@/utils/permissions'
 import { useLayout } from '@/context/layout-provider'
 import { useTheme } from '@/context/theme-provider'
 import { useAccreditations } from '@/hooks/use-accreditations'
@@ -22,6 +23,7 @@ import {
   SidebarRail,
   useSidebar,
 } from '@/components/ui/sidebar'
+import { PERMISSIONS } from '@/features/manage-role/types/permissions'
 // import { AppTitle } from './app-title'
 import { sidebarData } from './data/sidebar-data'
 import { NavGroup } from './nav-group'
@@ -31,9 +33,13 @@ export function AppSidebar() {
   const { collapsible, variant } = useLayout()
   const { data: accreditations } = useAccreditations()
 
+  const canAddAccreditation = useHasPermission(PERMISSIONS.CREATE_ACCREDITATION)
+
   const user = useAuthStore()
 
   const isSuperAdmin = user?.auth?.user?.role?.name === 'Super Admin'
+
+  const isAdministrator = user?.auth?.user?.role?.name === 'Administrator'
 
   const { theme } = useTheme()
 
@@ -48,7 +54,7 @@ export function AppSidebar() {
       url: `/accreditation/${acc.id}`,
     })) || []
 
-  isSuperAdmin
+  canAddAccreditation
     ? accreditationItems.push({
         title: 'Add Accreditation',
         url: '/accreditation/create',
@@ -87,7 +93,7 @@ export function AppSidebar() {
           }),
         }
       }),
-      ...(isSuperAdmin ? [othersNavGroup] : []),
+      ...(isSuperAdmin || isAdministrator ? [othersNavGroup] : []),
     ] as any,
   }
 

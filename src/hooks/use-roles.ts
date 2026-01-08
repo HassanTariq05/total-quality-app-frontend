@@ -7,14 +7,17 @@ import { toast } from 'sonner'
 
 export const roleQueryKeys = {
   all: ['roles'] as const,
+  byOrg: (orgId: string) => ['roles', 'org', orgId] as const,
   byId: (id: string) => ['roles', id] as const,
 }
 
-export const useRoles = () => {
-  const { getAll } = useRoleService()
+export const useRoles = (isSuperAdmin: boolean, orgId?: string) => {
+  const { getAll, getByOrgId } = useRoleService()
+
   return useQuery({
-    queryKey: roleQueryKeys.all,
-    queryFn: () => getAll(),
+    queryKey: isSuperAdmin ? roleQueryKeys.all : roleQueryKeys.byOrg(orgId!),
+    queryFn: () => (isSuperAdmin ? getAll() : getByOrgId(orgId!)),
+    enabled: isSuperAdmin || !!orgId,
   })
 }
 
@@ -36,9 +39,7 @@ export const useCreateRole = () => {
     onSuccess: () => {
       toast.success('Role created successfully!')
       queryClient.invalidateQueries({ queryKey: roleQueryKeys.all })
-    },
-    onError: () => {
-      toast.error('Failed to create role.')
+      queryClient.invalidateQueries({ queryKey: ['roles', 'org'] })
     },
   })
 }
@@ -52,13 +53,9 @@ export const useUpdateRole = () => {
       update(id, payload),
     onSuccess: (_, { id }) => {
       toast.success('Role updated successfully!')
-      queryClient.invalidateQueries({
-        queryKey: roleQueryKeys.byId(id),
-      })
+      queryClient.invalidateQueries({ queryKey: roleQueryKeys.byId(id) })
       queryClient.invalidateQueries({ queryKey: roleQueryKeys.all })
-    },
-    onError: () => {
-      toast.error('Failed to update role.')
+      queryClient.invalidateQueries({ queryKey: ['roles', 'org'] })
     },
   })
 }
@@ -72,9 +69,7 @@ export const useDeleteRole = () => {
     onSuccess: () => {
       toast.success('Role deleted successfully!')
       queryClient.invalidateQueries({ queryKey: roleQueryKeys.all })
-    },
-    onError: () => {
-      toast.error('Failed to delete role.')
+      queryClient.invalidateQueries({ queryKey: ['roles', 'org'] })
     },
   })
 }

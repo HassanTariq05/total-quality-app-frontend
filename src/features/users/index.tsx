@@ -1,4 +1,5 @@
 import { getRouteApi } from '@tanstack/react-router'
+import { useAuthStore } from '@/stores/auth-store'
 import { useOrganizations } from '@/hooks/use-organizations'
 import { useRoles } from '@/hooks/use-roles'
 import { useUsers } from '@/hooks/use-users'
@@ -15,17 +16,28 @@ import { UsersPrimaryButtons } from './components/users-primary-buttons'
 import { UsersProvider } from './components/users-provider'
 import { UsersTable } from './components/users-table'
 
-const route = getRouteApi('/_authenticated/users/')
+const route = getRouteApi('/_authenticated/users')
 
 export function Users() {
   const search = route.useSearch()
   const navigate = route.useNavigate()
+  const user = useAuthStore()
 
-  const { data: users, isPending: isLoadingUsers } = useUsers()
+  const isSuperAdmin = user?.auth?.user?.role?.name === 'Super Admin'
 
-  const { data: roles, isPending: isLoadingRoles } = useRoles()
+  const orgId = user?.auth?.user?.organisation.id
+
+  const { data: roles, isPending: isLoadingRoles } = useRoles(
+    isSuperAdmin,
+    orgId
+  )
   const { data: organizations, isPending: isLoadingOrganizations } =
-    useOrganizations()
+    useOrganizations(isSuperAdmin, orgId)
+
+  const { data: users, isPending: isLoadingUsers } = useUsers(
+    isSuperAdmin,
+    orgId
+  )
 
   return (
     <UsersProvider>

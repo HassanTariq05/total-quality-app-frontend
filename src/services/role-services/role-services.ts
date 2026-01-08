@@ -7,6 +7,7 @@ export interface Role {
   createdAt?: Date
   updatedAt?: Date
   permissions?: string[]
+  organisationId?: string
 }
 
 export type UpdateRolePayload = {
@@ -15,6 +16,7 @@ export type UpdateRolePayload = {
   createdAt?: Date
   updatedAt?: Date
   permissions?: string[]
+  organisationId?: string
 }
 
 export type CreateRolePayload = Omit<Role, 'id'>
@@ -29,6 +31,11 @@ export const useRoleService = () => {
 
   const getById = async (id: string): Promise<Role> => {
     const { data } = await apiClient.get(`/roles/${id}`)
+    return data
+  }
+
+  const getByOrgId = async (orgId: string): Promise<Role[]> => {
+    const { data } = await apiClient.get(`/roles/org/${orgId}`)
     return data
   }
 
@@ -49,5 +56,5 @@ export const useRoleService = () => {
     await apiClient.delete(`/roles/${id}`)
   }
 
-  return { getAll, getById, create, update, remove }
+  return { getAll, getById, getByOrgId, create, update, remove }
 }

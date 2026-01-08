@@ -27,15 +27,13 @@ export function ManageRoles() {
   const params = useParams({ from: '/_authenticated/manage-role/$roleId' })
   const { roleId } = params
 
-  const { data: roleData, isPending } = useRole(roleId)
+  const { data: roleData, isPending } = useRole(roleId) as any
   const updateRoleMutation = useUpdateRole()
 
-  // State to track selected permissions
   const [selectedPermissions, setSelectedPermissions] = useState<Set<string>>(
     new Set()
   )
 
-  // Initialize selected permissions from role data
   useEffect(() => {
     if (roleData?.permissions) {
       setSelectedPermissions(new Set(roleData.permissions))
@@ -60,6 +58,7 @@ export function ManageRoles() {
       payload: {
         ...roleData,
         permissions: Array.from(selectedPermissions),
+        organisationId: roleData?.organisation?.id as any,
       },
     })
   }

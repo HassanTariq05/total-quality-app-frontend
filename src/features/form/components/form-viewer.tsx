@@ -7,12 +7,14 @@ import { Loader2 } from 'lucide-react'
 import { useAuthStore } from '@/stores/auth-store'
 import { useFormBuilderStore } from '@/stores/useFormBuilderStore'
 import { cn } from '@/lib/utils'
+import { useHasPermission } from '@/utils/permissions'
 import { useUpdateFormSubmission } from '@/hooks/use-form-submissions'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
 import { Table, TableBody, TableRow, TableCell } from '@/components/ui/table'
+import { PERMISSIONS } from '@/features/manage-role/types/permissions'
 import { SignatureField } from './signature-field'
 
 type FormViewerProps = {
@@ -52,6 +54,10 @@ export const FormViewer: React.FC<FormViewerProps> = ({
       }
     }
   }, [formSubmissionData])
+
+  const canUpdateFormSubmission = useHasPermission(
+    PERMISSIONS.EDIT_FORM_SUBMISSION
+  )
 
   const buildSubmissionData = () => {
     const result: any[] = []
@@ -400,7 +406,7 @@ export const FormViewer: React.FC<FormViewerProps> = ({
         ))}
       </div>
 
-      {form.fields?.length !== 0 && (
+      {form.fields?.length !== 0 && canUpdateFormSubmission && (
         <div className='flex justify-end pt-4'>
           <Button
             type='submit'

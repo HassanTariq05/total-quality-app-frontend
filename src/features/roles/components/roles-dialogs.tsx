@@ -2,7 +2,11 @@ import { RolesActionDialog } from './roles-action-dialog'
 import { RolesDeleteDialog } from './roles-delete-dialog'
 import { useRoles } from './roles-provider'
 
-export function RolesDialogs() {
+interface Props {
+  organizations: any
+}
+
+export function RolesDialogs({ organizations }: Props) {
   const { open, setOpen, currentRow, setCurrentRow } = useRoles()
   return (
     <>
@@ -10,6 +14,7 @@ export function RolesDialogs() {
         key='role-add'
         open={open === 'add'}
         onOpenChange={() => setOpen('add')}
+        organizations={organizations}
       />
 
       {currentRow && (
@@ -24,6 +29,7 @@ export function RolesDialogs() {
               }, 500)
             }}
             currentRow={currentRow}
+            organizations={organizations}
           />
 
           <RolesDeleteDialog

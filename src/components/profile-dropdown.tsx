@@ -1,4 +1,3 @@
-import { useEffect } from 'react'
 import { useAuthStore } from '@/stores/auth-store'
 import useDialogState from '@/hooks/use-dialog-state'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -8,10 +7,10 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { SignOutDialog } from '@/components/sign-out-dialog'
+import { Badge } from './ui/badge'
 
 export function ProfileDropdown() {
   const [open, setOpen] = useDialogState()
@@ -30,10 +29,6 @@ export function ProfileDropdown() {
     return `${parts[0][0]}${parts[parts?.length - 1][0]}`.toUpperCase()
   }
 
-  useEffect(() => {
-    console.log('Auth: ', auth)
-  }, [auth])
-
   return (
     <>
       <DropdownMenu modal={false}>
@@ -45,21 +40,27 @@ export function ProfileDropdown() {
             </Avatar>
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent className='w-56' align='end' forceMount>
-          <DropdownMenuLabel className='font-normal'>
-            <div className='flex flex-col gap-1.5'>
-              <p className='text-sm leading-none font-medium'>
-                {auth?.user?.name || 'Unknown User'}
-              </p>
-              <p className='text-muted-foreground text-xs leading-none'>
-                {auth?.user?.email || ''}
-              </p>
+        <DropdownMenuContent className='w-56' align='end'>
+          <DropdownMenuLabel className='border-border/50 border-b p-3 font-normal'>
+            <div className='flex items-start gap-2'>
+              <div className='flex min-w-0 flex-col gap-1'>
+                <div className='flex flex-wrap items-center gap-2'>
+                  <p className='truncate text-sm leading-none font-semibold'>
+                    {auth?.user?.name || 'Unknown User'}
+                  </p>
+                  <Badge variant='secondary' className='px-2 py-0.5 text-xs'>
+                    {auth?.user?.role?.name || 'User'}
+                  </Badge>
+                </div>
+
+                <p className='text-muted-foreground truncate text-xs leading-none'>
+                  {auth?.user?.email || 'No email'}
+                </p>
+              </div>
             </div>
           </DropdownMenuLabel>
-          <DropdownMenuSeparator />
           <DropdownMenuItem onClick={() => setOpen(true)}>
             Sign out
-            {/* <DropdownMenuIcon ></DropdownMenuIcon> */}
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

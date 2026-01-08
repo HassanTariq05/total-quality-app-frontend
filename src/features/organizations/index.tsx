@@ -1,4 +1,5 @@
 import { getRouteApi } from '@tanstack/react-router'
+import { useAuthStore } from '@/stores/auth-store'
 import { useOrganizations } from '@/hooks/use-organizations'
 import { InfoSkeleton } from '@/components/ui/info-skeleton'
 import { ConfigDrawer } from '@/components/config-drawer'
@@ -19,8 +20,14 @@ export function Organizations() {
   const search = route.useSearch()
   const navigate = route.useNavigate()
 
+  const user = useAuthStore()
+
+  const isSuperAdmin = user?.auth?.user?.role?.name === 'Super Admin'
+
+  const orgId = user?.auth?.user?.organisation.id
+
   const { data: organizations, isPending: isLoadingOrganizations } =
-    useOrganizations()
+    useOrganizations(isSuperAdmin, orgId)
 
   return (
     <OrganizationsProvider>

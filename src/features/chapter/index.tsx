@@ -97,14 +97,8 @@ export function ChapterView() {
 
   const canViewChapter = useHasPermission(PERMISSIONS.VIEW_CHAPTER)
   const canViewForms = useHasPermission(PERMISSIONS.VIEW_FORM)
-  const canEditForms = useHasPermission(PERMISSIONS.EDIT_FORM)
-  const canDeleteForms = useHasPermission(PERMISSIONS.DELETE_FORM)
   const canViewChecklists = useHasPermission(PERMISSIONS.VIEW_CHECKLIST)
-  const canEditChecklists = useHasPermission(PERMISSIONS.EDIT_CHECKLIST)
-  const canDeleteChecklists = useHasPermission(PERMISSIONS.DELETE_CHECKLIST)
   const canViewPolicy = useHasPermission(PERMISSIONS.VIEW_POLICY)
-  const canEditPolicy = useHasPermission(PERMISSIONS.EDIT_POLICY)
-  const canDeletePolicy = useHasPermission(PERMISSIONS.DELETE_POLICY)
 
   return (
     <ChaptersProvider>

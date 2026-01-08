@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { useParams } from '@tanstack/react-router'
+import { useParams, useRouter } from '@tanstack/react-router'
 import { SuperDoc } from '@harbour-enterprises/superdoc'
 import '@harbour-enterprises/superdoc/style.css'
 import { useAuthStore } from '@/stores/auth-store'
@@ -30,6 +30,8 @@ export function PolicyVersionViewer() {
   const params = useParams({
     from: '/_authenticated/policy-version/$policyVersionId',
   })
+
+  const navigator = useRouter()
 
   const { policyVersionId } = params
 
@@ -521,8 +523,10 @@ export function PolicyVersionViewer() {
         },
         {
           onSuccess: (data) => {
+            navigator.navigate({
+              to: `/policy/${policyVersionData?.policy?.id}`,
+            })
             resetEditor({ keepToolbar: false, reinitWith: data })
-            console.log(`Action performed: ${action} — success`)
             setActiveAction(null)
           },
           onError: (err) => {

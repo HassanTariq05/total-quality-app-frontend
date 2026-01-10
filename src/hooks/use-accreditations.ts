@@ -3,16 +3,19 @@ import { useAccreditationService } from '@/services/accreditation-services/accre
 import { toast } from 'sonner'
 
 export const accreditationQueryKeys = {
-  all: ['accreditations'] as const,
+  all: (isSuperAdmin: boolean, orgId?: string) =>
+    ['accreditations', { isSuperAdmin, orgId }] as const,
+
   byId: (id: string) => ['accreditations', id] as const,
 }
 
-export const useAccreditations = () => {
-  const { getAll } = useAccreditationService()
+export const useAccreditations = (isSuperAdmin: boolean, orgId?: string) => {
+  const { getAccreditations } = useAccreditationService()
 
   return useQuery({
-    queryKey: accreditationQueryKeys.all,
-    queryFn: getAll,
+    queryKey: accreditationQueryKeys.all(isSuperAdmin, orgId),
+    queryFn: () => getAccreditations(isSuperAdmin, orgId),
+    enabled: isSuperAdmin || !!orgId,
   })
 }
 
@@ -34,7 +37,7 @@ export const useCreateAccreditation = () => {
     mutationFn: create,
     onSuccess: () => {
       toast.success('Accreditation created successfully!')
-      queryClient.invalidateQueries({ queryKey: accreditationQueryKeys.all })
+      queryClient.invalidateQueries({ queryKey: ['accreditations'] })
     },
     onError: () => {
       toast.error('Failed to create accreditation.')
@@ -49,12 +52,12 @@ export const useUpdateAccreditation = () => {
   return useMutation({
     mutationFn: ({ id, payload }: { id: string; payload: any }) =>
       update(id, payload),
-    onSuccess: (_, { id }) => {
+    onSuccess: (_, variables) => {
       toast.success('Accreditation updated successfully!')
       queryClient.invalidateQueries({
-        queryKey: accreditationQueryKeys.byId(id),
+        queryKey: accreditationQueryKeys.byId(variables.id),
       })
-      queryClient.invalidateQueries({ queryKey: accreditationQueryKeys.all })
+      queryClient.invalidateQueries({ queryKey: ['accreditations'] })
     },
     onError: () => {
       toast.error('Failed to update accreditation.')
@@ -70,7 +73,7 @@ export const useDeleteAccreditation = () => {
     mutationFn: remove,
     onSuccess: () => {
       toast.success('Accreditation deleted successfully!')
-      queryClient.invalidateQueries({ queryKey: accreditationQueryKeys.all })
+      queryClient.invalidateQueries({ queryKey: ['accreditations'] })
     },
     onError: () => {
       toast.error('Failed to delete accreditation.')

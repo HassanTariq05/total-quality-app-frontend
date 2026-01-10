@@ -1,7 +1,6 @@
 import { getRouteApi } from '@tanstack/react-router'
 import { useAuthStore } from '@/stores/auth-store'
 import { useOrganizations } from '@/hooks/use-organizations'
-import { useRoles } from '@/hooks/use-roles'
 import { useUsers } from '@/hooks/use-users'
 import { InfoSkeleton } from '@/components/ui/info-skeleton'
 import { ConfigDrawer } from '@/components/config-drawer'
@@ -27,17 +26,12 @@ export function Users() {
 
   const orgId = user?.auth?.user?.organisation.id
 
-  const { data: roles, isPending: isLoadingRoles } = useRoles(
-    isSuperAdmin,
-    orgId
-  )
   const { data: organizations, isPending: isLoadingOrganizations } =
     useOrganizations(isSuperAdmin, orgId)
 
-  const { data: users, isPending: isLoadingUsers } = useUsers(
-    isSuperAdmin,
-    orgId
-  )
+  const { data: users, isPending, isFetching } = useUsers(isSuperAdmin, orgId)
+
+  const isLoadingUsers = isPending || isFetching
 
   return (
     <UsersProvider>
@@ -50,7 +44,7 @@ export function Users() {
       </Header>
 
       <Main className='flex flex-1 flex-col gap-4 sm:gap-6'>
-        {isLoadingUsers || isLoadingRoles || isLoadingOrganizations ? (
+        {isLoadingUsers || isLoadingOrganizations ? (
           <>
             <InfoSkeleton />
             <DataTableSkeleton />
@@ -76,7 +70,7 @@ export function Users() {
         )}
       </Main>
 
-      <UsersDialogs roles={roles} organizations={organizations} />
+      <UsersDialogs organizations={organizations} />
     </UsersProvider>
   )
 }

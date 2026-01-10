@@ -42,10 +42,16 @@ export const useFormSubmissionService = () => {
 
   const getByOrganisationIdAndFormId = async (
     organisationId: string,
-    formId: string
+    formId: string,
+    keyword: string
   ): Promise<FormSubmission> => {
     const { data } = await apiClient.get(
-      `/formSubmissions/organisationId/${organisationId}/formId/${formId}`
+      `/formSubmissions/organisationId/${organisationId}/formId/${formId}`,
+      {
+        params: {
+          keyword: keyword.trim() || undefined,
+        },
+      }
     )
     return data
   }

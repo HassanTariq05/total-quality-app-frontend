@@ -22,7 +22,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { DataTablePagination, DataTableToolbar } from '@/components/data-table'
+import { DataTablePagination } from '@/components/data-table'
 import { DataTableBulkActions } from './data-table-bulk-actions'
 import { usersColumns as columns } from './users-columns'
 
@@ -98,7 +98,7 @@ export function UsersTable({ data, search, navigate }: DataTableProps) {
         'flex flex-1 flex-col gap-4'
       )}
     >
-      <DataTableToolbar
+      {/* <DataTableToolbar
         table={table}
         searchPlaceholder='Filter users...'
         searchKey='name'
@@ -112,7 +112,7 @@ export function UsersTable({ data, search, navigate }: DataTableProps) {
             ],
           },
         ]}
-      />
+      /> */}
       <div className='overflow-hidden rounded-md border'>
         <Table>
           <TableHeader>

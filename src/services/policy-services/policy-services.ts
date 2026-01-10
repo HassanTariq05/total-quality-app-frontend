@@ -41,7 +41,8 @@ export const usePolicyService = () => {
   const getAll = async (
     chapterId: string,
     page = 0,
-    size = 10
+    size = 10,
+    keyword = ''
   ): Promise<PolicyPaginatedResponse> => {
     const { data } = await apiClient.get(
       `/policies/getAllByChapterId/${chapterId}`,
@@ -49,6 +50,7 @@ export const usePolicyService = () => {
         params: {
           page,
           size,
+          keyword: keyword.trim() || undefined,
         },
       }
     )

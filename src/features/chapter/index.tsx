@@ -40,42 +40,92 @@ export function ChapterView() {
 
   const [formPage, setFormPage] = useState(0)
   const [formPageSize, setFormPageSize] = useState(10)
+  const [searchKeyword, setSearchKeyword] = useState<string | null>(null)
+  const [debouncedKeyword, setDebouncedKeyword] = useState(searchKeyword)
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedKeyword(searchKeyword)
+    }, 500)
+
+    return () => clearTimeout(handler)
+  }, [searchKeyword])
 
   const [checklistPage, setChecklistPage] = useState(0)
   const [checklistPageSize, setChecklistPageSize] = useState(10)
+  const [checklistSearchKeyword, setChecklistSearchKeyword] = useState<
+    string | null
+  >(null)
+  const [debouncedChecklistKeyword, setDebouncedChecklistKeyword] = useState(
+    checklistSearchKeyword
+  )
 
   const [policyPage, setPolicyPage] = useState(0)
   const [policyPageSize, setPolicyPageSize] = useState(10)
+  const [policySearchKeyword, setPolicySearchKeyword] = useState<string | null>(
+    null
+  )
+  const [debouncedPolicyKeyword, setDebouncedPolicyKeyword] =
+    useState(policySearchKeyword)
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedChecklistKeyword(checklistSearchKeyword)
+    }, 500)
+
+    return () => clearTimeout(handler)
+  }, [checklistSearchKeyword])
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedPolicyKeyword(policySearchKeyword)
+    }, 500)
+
+    return () => clearTimeout(handler)
+  }, [policySearchKeyword])
 
   const { data: chapter, isLoading: isFetchingChapters } = useChapter(chapterId)
-  const { data: formsData = null, isLoading: isFetchingForms } = useForms(
+  const {
+    data: formsData = null,
+    isLoading: isFetchingForms,
+    isRefetching: isRefetchingForms,
+  } = useForms(
     chapterId,
     formPage,
     formPageSize,
+    debouncedKeyword || '',
     selectedTab === 'forms'
   )
 
   const forms = formsData?.content || []
   const totalFormPages = formsData?.totalPages || 0
 
-  const { data: checklistsData = null, isLoading: isFetchingChecklists } =
-    useChecklists(
-      chapterId,
-      checklistPage,
-      checklistPageSize,
-      selectedTab === 'checklists'
-    )
+  const {
+    data: checklistsData = null,
+    isLoading: isFetchingChecklists,
+    isRefetching: isRefetchingChecklists,
+  } = useChecklists(
+    chapterId,
+    checklistPage,
+    checklistPageSize,
+    debouncedChecklistKeyword || '',
+    selectedTab === 'checklists'
+  )
 
   const checklists = checklistsData?.content || []
   const totalChecklistPages = checklistsData?.totalPages || 0
 
-  const { data: policiesData = null, isLoading: isFetchingPolicies } =
-    usePolicies(
-      chapterId,
-      policyPage,
-      policyPageSize,
-      selectedTab === 'policies'
-    )
+  const {
+    data: policiesData = null,
+    isLoading: isFetchingPolicies,
+    isRefetching: isRefetchingPolicies,
+  } = usePolicies(
+    chapterId,
+    policyPage,
+    policyPageSize,
+    debouncedPolicyKeyword || '',
+    selectedTab === 'policies'
+  )
 
   const policies = policiesData?.content || []
   const totalPolicyPages = policiesData?.totalPages || 0
@@ -185,6 +235,8 @@ export function ChapterView() {
                     totalPages={totalFormPages}
                     onPageChange={setFormPage}
                     onPageSizeChange={setFormPageSize}
+                    loading={isFetchingForms || isRefetchingForms}
+                    setSearchKeyword={setSearchKeyword}
                   />
                 )}
               </>
@@ -204,6 +256,8 @@ export function ChapterView() {
                     totalPages={totalChecklistPages}
                     onPageChange={setChecklistPage}
                     onPageSizeChange={setChecklistPageSize}
+                    loading={isFetchingChecklists || isRefetchingChecklists}
+                    setSearchKeyword={setChecklistSearchKeyword}
                   />
                 )}
               </>
@@ -223,6 +277,8 @@ export function ChapterView() {
                     totalPages={totalPolicyPages}
                     onPageChange={setPolicyPage}
                     onPageSizeChange={setPolicyPageSize}
+                    loading={isFetchingPolicies || isRefetchingPolicies}
+                    setSearchKeyword={setPolicySearchKeyword}
                   />
                 )}
               </>

@@ -42,7 +42,8 @@ export const useChecklistService = () => {
   const getAll = async (
     chapterId: string,
     page = 0,
-    size = 10
+    size = 10,
+    keyword = ''
   ): Promise<ChecklistPaginatedResponse> => {
     const { data } = await apiClient.get(
       `/checklists/getAllByChapterId/${chapterId}`,
@@ -50,12 +51,12 @@ export const useChecklistService = () => {
         params: {
           page,
           size,
+          keyword: keyword.trim() || undefined,
         },
       }
     )
     return data
   }
-
   const getById = async (id: string): Promise<Checklist> => {
     const { data } = await apiClient.get(`/checklists/${id}`)
     return data

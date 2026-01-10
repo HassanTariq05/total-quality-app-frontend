@@ -1,4 +1,6 @@
+import { useEffect, useState } from 'react'
 import { useParams } from '@tanstack/react-router'
+import { useDebounce } from 'use-debounce'
 import { useAuthStore } from '@/stores/auth-store'
 import { cn } from '@/lib/utils'
 import { useHasPermission } from '@/utils/permissions'
@@ -7,7 +9,6 @@ import { useForm } from '@/hooks/use-forms'
 import { Badge } from '@/components/ui/badge'
 import { InfoSkeleton } from '@/components/ui/info-skeleton'
 import { ConfigDrawer } from '@/components/config-drawer'
-import { DataTableSkeleton } from '@/components/data-table/data-table-skeleton'
 import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
 import { ProfileDropdown } from '@/components/profile-dropdown'
@@ -28,12 +29,23 @@ export function FormView() {
   const { data: form, isLoading: isLoadingForm } = useForm(formId)
   const badgeColor = badgeTypes.get(form?.status?.toLowerCase())
 
-  const { data: submissions = [], isLoading: isLoadingSubmissions } =
-    useGetFormSubmissionByOrgIdAndFormId(
-      auth?.user?.organisation?.id || '',
-      formId,
-      { enabled: true }
-    )
+  const [searchKeyword, setSearchKeyword] = useState<string | null>(null)
+  const [debouncedKeyword] = useDebounce(searchKeyword, 500)
+
+  const {
+    data: submissions = [],
+    isLoading: isLoadingSubmissions,
+    isRefetching,
+  } = useGetFormSubmissionByOrgIdAndFormId(
+    auth?.user?.organisation?.id || '',
+    formId,
+    debouncedKeyword || '',
+    { enabled: true }
+  )
+
+  useEffect(() => {
+    console.log('Keyword: ', debouncedKeyword)
+  }, [debouncedKeyword])
 
   const canViewForm = useHasPermission(PERMISSIONS.VIEW_FORM)
   const canViewFormSubmissions = useHasPermission(
@@ -95,12 +107,12 @@ export function FormView() {
           </>
         )}
 
-        {isLoadingSubmissions ? (
-          <DataTableSkeleton />
-        ) : (
-          <>
-            {canViewFormSubmissions && <FormSubmissions data={submissions} />}
-          </>
+        {canViewFormSubmissions && (
+          <FormSubmissions
+            data={submissions}
+            loading={isLoadingSubmissions || isRefetching}
+            setSearchKeyword={setSearchKeyword}
+          />
         )}
       </Main>
 

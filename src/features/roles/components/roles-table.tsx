@@ -21,7 +21,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { DataTablePagination, DataTableToolbar } from '@/components/data-table'
+import { DataTablePagination } from '@/components/data-table'
 import { type Role } from '../data/schema'
 import { DataTableBulkActions } from './data-table-bulk-actions'
 import { rolesColumns as columns } from './roles-columns'
@@ -100,7 +100,7 @@ export function RolesTable({ data, search, navigate }: DataTableProps) {
         'flex flex-1 flex-col gap-4'
       )}
     >
-      <DataTableToolbar
+      {/* <DataTableToolbar
         table={table}
         searchPlaceholder='Filter roles...'
         searchKey='name'
@@ -114,7 +114,7 @@ export function RolesTable({ data, search, navigate }: DataTableProps) {
             ],
           },
         ]}
-      />
+      /> */}
       <div className='overflow-hidden rounded-md border'>
         <Table>
           <TableHeader>

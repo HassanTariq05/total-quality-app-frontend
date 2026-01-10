@@ -16,13 +16,14 @@ export const useForms = (
   chapterId: string,
   page: number = 0,
   size: number = 10,
+  keyword: string = '',
   enabled: boolean = true
 ) => {
   const { getAll } = useFormService()
 
   return useQuery({
-    queryKey: [...formQueryKeys.byId(chapterId), { page, size }],
-    queryFn: () => getAll(chapterId, page, size),
+    queryKey: [...formQueryKeys.byId(chapterId), { page, size, keyword }],
+    queryFn: () => getAll(chapterId, page, size, keyword),
     enabled: !!chapterId && enabled,
     placeholderData: keepPreviousData,
   })

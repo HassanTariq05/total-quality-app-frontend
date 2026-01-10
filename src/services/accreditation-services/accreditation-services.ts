@@ -13,6 +13,26 @@ export type UpdateAccreditationPayload = Partial<CreateAccreditationPayload>
 export const useAccreditationService = () => {
   const apiClient = useApiClient()
 
+  const getAccreditations = async (
+    isSuperAdmin: boolean,
+    orgId?: string
+  ): Promise<Accreditation[]> => {
+    if (isSuperAdmin) {
+      const { data } = await apiClient.get('/accreditations')
+      return data
+    }
+
+    // Non-super admin → get accreditations for specific organization
+    if (!orgId) {
+      throw new Error('Organization ID is required for non-super admin users')
+    }
+
+    const { data } = await apiClient.get(
+      `/organizations/${orgId}/accreditations`
+    )
+    return data
+  }
+
   const getAll = async (): Promise<Accreditation[]> => {
     const { data } = await apiClient.get('/accreditations')
     return data
@@ -42,5 +62,5 @@ export const useAccreditationService = () => {
     await apiClient.delete(`/accreditations/${id}`)
   }
 
-  return { getAll, getById, create, update, remove }
+  return { getAll, getAccreditations, getById, create, update, remove }
 }

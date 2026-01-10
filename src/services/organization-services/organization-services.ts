@@ -9,6 +9,8 @@ export interface Organization {
   status: 'active' | 'inactive'
   createdAt?: Date
   updatedAt?: Date
+  accreditations?: string[] | undefined
+  accreditationIds?: string[] | undefined
 }
 
 export type CreateOrganizationPayload = Omit<Organization, 'id'>

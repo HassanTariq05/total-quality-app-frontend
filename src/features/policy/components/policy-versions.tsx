@@ -22,7 +22,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { DataTablePagination, DataTableToolbar } from '@/components/data-table'
+import { DataTablePagination } from '@/components/data-table'
 import { DataTableBulkActions } from './data-table-bulk-actions'
 import { PolicyVersionsColumns as columns } from './policy-version-columns'
 
@@ -107,10 +107,6 @@ export function PolicyVersions({ data }: DataTableProps) {
       )}
     >
       <h4 className='text-2xl font-bold tracking-tight'>Policy Versions</h4>
-      <DataTableToolbar
-        table={table}
-        searchPlaceholder='Filter by title or description...'
-      />
       <div className='overflow-hidden rounded-md border'>
         <Table>
           <TableHeader>

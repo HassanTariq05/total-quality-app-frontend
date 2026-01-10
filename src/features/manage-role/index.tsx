@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useParams } from '@tanstack/react-router'
-import { ChevronDown } from 'lucide-react'
+import { ChevronDown, Loader2 } from 'lucide-react'
 import { useRole } from '@/hooks/use-roles'
 import { useUpdateRole } from '@/hooks/use-roles'
 import { Button } from '@/components/ui/button'
@@ -86,7 +86,14 @@ export function ManageRoles() {
             onClick={handleSave}
             disabled={updateRoleMutation.isPending}
           >
-            Save Changes
+            {updateRoleMutation.isPending ? (
+              <div className='flex items-center gap-2'>
+                <Loader2 className='h-4 w-4 animate-spin' />
+                Saving...
+              </div>
+            ) : (
+              'Save Changes'
+            )}
           </Button>
         </div>
         {isPending ? (
@@ -96,50 +103,84 @@ export function ManageRoles() {
           </>
         ) : (
           <div className='flex flex-wrap items-start gap-6'>
-            {permissionsData.map((permission) => (
-              <Card
-                key={permission.id}
-                className='w-full rounded-xl md:w-[calc(50%-0.75rem)]'
-              >
-                <Collapsible>
-                  <CardHeader className='gap-0'>
-                    {' '}
-                    <CollapsibleTrigger className='group flex w-full items-center justify-between'>
-                      <CardTitle className='text-base font-semibold'>
-                        {permission.name}
-                      </CardTitle>
-                      <ChevronDown className='text-muted-foreground h-4 w-4 transition-transform data-[state=open]:rotate-180' />
-                    </CollapsibleTrigger>{' '}
-                  </CardHeader>
+            {permissionsData.map((permission) => {
+              const allActionValues = permission.actions.map((a) => a.value)
+              const allSelected = allActionValues.every((val) =>
+                selectedPermissions.has(val)
+              )
 
-                  <CollapsibleContent>
-                    <CardContent className='space-y-2 pt-2'>
-                      {permission.actions.map((action) => {
-                        const isChecked = selectedPermissions.has(action.value)
-                        const checkboxId = `${permission.id}-${action.value}`
+              const toggleAll = () => {
+                setSelectedPermissions((prev) => {
+                  const newSet = new Set(prev)
+                  if (allSelected) {
+                    // remove all
+                    allActionValues.forEach((val) => newSet.delete(val))
+                  } else {
+                    // add all
+                    allActionValues.forEach((val) => newSet.add(val))
+                  }
+                  return newSet
+                })
+              }
 
-                        return (
-                          <label
-                            key={action.value}
-                            htmlFor={checkboxId}
-                            onClick={(e) => {
-                              e.preventDefault()
-                              togglePermission(action.value)
-                            }}
-                            className='hover:bg-muted/50 active:bg-muted flex cursor-pointer items-center justify-between rounded-lg border px-4 py-2 transition-colors'
+              return (
+                <Card
+                  key={permission.id}
+                  className='w-[calc((100%-1.5rem)/3.1)] rounded-xl'
+                >
+                  <Collapsible>
+                    <CardHeader className='gap-0'>
+                      <CollapsibleTrigger className='group flex w-full items-center justify-between'>
+                        <CardTitle className='flex w-full items-center justify-between text-base font-semibold'>
+                          <span>{permission.name}</span>
+
+                          <div
+                            className='mr-2 flex items-center'
+                            onClick={(e) => e.stopPropagation()}
                           >
-                            <span className='text-sm font-medium'>
-                              {action.label}
-                            </span>
-                            <Checkbox checked={isChecked} id={checkboxId} />
-                          </label>
-                        )
-                      })}
-                    </CardContent>
-                  </CollapsibleContent>
-                </Collapsible>
-              </Card>
-            ))}
+                            <Checkbox
+                              checked={allSelected}
+                              onCheckedChange={toggleAll}
+                              aria-label={`Select all ${permission.name} permissions`}
+                            />
+                          </div>
+                        </CardTitle>
+
+                        <ChevronDown className='text-muted-foreground h-4 w-4 transition-transform data-[state=open]:rotate-180' />
+                      </CollapsibleTrigger>
+                    </CardHeader>
+
+                    <CollapsibleContent>
+                      <CardContent className='space-y-2 pt-2'>
+                        {permission.actions.map((action) => {
+                          const isChecked = selectedPermissions.has(
+                            action.value
+                          )
+                          const checkboxId = `${permission.id}-${action.value}`
+
+                          return (
+                            <label
+                              key={action.value}
+                              htmlFor={checkboxId}
+                              onClick={(e) => {
+                                e.preventDefault()
+                                togglePermission(action.value)
+                              }}
+                              className='hover:bg-muted/50 active:bg-muted flex cursor-pointer items-center justify-between rounded-lg border px-4 py-2 transition-colors'
+                            >
+                              <span className='text-sm font-medium'>
+                                {action.label}
+                              </span>
+                              <Checkbox checked={isChecked} id={checkboxId} />
+                            </label>
+                          )
+                        })}
+                      </CardContent>
+                    </CollapsibleContent>
+                  </Collapsible>
+                </Card>
+              )
+            })}
           </div>
         )}
       </Main>

@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { useParams } from '@tanstack/react-router'
 import { useAuthStore } from '@/stores/auth-store'
 import { cn } from '@/lib/utils'
@@ -7,7 +8,6 @@ import { useChecklist } from '@/hooks/use-checklists'
 import { Badge } from '@/components/ui/badge'
 import { InfoSkeleton } from '@/components/ui/info-skeleton'
 import { ConfigDrawer } from '@/components/config-drawer'
-import { DataTableSkeleton } from '@/components/data-table/data-table-skeleton'
 import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
 import { ProfileDropdown } from '@/components/profile-dropdown'
@@ -32,12 +32,32 @@ export function ChecklistView() {
 
   const badgeColor = badgeTypes.get(form?.status?.toLowerCase())
 
-  const { data: submissions = [], isLoading: isLoadingSubmissions } =
-    useGetChecklistSubmissionByOrgIdAndChecklistId(
-      auth?.user?.organisation?.id || '',
-      checklistId,
-      { enabled: true }
-    )
+  const [searchKeyword, setSearchKeyword] = useState<string | null>(null)
+  const [debouncedKeyword, setDebouncedKeyword] = useState(searchKeyword)
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedKeyword(searchKeyword)
+    }, 500)
+
+    return () => clearTimeout(handler)
+  }, [searchKeyword])
+
+  const {
+    data: submissions = [],
+    isLoading: isLoadingSubmissions,
+    isRefetching,
+    refetch,
+  } = useGetChecklistSubmissionByOrgIdAndChecklistId(
+    auth?.user?.organisation?.id || '',
+    checklistId,
+    debouncedKeyword || '',
+    { enabled: true }
+  )
+
+  useEffect(() => {
+    refetch()
+  }, [debouncedKeyword, refetch])
 
   const canViewChecklist = useHasPermission(PERMISSIONS.VIEW_CHECKLIST)
   const canViewCheclistSubmissions = useHasPermission(
@@ -99,14 +119,12 @@ export function ChecklistView() {
           </>
         )}
 
-        {isLoadingSubmissions ? (
-          <DataTableSkeleton />
-        ) : (
-          <>
-            {canViewCheclistSubmissions && (
-              <ChecklistSubmissions data={submissions} />
-            )}
-          </>
+        {canViewCheclistSubmissions && (
+          <ChecklistSubmissions
+            data={submissions}
+            loading={isLoadingSubmissions || isRefetching}
+            setSearchKeyword={setSearchKeyword}
+          />
         )}
       </Main>
 

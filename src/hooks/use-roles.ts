@@ -1,4 +1,9 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  UseQueryOptions,
+} from '@tanstack/react-query'
 import {
   UpdateRolePayload,
   useRoleService,
@@ -7,7 +12,7 @@ import { toast } from 'sonner'
 
 export const roleQueryKeys = {
   all: ['roles'] as const,
-  byOrg: (orgId: string) => ['roles', 'org', orgId] as const,
+  byOrg: (orgId?: string) => ['roles', 'org', orgId] as const,
   byId: (id: string) => ['roles', id] as const,
 }
 
@@ -21,6 +26,22 @@ export const useRoles = (isSuperAdmin: boolean, orgId?: string) => {
   })
 }
 
+export const useRolesByOrg = (
+  orgId?: string,
+  options?: Pick<
+    UseQueryOptions<any, Error>,
+    'enabled' | 'staleTime' | 'select'
+  >
+) => {
+  const { getByOrgId } = useRoleService()
+
+  return useQuery({
+    queryKey: roleQueryKeys.byOrg(orgId),
+    queryFn: () => getByOrgId(orgId!),
+    enabled: !!orgId && (options?.enabled ?? true),
+    ...options,
+  })
+}
 export const useRole = (id: string) => {
   const { getById } = useRoleService()
   return useQuery({

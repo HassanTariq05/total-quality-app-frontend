@@ -3,11 +3,10 @@ import { UsersInviteDialog } from './users-invite-dialog'
 import { useUsers } from './users-provider'
 
 interface Props {
-  roles: any
   organizations: any
 }
 
-export function UsersDialogs({ roles, organizations }: Props) {
+export function UsersDialogs({ organizations }: Props) {
   const { open, setOpen, currentRow, setCurrentRow } = useUsers()
   return (
     <>
@@ -15,7 +14,6 @@ export function UsersDialogs({ roles, organizations }: Props) {
         key='user-add'
         open={open === 'add'}
         onOpenChange={() => setOpen('add')}
-        roles={roles}
         organizations={organizations}
       />
 
@@ -37,7 +35,6 @@ export function UsersDialogs({ roles, organizations }: Props) {
               }, 500)
             }}
             currentRow={currentRow}
-            roles={roles}
             organizations={organizations}
           />
 

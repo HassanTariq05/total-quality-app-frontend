@@ -22,7 +22,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { DataTablePagination, DataTableToolbar } from '@/components/data-table'
+import { DataTablePagination } from '@/components/data-table'
+import { DataTableToolbarWithDebounce } from '@/features/chapter/components/data-table-toolbar-debounced'
 import { checklistColumns as columns } from './checklists-columns'
 import { DataTableBulkActions } from './data-table-bulk-actions'
 
@@ -30,9 +31,15 @@ const route = getRouteApi('/_authenticated/checklist/$checklistId')
 
 type DataTableProps = {
   data: any
+  loading?: boolean
+  setSearchKeyword: (searchKeyword: string) => void
 }
 
-export function ChecklistSubmissions({ data }: DataTableProps) {
+export function ChecklistSubmissions({
+  data,
+  loading,
+  setSearchKeyword,
+}: DataTableProps) {
   // Local UI-only states
   const [rowSelection, setRowSelection] = useState({})
   const [sorting, setSorting] = useState<SortingState>([])
@@ -44,15 +51,7 @@ export function ChecklistSubmissions({ data }: DataTableProps) {
   // const [pagination, onPaginationChange] = useState<PaginationState>({ pageIndex: 0, pageSize: 10 })
 
   // Synced with URL states (updated to match route search schema defaults)
-  const {
-    globalFilter,
-    onGlobalFilterChange,
-    columnFilters,
-    onColumnFiltersChange,
-    pagination,
-    onPaginationChange,
-    ensurePageInRange,
-  } = useTableUrlState({
+  const { ensurePageInRange } = useTableUrlState({
     search: route.useSearch(),
     navigate: route.useNavigate(),
     pagination: { defaultPage: 1, defaultPageSize: 10 },
@@ -68,9 +67,6 @@ export function ChecklistSubmissions({ data }: DataTableProps) {
       sorting,
       columnVisibility,
       rowSelection,
-      columnFilters,
-      globalFilter,
-      pagination,
     },
     enableRowSelection: true,
     onRowSelectionChange: setRowSelection,
@@ -89,9 +85,6 @@ export function ChecklistSubmissions({ data }: DataTableProps) {
     getSortedRowModel: getSortedRowModel(),
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
-    onPaginationChange,
-    onGlobalFilterChange,
-    onColumnFiltersChange,
   })
 
   const pageCount = table.getPageCount()
@@ -109,9 +102,9 @@ export function ChecklistSubmissions({ data }: DataTableProps) {
       <h4 className='text-2xl font-bold tracking-tight'>
         Checklist Submissions
       </h4>
-      <DataTableToolbar
-        table={table}
-        searchPlaceholder='Filter by title or description...'
+      <DataTableToolbarWithDebounce
+        searchPlaceholder='Filter by title...'
+        onSearchChange={setSearchKeyword}
       />
       <div className='overflow-hidden rounded-md border'>
         <Table>
@@ -141,7 +134,34 @@ export function ChecklistSubmissions({ data }: DataTableProps) {
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
+            {loading ? (
+              Array.from({ length: 5 }).map((_, index) => (
+                <TableRow
+                  key={`skeleton-${index}`}
+                  className='hover:bg-transparent'
+                >
+                  {columns.map((column, colIndex) => (
+                    <TableCell
+                      key={colIndex}
+                      className={cn(
+                        'h-13',
+                        column.meta?.className,
+                        column.meta?.tdClassName
+                      )}
+                    >
+                      <div
+                        className={cn(
+                          'bg-muted/70 h-6 w-full animate-pulse rounded-md',
+                          colIndex === 0 && 'w-3/4',
+                          colIndex === 1 && 'w-1/2',
+                          colIndex === columns.length - 1 && 'mx-auto w-24'
+                        )}
+                      />
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
@@ -166,7 +186,7 @@ export function ChecklistSubmissions({ data }: DataTableProps) {
             ) : (
               <TableRow>
                 <TableCell
-                  colSpan={columns?.length}
+                  colSpan={columns.length}
                   className='h-24 text-center'
                 >
                   No results.

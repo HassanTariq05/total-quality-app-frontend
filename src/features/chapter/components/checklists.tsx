@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { getRouteApi } from '@tanstack/react-router'
 import {
   flexRender,
@@ -15,19 +15,22 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { DataTablePagination, DataTableToolbar } from '@/components/data-table'
+import { DataTablePagination } from '@/components/data-table'
 import { checklistColumns as columns } from './checklists-columns'
 import { DataTableBulkActions } from './data-table-bulk-actions'
+import { DataTableToolbarWithDebounce } from './data-table-toolbar-debounced'
 
 const route = getRouteApi('/_authenticated/chapter/$chapterId')
 
 type DataTableProps = {
-  data: any
+  data: any[]
   page: number
   pageSize: number
   totalPages: number
-  onPageChange: (page: number) => void
-  onPageSizeChange: (page: number) => void
+  onPageChange: (pageIndex: number) => void
+  onPageSizeChange: (size: number) => void
+  loading?: boolean
+  setSearchKeyword: (searchKeyword: string) => void
 }
 
 export function Checklists({
@@ -37,18 +40,11 @@ export function Checklists({
   totalPages,
   onPageChange,
   onPageSizeChange,
+  loading = false,
+  setSearchKeyword,
 }: DataTableProps) {
-  // Local UI-only states
-  // const [rowSelection, setRowSelection] = useState({})
-  // const [sorting, setSorting] = useState<SortingState>([])
-  // const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
+  const [isPaginating, setIsPaginating] = useState(false)
 
-  // Local state management for table (uncomment to use local-only state, not synced with URL)
-  // const [globalFilter, onGlobalFilterChange] = useState('')
-  // const [columnFilters, onColumnFiltersChange] = useState<ColumnFiltersState>([])
-  // const [pagination, onPaginationChange] = useState<PaginationState>({ pageIndex: 0, pageSize: 10 })
-
-  // Synced with URL states (updated to match route search schema defaults)
   const { ensurePageInRange } = useTableUrlState({
     search: route.useSearch(),
     navigate: route.useNavigate(),
@@ -57,17 +53,16 @@ export function Checklists({
     columnFilters: [{ columnId: 'status', searchKey: 'status', type: 'array' }],
   })
 
-  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data,
     columns,
     state: {
       pagination: {
         pageIndex: page,
-        pageSize: pageSize,
+        pageSize,
       },
     },
-    manualPagination: true, // important!
+    manualPagination: true,
     pageCount: totalPages,
 
     onPaginationChange: (updater) => {
@@ -76,58 +71,91 @@ export function Checklists({
           ? updater({ pageIndex: page, pageSize })
           : updater
 
+      setIsPaginating(true)
+
       onPageChange(newState.pageIndex)
+      onPageSizeChange(newState.pageSize)
     },
 
     getCoreRowModel: getCoreRowModel(),
   })
 
-  const pageCount = table.getPageCount()
   useEffect(() => {
-    ensurePageInRange(pageCount)
-  }, [pageCount, ensurePageInRange])
+    if (!loading) {
+      setIsPaginating(false)
+    }
+  }, [loading, data])
+
+  useEffect(() => {
+    ensurePageInRange(totalPages)
+  }, [totalPages, ensurePageInRange])
+
+  const isLoading = loading || isPaginating
 
   return (
-    <div
-      className={cn(
-        'max-sm:has-[div[role="toolbar"]]:mb-16',
-        'flex flex-1 flex-col gap-4'
-      )}
-    >
+    <div className={cn('flex flex-1 flex-col gap-4')}>
       <h4 className='text-2xl font-bold tracking-tight'>Checklists</h4>
-      <DataTableToolbar
-        table={table}
-        searchPlaceholder='Filter by title or description...'
+
+      <DataTableToolbarWithDebounce
+        searchPlaceholder='Filter by title...'
+        onSearchChange={setSearchKeyword}
       />
-      <div className='overflow-hidden rounded-md border'>
+
+      <div className='relative overflow-hidden rounded-md border'>
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead
-                      key={header.id}
-                      colSpan={header.colSpan}
-                      className={cn(
-                        header.column.columnDef.meta?.className,
-                        header.column.columnDef.meta?.thClassName
-                      )}
-                    >
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
-                  )
-                })}
+                {headerGroup.headers.map((header) => (
+                  <TableHead
+                    key={header.id}
+                    colSpan={header.colSpan}
+                    className={cn(
+                      header.column.columnDef.meta?.className,
+                      header.column.columnDef.meta?.thClassName
+                    )}
+                  >
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                  </TableHead>
+                ))}
               </TableRow>
             ))}
           </TableHeader>
+
           <TableBody>
-            {table.getRowModel().rows?.length ? (
+            {isLoading ? (
+              Array.from({ length: 5 }).map((_, index) => (
+                <TableRow
+                  key={`skeleton-${index}`}
+                  className='hover:bg-transparent'
+                >
+                  {columns.map((column, colIndex) => (
+                    <TableCell
+                      key={colIndex}
+                      className={cn(
+                        'h-13',
+                        column.meta?.className,
+                        column.meta?.tdClassName
+                      )}
+                    >
+                      <div
+                        className={cn(
+                          'bg-muted/70 h-6 w-full animate-pulse rounded-md',
+                          colIndex === 0 && 'w-3/4',
+                          colIndex === 1 && 'w-1/2',
+                          colIndex === columns.length - 1 && 'mx-auto w-24'
+                        )}
+                      />
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
@@ -152,7 +180,7 @@ export function Checklists({
             ) : (
               <TableRow>
                 <TableCell
-                  colSpan={columns?.length}
+                  colSpan={columns.length}
                   className='h-24 text-center'
                 >
                   No results.
@@ -162,11 +190,13 @@ export function Checklists({
           </TableBody>
         </Table>
       </div>
+
       <DataTablePagination
-        onPageSizeChange={onPageSizeChange}
         table={table}
+        onPageSizeChange={onPageSizeChange}
         className='mt-auto'
       />
+
       <DataTableBulkActions table={table} />
     </div>
   )

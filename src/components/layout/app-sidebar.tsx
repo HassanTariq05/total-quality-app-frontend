@@ -31,7 +31,6 @@ import { SidebarData } from './types'
 
 export function AppSidebar() {
   const { collapsible, variant } = useLayout()
-  const { data: accreditations } = useAccreditations()
 
   const canAddAccreditation = useHasPermission(PERMISSIONS.CREATE_ACCREDITATION)
 
@@ -40,6 +39,10 @@ export function AppSidebar() {
   const isSuperAdmin = user?.auth?.user?.role?.name === 'Super Admin'
 
   const isAdministrator = user?.auth?.user?.role?.name === 'Administrator'
+
+  const orgId = user?.auth?.user?.organisation?.id
+
+  const { data: accreditations } = useAccreditations(isSuperAdmin, orgId)
 
   const { theme } = useTheme()
 
@@ -54,7 +57,7 @@ export function AppSidebar() {
       url: `/accreditation/${acc.id}`,
     })) || []
 
-  canAddAccreditation
+  canAddAccreditation && isSuperAdmin
     ? accreditationItems.push({
         title: 'Add Accreditation',
         url: '/accreditation/create',

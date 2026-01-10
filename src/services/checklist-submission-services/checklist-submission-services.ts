@@ -41,10 +41,16 @@ export const useChecklistSubmissionService = () => {
 
   const getByOrganisationIdAndChecklistId = async (
     organisationId: string,
-    checklistId: string
+    checklistId: string,
+    keyword: string
   ): Promise<ChecklistSubmission> => {
     const { data } = await apiClient.get(
-      `/checklistSubmissions/organisationId/${organisationId}/checklistId/${checklistId}`
+      `/checklistSubmissions/organisationId/${organisationId}/checklistId/${checklistId}`,
+      {
+        params: {
+          keyword: keyword.trim() || undefined,
+        },
+      }
     )
     return data
   }

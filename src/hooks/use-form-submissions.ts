@@ -5,12 +5,18 @@ import { toast } from 'sonner'
 export const formSubmissionQueryKeys = {
   all: ['formSubmissions'] as const,
   byId: (id: string) => ['formSubmissions', id] as const,
-  byOrganisationIdAndFormId: (organisationId: string, formId: string) =>
+  byOrganisationIdAndFormId: (
+    organisationId: string,
+    formId: string,
+    keyword: string = ''
+  ) =>
     [
-      'formSubmissionsOrgId',
+      'formSubmissions',
+      'byOrgAndForm',
       organisationId,
-      'formSubmissionsFormId',
       formId,
+      'search',
+      keyword.trim().toLowerCase(),
     ] as const,
 }
 
@@ -36,6 +42,7 @@ export const useFormSubmission = (id: string) => {
 export const useGetFormSubmissionByOrgIdAndFormId = (
   organisationId: string,
   formId: string,
+  keyword: string,
   options?: { enabled?: boolean }
 ) => {
   const { getByOrganisationIdAndFormId } = useFormSubmissionService()
@@ -43,7 +50,8 @@ export const useGetFormSubmissionByOrgIdAndFormId = (
   return useQuery({
     queryKey: formSubmissionQueryKeys.byOrganisationIdAndFormId(
       organisationId,
-      formId
+      formId,
+      keyword ?? ''
     ),
     enabled: !!formId && !!organisationId && (options?.enabled ?? true),
 
@@ -54,7 +62,11 @@ export const useGetFormSubmissionByOrgIdAndFormId = (
 
     queryFn: async () => {
       try {
-        return await getByOrganisationIdAndFormId(organisationId, formId)
+        return await getByOrganisationIdAndFormId(
+          organisationId,
+          formId,
+          keyword
+        )
       } catch (error: any) {
         // if (error?.response?.status === 404) {
         //   return null

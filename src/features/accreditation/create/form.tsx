@@ -2,6 +2,7 @@ import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { CreateAccreditationPayload } from '@/services/accreditation-services/accreditation-services'
+import { useAuthStore } from '@/stores/auth-store'
 import { useCreateAccreditation } from '@/hooks/use-accreditations'
 import { Button } from '@/components/ui/button'
 import {
@@ -63,6 +64,10 @@ export function CreateAccreditationForm() {
     })
   }
 
+  const user = useAuthStore()
+
+  const isSuperAdmin = user?.auth?.user?.role?.name === 'Super Admin'
+
   return (
     <Form {...form}>
       <form
@@ -120,7 +125,7 @@ export function CreateAccreditationForm() {
             </FormItem>
           )}
         />
-        <Button type='submit'>Submit</Button>
+        {isSuperAdmin && <Button type='submit'>Submit</Button>}
       </form>
     </Form>
   )

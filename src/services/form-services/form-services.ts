@@ -31,7 +31,8 @@ export const useFormService = () => {
   const getAll = async (
     chapterId: string,
     page = 0,
-    size = 10
+    size = 10,
+    keyword = ''
   ): Promise<Page<Form>> => {
     const { data } = await apiClient.get(
       `/forms/getAllByChapterId/${chapterId}`,
@@ -39,12 +40,12 @@ export const useFormService = () => {
         params: {
           page,
           size,
+          keyword: keyword.trim() || undefined,
         },
       }
     )
     return data
   }
-
   const getById = async (id: string): Promise<Form> => {
     const { data } = await apiClient.get(`/forms/${id}`)
     return data

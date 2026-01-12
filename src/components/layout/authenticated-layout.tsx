@@ -1,4 +1,6 @@
-import { Outlet } from '@tanstack/react-router'
+import { useEffect } from 'react'
+import { Outlet, useNavigate } from '@tanstack/react-router'
+import { useAuthStore } from '@/stores/auth-store'
 import { getCookie } from '@/lib/cookies'
 import { cn } from '@/lib/utils'
 import { LayoutProvider } from '@/context/layout-provider'
@@ -12,24 +14,29 @@ type AuthenticatedLayoutProps = {
 }
 
 export function AuthenticatedLayout({ children }: AuthenticatedLayoutProps) {
-  const defaultOpen = getCookie('sidebar_state') !== 'false'
+  const navigate = useNavigate()
+  const { auth } = useAuthStore()
+  useEffect(() => {
+    async function protectRoute() {
+      if (!auth.accessToken) {
+        navigate({ to: '/sign-in', replace: true })
+        return
+      }
+    }
+
+    protectRoute()
+  }, [auth.accessToken, navigate])
+
   return (
     <SearchProvider>
       <LayoutProvider>
-        <SidebarProvider defaultOpen={defaultOpen}>
+        <SidebarProvider defaultOpen={getCookie('sidebar_state') !== 'false'}>
           <SkipToMain />
           <AppSidebar />
           <SidebarInset
             className={cn(
-              // Set content container, so we can use container queries
               '@container/content',
-
-              // If layout is fixed, set the height
-              // to 100svh to prevent overflow
               'has-[[data-layout=fixed]]:h-svh',
-
-              // If layout is fixed and sidebar is inset,
-              // set the height to 100svh - spacing (total margins) to prevent overflow
               'peer-data-[variant=inset]:has-[[data-layout=fixed]]:h-[calc(100svh-(var(--spacing)*4))]'
             )}
           >

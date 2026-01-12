@@ -13,7 +13,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const init = async () => {
       if (!auth.accessToken) {
         setLoading(false)
-        return
+        navigator.navigate({ to: '/sign-in' })
       }
 
       try {
@@ -28,7 +28,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         auth.setUser(data.user)
       } catch (err) {
         auth.reset()
-        navigator.navigate({ to: '/sign-in' })
       } finally {
         setLoading(false)
       }
